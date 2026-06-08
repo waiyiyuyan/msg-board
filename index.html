@@ -6,7 +6,8 @@
 <title>留言板</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;}
-body{background:#f2f2f7;padding:14px;max-width:700px;margin:0 auto;}
+/* 新增底部留白，防止内容被悬浮按钮遮挡 */
+body{background:#f2f2f7;padding:14px;max-width:700px;margin:0 auto;padding-bottom: 80px;}
 .post-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:16px;}
 .post-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .post-author{font-size:15px;color:#007aff;font-weight:500;}
@@ -81,6 +82,11 @@ textarea{
   display: flex;
   align-items: center;
   justify-content: center;
+}
+/* 新增：悬浮按钮点击按压效果 */
+.float-add-btn:active, .bell-btn:active {
+  opacity: 0.8;
+  transform: scale(0.95);
 }
 .badge{
   position:absolute;
@@ -213,6 +219,24 @@ textarea{
   object-fit: contain;
   loading: lazy;
 }
+/* 图片放大预览弹窗 + 新增淡入动画 */
+.img-preview-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  transition: opacity 0.2s ease;
+}
+.img-preview-mask img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
 </style>
 </head>
 <body>
@@ -260,6 +284,10 @@ textarea{
 </div>
 
 <div id="listBox"></div>
+<!-- 图片放大预览弹窗 -->
+<div class="img-preview-mask" id="imgPreviewMask">
+  <img src="" alt="大图预览" id="previewImg">
+</div>
 
 <script>
 // ===================== 【重要】替换为你自己的 Workers 域名 =====================
@@ -302,7 +330,10 @@ if (uploadBtn && fileSelector) {
     clearMedia();
     mediaPreview.innerHTML = "<span>文件上传中，请稍候...</span>";
     uploadBtn.disabled = true;
-
+    // 标记：开始上传，禁用发布按钮
+      isUploading = true;
+      const submitBtn = popForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -330,6 +361,10 @@ if (uploadBtn && fileSelector) {
       console.error("上传错误：", err);
     } finally {
       uploadBtn.disabled = false;
+        // 标记：上传结束，恢复发布按钮
+    isUploading = false;
+    const submitBtn = popForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = false;
     }
   }
 
@@ -381,6 +416,11 @@ let refreshTimer = null;
 // ========== 阶段三：刷新频率常量 ==========
 const NORMAL_INTERVAL = 6000;    // 前台激活：6秒刷新
 const BACKGROUND_INTERVAL = 30000; // 切后台/最小化：30秒刷新
+// 图片上传状态标记：防止上传中提交表单
+let isUploading = false;
+// 图片放大预览 DOM
+const imgPreviewMask = document.getElementById('imgPreviewMask');
+const previewImg = document.getElementById('previewImg');
     
 const maskDom = document.getElementById('popMask');
 const popForm = document.getElementById('popForm');
@@ -396,12 +436,24 @@ const unReadBadge = document.getElementById('unReadBadge');
 const notifyMask = document.getElementById('notifyMask');
 const notifyWrap = document.getElementById('notifyWrap');
 
+// ========= 新增：textarea 自动高度函数 =========
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+// 监听输入，实时自适应高度
+textareaDom.addEventListener('input', () => autoResize(textareaDom));
+
 let userNick=getCookie('userNick');
 const adj = ['晚风','青禾','屿鹿','星眠','浅墨','雾野','秋辞','南栀','枕雪','临江'];
 const noun = ['清茶','星河','孤岛','落日','白舟','云笺','寒川','青衫','暮雪','闲舟'];
 
+// ========= 修复：昵称生成防无限循环 =========
 async function createNewNick(){
-  while(true){
+  const maxTry = 20; // 最多尝试20次
+  let tryCount = 0;
+  while(tryCount < maxTry){
+    tryCount++;
     let randName = adj[Math.floor(Math.random()*adj.length)] + "_" + noun[Math.floor(Math.random()*noun.length)] + Math.floor(Math.random()*900+100);
     const res = await fetch(`${API_BASE}/checkNick?nick=` + encodeURIComponent(randName), {
       credentials: "include"
@@ -412,6 +464,10 @@ async function createNewNick(){
       return randName;
     }
   }
+  // 兜底昵称，防止页面卡死
+  const fallbackName = "访客_" + Math.random().toString(36).slice(2,8);
+  setCookie('userNick', fallbackName);
+  return fallbackName;
 }
 
 if(!userNick){
@@ -434,6 +490,7 @@ function openReplyPop(pid,authorName){
   replyTip.textContent='回复：@'+authorName;
   replyTip.style.display='block';
   maskDom.style.display='flex';
+  autoResize(textareaDom); // 打开弹窗重置输入框高度
 }
 function openSubReplyPop(pid,rid,atName){
   clearMedia();
@@ -445,6 +502,7 @@ function openSubReplyPop(pid,rid,atName){
   replyTip.textContent='回复：@'+atName;
   replyTip.style.display='block';
   maskDom.style.display='flex';
+  autoResize(textareaDom); // 打开弹窗重置输入框高度
 }
 
 function renderMedia(mediaUrl) {
@@ -729,11 +787,17 @@ document.getElementById('openPopBtn').onclick=()=>{
     maskDom.style.display='flex';
     if (refreshTimer) clearInterval(refreshTimer);
     popOpen = true;
+    autoResize(textareaDom); // 打开弹窗重置输入框高度
   }
 }
 
 popForm.onsubmit=async function(e){
   e.preventDefault();
+    // ========= 核心拦截：图片正在上传，禁止提交 =========
+  if (isUploading) {
+    alert("图片正在上传，请稍后再发布！");
+    return;
+  }
   const fd=new FormData(this);
   const pid=hidPid.value;
   let res;
@@ -749,10 +813,7 @@ popForm.onsubmit=async function(e){
           credentials: "include"
         });
     }else{
-      // 回复帖子
-      const targetName = targetUserDom.value;
-      let content = fd.get('content').trim();
-      fd.set('content', targetName + ' ' + content);
+      // ========= 核心修改：移除前端拼接@昵称，只传原始内容 =========
       fd.append('pid',pid);
       res = await fetch(`${API_BASE}/addReply`,{
           method:'POST',
@@ -804,9 +865,17 @@ function bindMediaEvents(container) {
   console.log('开始绑定媒体事件，容器：', container);
   container.querySelectorAll('.msg-media-img:not([data-event-bound])').forEach(img => {
     img.dataset.eventBound = "true";
+    // 图片加载失败兜底
     img.onerror = function () {
       this.style.display = 'none';
     };
+    // 点击图片 → 放大预览 + 禁止底层滚动
+    img.style.cursor = "zoom-in";
+    img.addEventListener('click', function () {
+      previewImg.src = this.src;
+      imgPreviewMask.style.display = 'flex';
+      document.body.style.overflow = 'hidden'; 
+    });
   });
 }
 
@@ -837,10 +906,22 @@ document.addEventListener('visibilitychange', function () {
 });
 
 startRefreshTimer();
+    
+// 关闭图片预览 + 恢复页面滚动
+imgPreviewMask.addEventListener('click', function (e) {
+  // 点击图片本身不关闭，只点击空白区域关闭
+  if (e.target !== previewImg) {
+    imgPreviewMask.style.display = 'none';
+    previewImg.src = ""; 
+    document.body.style.overflow = ''; 
+  }
+});
 (async function init() {
   await updateList();
   bindMediaEvents(document);
 })();
+
 </script>
+
 </body>
 </html>
