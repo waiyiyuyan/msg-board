@@ -548,6 +548,7 @@ function buildPostHtml(post){
     ${renderMedia(post.media_urls || "")}
     <div class="post-btn-group">
       <button class="reply-small-btn" onclick="openReplyPop(${post.id},'${post.name}')">回复</button>
+      <button class="btn del-btn" onclick="delPost(${post.id})">删除帖子</button>
     </div>
     <div class="divider"></div>
     <button class="fold-btn" data-fold-pid="${post.id}" style="${post.replys.length===0?'color:#999;cursor:default;':''}">
@@ -777,7 +778,29 @@ function closeReply(pid){
   wrap.style.display='none';
   foldBtn.innerText = total+'条回复 ▶';
 }
-
+// 删帖函数：删除帖子 + 对应回复 + 对应通知
+async function delPost(postId) {
+  // 二次确认，防止误删
+  if (!confirm("确定要删除该帖子吗？\n帖子、所有回复、相关通知都会一并清空！")) {
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/del?id=${postId}`, {
+      method: "GET",
+      credentials: "include"
+    });
+    if (res.ok) {
+      // 删除成功，刷新页面数据
+      await updateList();
+      getMyNotify();
+    } else {
+      alert("删除失败，请重试");
+    }
+  } catch (err) {
+    console.error("删帖出错：", err);
+    alert("网络异常，删除失败");
+  }
+}
 
 document.getElementById('openPopBtn').onclick=()=>{
   if(popOpen){
