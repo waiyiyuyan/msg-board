@@ -592,11 +592,16 @@ async function updateList(){
     const listBox = document.getElementById('listBox');
     const keepFoldIds = [...foldReplyIds];
 
-    // 新旧帖子ID集合
+    // 数据完全无变化，直接跳过渲染，优化性能
+    if(JSON.stringify(newData) === JSON.stringify(lastData)){
+      await getMyNotify();
+      return;
+    }
+
     const oldIdSet = new Set(lastData.map(item => item.id));
     const newIdSet = new Set(newData.map(item => item.id));
 
-    // 1. 删除已被后台移除的帖子
+    // 删除已被移除的帖子
     oldIdSet.forEach(pid => {
       if (!newIdSet.has(pid)) {
         const delDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
@@ -604,38 +609,31 @@ async function updateList(){
       }
     });
 
-    // 2. 遍历数据做增量更新
+    // 遍历所有帖子，增量更新
     for (let i = newData.length - 1; i >= 0; i--) {
       const post = newData[i];
       const pid = post.id;
       const existDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
 
       if (existDom) {
-        // 找到本地缓存对应的旧帖子
         const oldPostIdx = lastData.findIndex(p => p.id === pid);
         const oldPost = lastData[oldPostIdx];
-
-        // 取出所有回复ID，精准判断是否有新回复
-        const oldReplyIds = (oldPost?.replys || []).map(r => r.id);
-        const newReplyIds = (post.replys || []).map(r => r.id);
-        const hasNew = newReplyIds.some(rid => !oldReplyIds.includes(rid));
-
-        if (hasNew) {
-          // 刷新DOM
+        // 全量对比回复内容，只要回复有变动就刷新DOM（彻底修复刷新失效）
+        const replyChanged = JSON.stringify(oldPost.replys) !== JSON.stringify(post.replys);
+        if (replyChanged) {
           existDom.outerHTML = buildPostHtml(post);
-          // 关键：同步更新本地缓存，避免下一轮比对错乱
           if (oldPostIdx > -1) {
             lastData[oldPostIdx] = JSON.parse(JSON.stringify(post));
           }
         }
       } else {
-        // 全新帖子，插入顶部
+        // 全新帖子，插入页面顶部
         const postHtml = buildPostHtml(post);
         listBox.insertAdjacentHTML('afterbegin', postHtml);
       }
     }
 
-    // 3. 恢复回复展开状态
+    // 还原回复区 展开/收起 状态
     foldReplyIds = keepFoldIds;
     foldReplyIds.forEach(pid => {
       const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
@@ -647,11 +645,11 @@ async function updateList(){
       }
     });
 
-    // 4. 绑定事件
+    // 重新绑定按钮、图片事件
     bindFoldBtn();
     bindMediaEvents(listBox);
 
-    // 兜底：全量覆盖缓存，极端网络/并发场景容错
+    // 更新本地缓存
     lastData = JSON.parse(JSON.stringify(newData));
     await getMyNotify();
   } catch (err) {
@@ -755,6 +753,7 @@ popForm.onsubmit=async function(e){
       clearMedia();
       popOpen = false;
       // 立即刷新列表
+      if(refreshTimer) clearInterval(refreshTimer);
       await updateList();
       startRefreshTimer();
     }
