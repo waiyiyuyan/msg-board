@@ -592,11 +592,11 @@ async function updateList(){
     const listBox = document.getElementById('listBox');
     const keepFoldIds = [...foldReplyIds];
 
-    // 1. 提取新旧数据的帖子ID集合
+    // 新旧帖子ID集合
     const oldIdSet = new Set(lastData.map(item => item.id));
     const newIdSet = new Set(newData.map(item => item.id));
 
-    // 2. 移除：后台已删除的帖子DOM
+    // 1. 删除已被后台移除的帖子
     oldIdSet.forEach(pid => {
       if (!newIdSet.has(pid)) {
         const delDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
@@ -604,31 +604,38 @@ async function updateList(){
       }
     });
 
-    // 3. 遍历新数据，局部更新已有帖子 / 新增帖子
-    // 倒序遍历（接口返回 新帖在前，保持原有展示顺序）
+    // 2. 遍历数据做增量更新
     for (let i = newData.length - 1; i >= 0; i--) {
       const post = newData[i];
       const pid = post.id;
       const existDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
 
       if (existDom) {
-        // 已有帖子：仅对比回复，有变化才局部刷新回复区
-        const oldPost = lastData.find(p => p.id === pid);
-        const oldReplyLen = oldPost?.replys?.length || 0;
-        const newReplyLen = post.replys?.length || 0;
+        // 找到本地缓存对应的旧帖子
+        const oldPostIdx = lastData.findIndex(p => p.id === pid);
+        const oldPost = lastData[oldPostIdx];
 
-        if (oldReplyLen !== newReplyLen) {
-          // 回复数量变化 → 重渲染当前整帖（复用原有渲染逻辑）
+        // 取出所有回复ID，精准判断是否有新回复
+        const oldReplyIds = (oldPost?.replys || []).map(r => r.id);
+        const newReplyIds = (post.replys || []).map(r => r.id);
+        const hasNew = newReplyIds.some(rid => !oldReplyIds.includes(rid));
+
+        if (hasNew) {
+          // 刷新DOM
           existDom.outerHTML = buildPostHtml(post);
+          // 关键：同步更新本地缓存，避免下一轮比对错乱
+          if (oldPostIdx > -1) {
+            lastData[oldPostIdx] = JSON.parse(JSON.stringify(post));
+          }
         }
       } else {
-        // 全新帖子 → 插入到列表顶部
+        // 全新帖子，插入顶部
         const postHtml = buildPostHtml(post);
         listBox.insertAdjacentHTML('afterbegin', postHtml);
       }
     }
 
-    // 4. 恢复回复展开状态、更新按钮文字
+    // 3. 恢复回复展开状态
     foldReplyIds = keepFoldIds;
     foldReplyIds.forEach(pid => {
       const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
@@ -640,11 +647,11 @@ async function updateList(){
       }
     });
 
-    // 5. 重新绑定折叠按钮、图片事件（仅新/更新节点）
+    // 4. 绑定事件
     bindFoldBtn();
     bindMediaEvents(listBox);
 
-    // 6. 缓存最新数据 & 拉取通知
+    // 兜底：全量覆盖缓存，极端网络/并发场景容错
     lastData = JSON.parse(JSON.stringify(newData));
     await getMyNotify();
   } catch (err) {
