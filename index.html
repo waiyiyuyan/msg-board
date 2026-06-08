@@ -222,15 +222,14 @@ textarea{
   margin-left: 8px;
 }
 .msg-media-img {
-  width: 100%;          /* 宽度自适应父容器 */
-  height: 180px;        /* 固定高度 */
+  width: 100%;          /* 宽度自适应父容器（帖子卡片），和文字同宽 */
+  height: 180px;         /* 固定高度，可自行修改数值 */
   border-radius: 8px;
   margin: 8px 0;
-  object-fit: contain;  /* 完整显示图片，等比例缩放，留白 */
-  object-position: center;
+  object-fit: cover;     /* 等比例铺满容器，超出部分裁剪 */
+  object-position: center; /* 图片居中 */
   loading: lazy;
-  display: block;
-  background-color: #f7f7f7; /* 给留白区域加浅底色，优化视觉（可选） */
+  display: block;        /* 消除图片默认行内留白间隙 */
 }
 /* 图片放大预览弹窗 + 新增淡入动画 */
 .img-preview-mask {
