@@ -576,26 +576,18 @@ async function updateList(){
     const newData = await res.json();
     const listBox = document.getElementById('listBox');
 
-    const existPids = new Set();
-    listBox.querySelectorAll('.post-card').forEach(card => {
-      existPids.add(Number(card.dataset.pid));
-    });
+    // 清空现有列表，全量重渲染（解决已有帖子回复不更新）
+    listBox.innerHTML = "";
 
-    const newPostDoms = [];
+    // 倒序渲染全部帖子
     for (let i = newData.length - 1; i >= 0; i--) {
       const post = newData[i];
-      if (!existPids.has(post.id)) {
-        const postHtml = buildPostHtml(post);
-        listBox.insertAdjacentHTML('afterbegin', postHtml);
-        newPostDoms.push(listBox.firstElementChild);
-      }
+      const postHtml = buildPostHtml(post);
+      listBox.insertAdjacentHTML('afterbegin', postHtml);
     }
 
-    newPostDoms.forEach(postDom => {
-      bindMediaEvents(postDom);
-    });
-
     bindFoldBtn();
+    bindMediaEvents(listBox);
     lastData = JSON.parse(JSON.stringify(newData));
     await getMyNotify();
   } catch (err) {
@@ -698,7 +690,7 @@ popForm.onsubmit=async function(e){
       popForm.reset();
       clearMedia();
       popOpen = false;
-      // 立即刷新整页列表（兼容所有浏览器，解决局部刷新失效）
+      // 立即刷新列表
       await updateList();
       startRefreshTimer();
     }
