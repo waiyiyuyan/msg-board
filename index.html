@@ -278,7 +278,7 @@ textarea{
       <input type="hidden" name="name" id="popNick">
       <input type="hidden" id="hidPid" name="pid" value="">
       <input type="hidden" id="hidRid" name="targetRid" value="">
-      <input type="hidden" id="targetUser" value="">
+      <input type="hidden" name="targetUser" id="targetUser" value="">
     </form>
   </div>
 </div>
@@ -834,6 +834,7 @@ popForm.onsubmit=async function(e){
         });
     }else{
       // ========= 核心修改：移除前端拼接@昵称，只传原始内容 =========
+        fd.append('targetUser', targetUserDom.value); 
       fd.append('pid',pid);
       res = await fetch(`${API_BASE}/addReply`,{
           method:'POST',
