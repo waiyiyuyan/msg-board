@@ -134,7 +134,15 @@ textarea{
 .notify-item:hover {
   background-color: #f8f8f8;
 }
-    
+/* 通知顶部按钮栏布局 */
+.notify-btn-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.notify-btn-bar .btn {
+  flex: 1; /* 两个按钮平分宽度 */
+}
 .notify-item:last-child{border-bottom:none;}
 .notify-txt{font-size:14px;color:#333;line-height:1.4;}
 .notify-time{font-size:11px;color:#999;margin-top:4px;}
@@ -255,7 +263,14 @@ textarea{
 
 <!-- 通知弹窗遮罩 -->
 <div class="notify-mask" id="notifyMask">
-  <div class="notify-box" id="notifyWrap"></div>
+  <div class="notify-box" id="notifyWrap">
+  <!-- 通知操作按钮 -->
+      <div class="notify-btn-bar">
+        <button class="btn" id="readAllBtn" onclick="readAllNotify()">全部已读</button>
+        <button class="btn del-btn" id="clearNotifyBtn" onclick="clearAllNotify()">清空通知</button>
+      </div>
+      <div class="divider"></div>
+  </div>
 </div>
 
 <!-- 统一共用弹窗：发帖+所有回复共用 -->
@@ -579,6 +594,23 @@ async function getMyNotify(){
 }
 
 function renderNotify(){
+    // ========= 新增：按钮状态控制 =========
+  const readAllBtn = document.getElementById('readAllBtn');
+  const clearNotifyBtn = document.getElementById('clearNotifyBtn');
+  const totalNotify = notifyList.length;
+  const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
+
+  if (totalNotify === 0) {
+    readAllBtn.disabled = true;
+    clearNotifyBtn.disabled = true;
+  } else if (unReadCount === 0) {
+    readAllBtn.disabled = true;
+    clearNotifyBtn.disabled = false;
+  } else {
+    readAllBtn.disabled = false;
+    clearNotifyBtn.disabled = false;
+  }
+  // ======================================
   if(notifyList.length===0){
     notifyWrap.innerHTML = '<div class="empty-tip">暂无消息通知</div>';
     return;
@@ -646,6 +678,56 @@ async function jumpPost(nid,pid,rid){
   },120);
 }
 
+// 全部标记为已读
+async function readAllNotify() {
+  const readAllBtn = document.getElementById('readAllBtn');
+  const uid = encodeURIComponent(userNick);
+  readAllBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${API_BASE}/readAllNotify?uid=${uid}`, {
+      method: "POST",
+      credentials: "include"
+    });
+    if (res.ok) {
+      await getMyNotify();
+      renderNotify();
+    } else {
+      alert("操作失败，请重试");
+    }
+  } catch (err) {
+    console.error("全部已读出错：", err);
+    alert("网络异常");
+  } finally {
+    readAllBtn.disabled = false;
+  }
+}
+
+// 清空通知（无二次确认，点击直接执行）
+async function clearAllNotify() {
+  const clearBtn = document.getElementById('clearNotifyBtn');
+  const uid = encodeURIComponent(userNick);
+  clearBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${API_BASE}/clearAllNotify?uid=${uid}`, {
+      method: "POST",
+      credentials: "include"
+    });
+    if (res.ok) {
+      await getMyNotify();
+      renderNotify();
+    } else {
+      alert("清空失败，请重试");
+    }
+  } catch (err) {
+    console.error("清空通知出错：", err);
+    alert("网络异常");
+  } finally {
+    clearBtn.disabled = false;
+  }
+}
+    
 bellBtn.onclick=()=>{
   if(notifyMask.style.display === 'flex'){
     notifyMask.style.display = 'none';
