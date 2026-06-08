@@ -243,9 +243,11 @@ textarea{
       <div id="replyTip" style="color:#999;font-size:13px;display:none;"></div>
       <textarea placeholder="输入回复内容" name="content" required></textarea>
       <div id="mediaPreview"></div>
-      <div style="display:flex;gap:10px;align-items:center;">
+      <!-- 按钮行：上传图片(左) + 发布(右) 平行对齐、整体靠右 -->
+      <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
         <button type="button" class="btn" id="uploadBtn">上传图片</button>
         <input type="hidden" name="media" id="mediaInput" value="">
+        <button class="btn" type="submit">发布</button>
       </div>
       <input type="file" id="fileSelector" style="display:none;" accept="image/jpeg,image/png,image/gif,image/webp">
       <input type="hidden" name="title" value="">
@@ -253,7 +255,6 @@ textarea{
       <input type="hidden" id="hidPid" name="pid" value="">
       <input type="hidden" id="hidRid" name="targetRid" value="">
       <input type="hidden" id="targetUser" value="">
-      <button class="btn" type="submit">发布</button>
     </form>
   </div>
 </div>
