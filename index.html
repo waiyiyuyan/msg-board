@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>留言板</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;}
+body{background:#f2f2f7;padding:14px;max-width:700px;margin:0 auto;}
+.post-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:16px;}
+.post-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.post-author{font-size:15px;color:#007aff;font-weight:500;}
+.post-time{font-size:12px;color:#86868b;}
+.post-content{font-size:15px;color:#333;line-height:1.5;margin-bottom:8px;white-space: pre-line;}
+.post-btn-group{display:flex;justify-content:flex-end;gap:8px;margin:10px 0;}
+.btn{background:#007aff;color:#fff;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;}
+.del-btn{background:#ff3b30;}
+.divider{height:1px;background:#e5e5ea;margin:16px 0;}
+.reply-wrap{padding-top:12px;padding-bottom:85px;}
+.reply-item{padding:8px 0;border-bottom:1px solid #eee;display:flex;flex-direction:column;}
+.reply-item:last-child{border-bottom:none;}
+.reply-head{display:flex;justify-content:space-between;align-items:center;}
+.reply-name{font-size:13px;color:#007aff;}
+.reply-text{font-size:14px;color:#333;margin:3px 0;white-space: pre-line;}
+.reply-time{font-size:11px;color:#999;}
+.reply-small-btn{
+    font-size:13px;
+    padding:2px 4px;
+    background:transparent;
+    border:0;
+    color:#007aff;
+    margin-top:4px;
+    cursor:pointer;
+}
+.reply-small-btn:hover{color:#0051b8;}
+input{width:100%;font-size:15px;outline-color:#007aff;}
+textarea{
+  width:100%;
+  border:none;
+  border-bottom:1px solid #e5e5ea;
+  padding:8px 0;
+  font-size:15px;
+  outline:none;
+  resize:none;
+  min-height:32px;
+}
+.btn:disabled{opacity:0.6;cursor:not-allowed;}
+
+/* 右下角悬浮发帖按钮 */
+.float-add-btn{
+  position:fixed;
+  right:18px;
+  bottom:22px;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  border:none;
+  background:#007aff;
+  color:#fff;
+  font-size:26px;
+  z-index:101;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+/* 消息铃铛样式 */
+.bell-btn{
+  position:fixed;
+  bottom:22px;
+  right:76px;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  border:none;
+  background:#007aff;
+  font-size:20px;
+  color:#fff;
+  z-index:101;
+  cursor:pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.badge{
+  position:absolute;
+  top:-4px;
+  right:-4px;
+  background:#f53f3f;
+  color:#fff;
+  font-size:11px;
+  min-width:18px;
+  height:18px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+}
+/* 通知弹窗 */
+.notify-mask{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.25);
+  z-index:100;
+  align-items:center;
+  justify-content:center;
+  
+}
+.notify-box{
+  width:min(90%,460px);
+  max-height:70vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:14px;
+  padding:16px;
+  pointer-events:auto;
+}
+
+.notify-item{
+  padding:12px 0;
+  border-bottom:1px solid #eee;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.notify-item:last-child{border-bottom:none;}
+.notify-txt{font-size:14px;color:#333;line-height:1.4;}
+.notify-time{font-size:11px;color:#999;margin-top:4px;}
+.look-btn{
+  font-size:12px;
+  padding:3px 8px;
+  border:none;
+  background:#007aff;
+  color:#fff;
+  border-radius:6px;
+  cursor:pointer;
+}
+.empty-tip{text-align:center;padding:30px 0;color:#999;}
+
+/* 弹窗遮罩+发帖弹窗 */
+.mask{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  z-index:98;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+.pop-post{
+  width:min(520px,100%);
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+}
+.pop-post form{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.pop-post .btn{
+  align-self:flex-end;
+}
+.fold-btn{
+  color:#007aff;
+  background:transparent;
+  border:none;
+  font-size:13px;
+  cursor:pointer;
+  padding:2px 0;
+}
+
+@keyframes flash-highlight {
+  0% { background-color: #e3f2fd; }
+  50% { background-color: #ffffff; }
+  100% { background-color: #e3f2fd; }
+}
+.flash {
+  animation: flash-highlight 0.6s ease-in-out 2;
+}
+/* 超链接样式 */
+.post-content a, .reply-text a {
+  color: #007aff;
+  text-decoration: underline;
+}
+.post-content a:hover, .reply-text a:hover {
+  color: #0051b8;
+}
+
+/* 媒体上传样式 */
+#mediaPreview {
+  font-size: 14px;
+  color: #666;
+  min-height: 40px;
+  padding: 4px 0;
+}
+#mediaPreview .err-text {
+  color: #f53f3f;
+}
+#mediaPreview .remove-btn {
+  font-size: 12px;
+  color: #007aff;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.msg-media-img {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 8px 0;
+  object-fit: contain;
+  loading: lazy;
+}
+</style>
+</head>
+<body>
+<!-- 消息铃铛按钮 -->
+<button class="bell-btn" id="bellBtn">
+<svg viewBox="0 0 1024 1024" width="22" height="22" fill="#fff">
+<path d="M954.181818 768h-23.272727V418.909091c0-230.4-188.509091-418.909091-418.909091-418.909091S93.090909 188.509091 93.090909 418.909091v349.090909H69.818182c-25.6 0-46.545455 20.945455-46.545455 46.545455s20.945455 46.545455 46.545455 46.545454h237.381818c20.945455 93.090909 104.727273 162.909091 204.8 162.909091s183.854545-69.818182 204.8-162.909091H954.181818c25.6 0 46.545455-20.945455 46.545455-46.545454s-20.945455-46.545455-46.545455-46.545455z m-442.181818 162.909091c-46.545455 0-88.436364-27.927273-107.054545-69.818182h214.10909c-18.618182 41.890909-60.509091 69.818182-107.054545 69.818182zM186.181818 768V418.909091c0-179.2 146.618182-325.818182 325.818182-325.818182s325.818182 146.618182 325.818182 325.818182v349.090909H186.181818z"></path>
+</svg>
+<span class="badge" id="unReadBadge" style="display:none">0</span>
+</button>
+
+<!-- 悬浮发帖按钮 -->
+<button class="float-add-btn" id="openPopBtn">
+<svg viewBox="0 0 1024 1024" width="24" height="24" fill="#fff">
+<path d="M572.505 333.958l-52.252 54.447-47.159 48.993c-14.135 14.85-53.825 55.066-63.31 65.163-9.48 10.093-15.542 16.509-18.09 19.141-6.056 6.32-10.712 12.029-13.875 17.211-3.25 5.097-6.143 10.807-8.69 17.037-2.11 4.036-4.916 11.415-8.347 22.128-3.51 10.8-7.02 22.568-10.713 35.3a1679.139 1679.139 0 0 0-10.27 37.059c-3.337 11.85-5.36 20.899-6.238 27.22-1.754 11.68-0.617 20.02 3.25 24.854 3.866 5.004 11.59 6.668 23.18 5.358 5.62-0.877 14.143-2.818 25.465-5.98 11.416-3.155 23.536-6.757 36.185-11.06 12.641-4.302 24.847-8.606 36.525-13.085 11.685-4.48 20.461-8.337 26.437-11.412 6.056-2.721 11.851-6.328 17.472-10.714 5.535-4.57 10.538-8.782 14.84-12.825 1.755-1.397 7.114-6.757 16.16-16.244 9.044-9.306 20.46-21.34 34.242-35.914 13.7-14.577 57.078-58.483 74.291-75.96l51.633-54.444L828.038 317.71 706.326 194.511 572.505 333.958z m296.012 77.453V737.893v-0.787 26.607c0 68.758-56.109 124.78-124.866 124.78H280.523c-68.76 0-124.78-56.021-124.78-124.78V284.348v1.84-25.817c0-68.759 56.02-124.78 124.78-124.78H586.024l84.474-71.218h-27.923v-0.086H280.523c-104.936 0-190.905 82.895-195.823 186.602h-0.261V773.112h0.175c5.005 103.706 90.973 186.603 195.82 186.603h463.129c104.936 0 190.906-82.897 195.823-186.603h0.174V341.423l-71.043 69.988z m-17.036-318.94c-4.65-0.878-9.132-1.312-13.345-1.227h1.841c3.953 0.175 7.732 0.531 11.504 1.227z m77.011 90.801c0.531-12.557-2.719-26.432-9.74-39.602-4.832-9.046-11.33-17.654-19.41-25.554-14.404-13.96-31.528-22.743-47.86-25.645-3.773-0.697-7.552-1.052-11.505-1.227h-1.84c-7.204-0.085-14.579 1.054-21.956 3.424-7.899 2.46-15.804 6.848-23.355 12.91-5.795 5.094-13.172 11.852-21.955 20.547-8.958 8.603-16.595 16.073-23.007 22.216l121.097 123.115c3.771-3.341 7.9-7.199 12.207-11.68 3.598-3.954 8.073-8.338 13.172-13.432 5.178-5.005 10.8-10.894 17.123-17.566 5.97-6.673 10.27-13.695 12.991-20.897a61.863 61.863 0 0 0 3.952-21.868c0.086-1.58 0.086-3.162 0.086-4.74z m0 0"></path>
+</svg>
+</button>
+
+<!-- 通知弹窗遮罩 -->
+<div class="notify-mask" id="notifyMask">
+  <div class="notify-box" id="notifyWrap"></div>
+</div>
+
+<!-- 统一共用弹窗：发帖+所有回复共用 -->
+<div class="mask" id="popMask">
+  <div class="pop-post">
+    <form id="popForm">
+      <div id="replyTip" style="color:#999;font-size:13px;display:none;"></div>
+      <textarea placeholder="输入回复内容" name="content" required></textarea>
+      <div id="mediaPreview"></div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button type="button" class="btn" id="uploadBtn">上传图片</button>
+        <input type="hidden" name="media" id="mediaInput" value="">
+      </div>
+      <input type="file" id="fileSelector" style="display:none;" accept="image/jpeg,image/png,image/gif,image/webp">
+      <input type="hidden" name="title" value="">
+      <input type="hidden" name="name" id="popNick">
+      <input type="hidden" id="hidPid" name="pid" value="">
+      <input type="hidden" id="hidRid" name="targetRid" value="">
+      <input type="hidden" id="targetUser" value="">
+      <button class="btn" type="submit">发布</button>
+    </form>
+  </div>
+</div>
+
+<div id="listBox"></div>
+
+<script>
+// ===================== 【重要】替换为你自己的 Workers 域名 =====================
+const API_BASE = "https://mb.lovefree.de5.net";
+const UPLOAD_API = API_BASE + "/proxyUpload";
+
+let currentMediaUrl = "";
+const uploadBtn = document.getElementById("uploadBtn");
+const fileSelector = document.getElementById("fileSelector");
+const mediaPreview = document.getElementById("mediaPreview");
+const mediaInput = document.getElementById("mediaInput");
+
+function clearMedia() {
+  currentMediaUrl = "";
+  mediaInput.value = "";
+  mediaPreview.innerHTML = "";
+  uploadBtn.disabled = false;
+}
+
+if (uploadBtn && fileSelector) {
+  uploadBtn.addEventListener("click", function() {
+    fileSelector.click();
+  });
+
+  function checkFile(file) {
+    const allowMime = ["image/jpeg","image/png","image/gif","image/webp"];
+    if (!allowMime.includes(file.type)) {
+      return { ok: false, msg: "仅支持 JPG/PNG/GIF/WEBP 图片" };
+    }
+    if (file.size === 0) {
+      return { ok: false, msg: "文件无效，请重新选择" };
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      return { ok: false, msg: "文件不能超过50MB" };
+    }
+    return { ok: true };
+  }
+
+  async function uploadFile(file) {
+    clearMedia();
+    mediaPreview.innerHTML = "<span>文件上传中，请稍候...</span>";
+    uploadBtn.disabled = true;
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch(UPLOAD_API, {
+        method: "POST",
+        body: formData
+      });
+
+      if (!res.ok) throw new Error("图床服务异常");
+      const json = await res.json();
+      if (!Array.isArray(json) || json.length === 0 || !json[0].src) throw new Error("返回数据异常");
+
+      const fullUrl = "https://telegraph-image-92x.pages.dev" + json[0].src;
+      currentMediaUrl = fullUrl;
+      mediaInput.value = fullUrl;
+      mediaPreview.innerHTML = "<span>上传成功</span><span class='remove-btn' onclick='clearMedia()'>移除</span>";
+
+    } catch (err) {
+      let errMsg = "上传失败，请重试";
+      if (err.message.includes("1101") || err.message.includes("Worker threw exception")) {
+        errMsg = "文件过大，上传失败，请压缩后重试";
+      }
+      mediaPreview.innerHTML = "<span class='err-text'>" + errMsg + "</span>";
+      console.error("上传错误：", err);
+    } finally {
+      uploadBtn.disabled = false;
+    }
+  }
+
+  fileSelector.addEventListener("change", async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const checkRes = checkFile(file);
+    if (!checkRes.ok) {
+      mediaPreview.innerHTML = "<span class='err-text'>" + checkRes.msg + "</span>";
+      fileSelector.value = "";
+      return;
+    }
+    await uploadFile(file);
+    fileSelector.value = "";
+  });
+}
+
+function setCookie(name,val,day=30){
+  let d=new Date();
+  d.setTime(d.getTime()+day*24*3600*1000);
+  document.cookie=name+"="+encodeURIComponent(val)+";expires="+d.toUTCString()+";path=/";
+}
+function getCookie(name){
+  let arr=document.cookie.split('; ');
+  for(let item of arr){
+    let kv=item.split('=');
+    if(kv[0]===name) return decodeURIComponent(kv[1]);
+  }
+  return '';
+}
+
+function parseLink(text) {
+  if (!text) return "";
+  let escapeTxt = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+  const linkReg = /(https?:\/\/[^\s<>"]+)/g;
+  return escapeTxt.replace(linkReg, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+}
+
+let foldReplyIds = [];
+let lastData = [];
+let notifyList = [];
+let popOpen = false;
+let refreshTimer = null;
+const maskDom = document.getElementById('popMask');
+const popForm = document.getElementById('popForm');
+const textareaDom = popForm.querySelector('textarea');
+const hidPid = document.getElementById('hidPid');
+const hidRid = document.getElementById('hidRid');
+const popNick = document.getElementById('popNick');
+const replyTip = document.getElementById('replyTip');
+const targetUserDom = document.getElementById('targetUser');
+
+const bellBtn = document.getElementById('bellBtn');
+const unReadBadge = document.getElementById('unReadBadge');
+const notifyMask = document.getElementById('notifyMask');
+const notifyWrap = document.getElementById('notifyWrap');
+
+let userNick=getCookie('userNick');
+const adj = ['晚风','青禾','屿鹿','星眠','浅墨','雾野','秋辞','南栀','枕雪','临江'];
+const noun = ['清茶','星河','孤岛','落日','白舟','云笺','寒川','青衫','暮雪','闲舟'];
+
+async function createNewNick(){
+  while(true){
+    let randName = adj[Math.floor(Math.random()*adj.length)] + "_" + noun[Math.floor(Math.random()*noun.length)] + Math.floor(Math.random()*900+100);
+    const res = await fetch(`${API_BASE}/checkNick?nick=` + encodeURIComponent(randName));
+    const json = await res.json();
+    if(!json.exist){
+      setCookie('userNick', randName);
+      return randName;
+    }
+  }
+}
+
+if(!userNick){
+  ;(async ()=>{
+    userNick = await createNewNick();
+    popNick.value = userNick;
+    await updateList();
+  })();
+}else{
+  popNick.value = userNick;
+}
+
+function openReplyPop(pid,authorName){
+  clearMedia();
+  hidPid.value=pid;
+  hidRid.value='';
+  targetUserDom.value='@'+authorName;
+  textareaDom.value='';
+  textareaDom.placeholder='输入回复内容';
+  replyTip.textContent='回复：@'+authorName;
+  replyTip.style.display='block';
+  maskDom.style.display='flex';
+}
+function openSubReplyPop(pid,rid,atName){
+  clearMedia();
+  hidPid.value=pid;
+  hidRid.value=rid;
+  targetUserDom.value='@'+atName;
+  textareaDom.value='';
+  textareaDom.placeholder='输入回复内容';
+  replyTip.textContent='回复：@'+atName;
+  replyTip.style.display='block';
+  maskDom.style.display='flex';
+}
+
+function renderMedia(mediaUrl) {
+  if (!mediaUrl) return "";
+  const lowerUrl = mediaUrl.toLowerCase();
+  if (lowerUrl.endsWith(".png") || lowerUrl.endsWith(".jpg") || 
+      lowerUrl.endsWith(".jpeg") || lowerUrl.endsWith(".gif") || 
+      lowerUrl.endsWith(".webp")) {
+    return '<img class="msg-media-img" src="' + mediaUrl + '" alt="">';
+  }
+  return "";
+}
+
+function buildPostHtml(post){
+  let rHtml = '';
+  if(post.replys&&post.replys.length>0){
+    post.replys.forEach((r, index)=>{
+      let extraBtn = "";
+      if(index === post.replys.length - 1){
+        extraBtn = `<button class="reply-small-btn" style="margin-right:8px;" onclick="closeReply(${post.id})">收起</button>`;
+      }
+      rHtml += `<div class="reply-item" data-rid="${r.id}">
+        <div class="reply-head">
+          <div class="reply-name">${r.r_name}</div>
+          <div class="reply-time">${r.create_time}</div>
+        </div>
+        <div class="reply-text">${parseLink(r.r_content)}</div>
+        ${renderMedia(r.media_urls || "")}
+        <div style="text-align:right;margin-top:4px;">
+          ${extraBtn}
+          <button class="reply-small-btn" onclick="openSubReplyPop(${post.id},${r.id},'${r.r_name}')">回复</button>
+        </div>
+      </div>`
+    })
+  }
+  return `<div class="post-card" data-pid="${post.id}">
+    <div class="post-info">
+      <span class="post-author">${post.name}</span>
+      <span class="post-time">${post.create_time}</span>
+    </div>
+    <div class="post-content">${parseLink(post.content)}</div>
+    ${renderMedia(post.media_urls || "")}
+    <div class="post-btn-group">
+      <button class="reply-small-btn" onclick="openReplyPop(${post.id},'${post.name}')">回复</button>
+    </div>
+    <div class="divider"></div>
+    <button class="fold-btn" data-fold-pid="${post.id}" style="${post.replys.length===0?'color:#999;cursor:default;':''}">
+      ${post.replys.length}条回复 ${post.replys.length>0?(foldReplyIds.includes(post.id)?'▼':'▶'):''}
+    </button>
+    <div class="reply-wrap" data-wrap-pid="${post.id}" style="${!foldReplyIds.includes(post.id) || post.replys.length===0 ? 'display:none' : ''}">${rHtml}</div>   
+  </div>`;
+}
+
+async function getMyNotify(){
+  try{
+    const res = await fetch(`${API_BASE}/getNotify?uid=` + encodeURIComponent(userNick));
+    notifyList = await res.json();
+    const unReadCount = notifyList.filter(item=>item.is_read===0).length;
+    unReadBadge.style.display = unReadCount>0 ? 'grid' : 'none';
+    unReadBadge.innerText = unReadCount>99 ? '99+' : unReadCount;
+  }catch(e){
+    console.log('通知拉取失败',e);
+  }
+}
+
+function renderNotify(){
+  if(notifyList.length===0){
+    notifyWrap.innerHTML = '<div class="empty-tip">暂无消息通知</div>';
+    return;
+  }
+  let html='';
+  notifyList.forEach(item=>{
+    const isRead = item.is_read===1;
+    const textStyle = isRead ? 'style="color:#999"' : '';
+    const dot = isRead ? '' : '● ';
+    html += `<div class="notify-item">
+      <div>
+        <div class="notify-txt" ${textStyle}>${dot}${item.reply_name}@了你：${item.reply_preview}</div>
+        <div class="notify-time">${item.create_time}</div>
+      </div>
+      <button class="look-btn" onclick="jumpPost(${item.id},${item.target_msg_id},${item.reply_id})">查看</button>
+    </div>`
+  })
+  notifyWrap.innerHTML=html;
+}
+
+async function jumpPost(nid,pid,rid){
+  const fd=new FormData();
+  fd.append('nid',nid);
+  await fetch(`${API_BASE}/setRead`,{method:'POST',body:fd});
+
+  if(!foldReplyIds.includes(pid)) foldReplyIds.push(pid);
+  notifyMask.style.display='none';
+  await updateList();
+
+  const postDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
+  if(!postDom) return;
+  postDom.scrollIntoView({behavior:'smooth',block:'center'});
+
+  setTimeout(()=>{
+    const replyDom = document.querySelector('.reply-item[data-rid="' + rid + '"]');
+    if(replyDom){
+      replyDom.scrollIntoView({behavior:'smooth',block:'center'});
+      replyDom.classList.remove('flash');
+      void replyDom.offsetWidth;
+      replyDom.classList.add('flash');
+      replyDom.addEventListener('animationend', () => {
+        replyDom.classList.remove('flash');
+      }, {once: true});
+    }
+  },120);
+}
+
+bellBtn.onclick=()=>{
+  if(notifyMask.style.display === 'flex'){
+    notifyMask.style.display = 'none';
+    if (!popOpen) {
+      startRefreshTimer();
+    }
+  }else{
+    if(popOpen){
+      maskDom.style.display = 'none';
+      popForm.reset();
+      popOpen = false;
+    }
+    renderNotify();
+    notifyMask.style.display = 'flex';
+    if (refreshTimer) clearInterval(refreshTimer);
+  }
+}
+
+async function updateList(){
+  console.log('🔄 执行自动刷新');
+  try{
+    const res = await fetch(`${API_BASE}/listAll`);
+    const newData = await res.json();
+    const listBox = document.getElementById('listBox');
+
+    const existPids = new Set();
+    listBox.querySelectorAll('.post-card').forEach(card => {
+      existPids.add(Number(card.dataset.pid));
+    });
+
+    const newPostDoms = [];
+    for (let i = newData.length - 1; i >= 0; i--) {
+      const post = newData[i];
+      if (!existPids.has(post.id)) {
+        const postHtml = buildPostHtml(post);
+        listBox.insertAdjacentHTML('afterbegin', postHtml);
+        newPostDoms.push(listBox.firstElementChild);
+      }
+    }
+
+    newPostDoms.forEach(postDom => {
+      bindMediaEvents(postDom);
+    });
+
+    bindFoldBtn();
+    lastData = JSON.parse(JSON.stringify(newData));
+    await getMyNotify();
+  } catch (err) {
+    console.error('列表刷新失败', err);
+  }
+}
+
+function bindFoldBtn(){
+  document.querySelectorAll('.fold-btn:not([data-btn-bound])').forEach(btn=>{
+    btn.dataset.btnBound = "true";
+    btn.onclick=function(){
+      const pid = Number(this.dataset.foldPid);
+      const wrap = document.querySelector('.reply-wrap[data-wrap-pid="' + pid + '"]');
+      const total = wrap.querySelectorAll('.reply-item').length;
+      if(total === 0) return;
+      if(foldReplyIds.includes(pid)){
+        foldReplyIds = foldReplyIds.filter(x=>x!==pid);
+        wrap.style.display='none';
+        this.innerText = total+'条回复 ▶';
+      }else{
+        foldReplyIds.push(pid);
+        wrap.style.display='block';
+        this.innerText = total+'条回复 ▼';
+      }
+    }
+  })
+}
+function closeReply(pid){
+  const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
+  const foldBtn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
+  const total = wrap.querySelectorAll('.reply-item').length;
+
+  foldReplyIds = foldReplyIds.filter(x=>x!==pid);
+  wrap.style.display='none';
+  foldBtn.innerText = total+'条回复 ▶';
+}
+
+async function refreshSinglePost(pid) {
+  try {
+    const res = await fetch(`${API_BASE}/listAll`);
+    const allData = await res.json();
+    const targetPost = allData.find(p => p.id === pid);
+    if (!targetPost) return;
+
+    const postDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
+    if (!postDom) return;
+
+    const newHtml = buildPostHtml(targetPost);
+    postDom.outerHTML = newHtml;
+    bindFoldBtn();
+    bindMediaEvents(document.querySelector(`.post-card[data-pid="${pid}"]`));
+  } catch (e) {
+    console.error("单条帖子刷新失败", e);
+  }
+}
+
+document.getElementById('openPopBtn').onclick=()=>{
+  if(popOpen){
+    maskDom.style.display = 'none';
+    popForm.reset();
+    popOpen = false;
+  }else{
+    if(notifyMask.style.display === 'flex'){
+      notifyMask.style.display = 'none';
+    }
+    hidPid.value='';
+    hidRid.value='';
+    targetUserDom.value='';
+    textareaDom.value='';
+    textareaDom.placeholder='有什么新鲜事？';
+    replyTip.style.display='none';
+    maskDom.style.display='flex';
+    if (refreshTimer) clearInterval(refreshTimer);
+    popOpen = true;
+  }
+}
+
+popForm.onsubmit=async function(e){
+  e.preventDefault();
+  const fd=new FormData(this);
+  const pid=hidPid.value;
+  if(!pid){
+    await fetch(`${API_BASE}/add`,{method:'POST',body:fd});
+  }else{
+    const targetName = targetUserDom.value;
+    let content = fd.get('content').trim();
+    fd.set('content', targetName + ' ' + content);
+    fd.append('pid',pid);
+    await fetch(`${API_BASE}/addReply`,{method:'POST',body:fd});
+    await refreshSinglePost(Number(pid));
+  }
+  popForm.reset();
+  clearMedia();
+  maskDom.style.display='none';
+  startRefreshTimer();
+}
+
+maskDom.addEventListener('click', function(e) {
+  if (e.target === maskDom) {
+    maskDom.style.display = 'none';
+    popForm.reset();
+    clearMedia();
+    popOpen = false;
+    startRefreshTimer();
+  }
+});
+notifyMask.addEventListener('click', function(e) {
+  if (e.target === notifyMask) {
+    notifyMask.style.display = 'none';
+    if (!popOpen) {
+      startRefreshTimer();
+    }
+  }
+});
+
+function bindMediaEvents(container) {
+  console.log('开始绑定媒体事件，容器：', container);
+  container.querySelectorAll('.msg-media-img:not([data-event-bound])').forEach(img => {
+    img.dataset.eventBound = "true";
+    img.onerror = function () {
+      this.style.display = 'none';
+    };
+  });
+}
+
+function startRefreshTimer() {
+  if (refreshTimer) {
+    clearInterval(refreshTimer);
+  }
+  refreshTimer = setInterval(updateList, 6000);
+  console.log('✅ 启动自动刷新定时器');
+}
+
+startRefreshTimer();
+(async function init() {
+  await updateList();
+  bindMediaEvents(document);
+})();
+</script>
+</body>
+</html>
