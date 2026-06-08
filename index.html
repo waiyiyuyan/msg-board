@@ -182,7 +182,12 @@ textarea{
   cursor:pointer;
   padding:2px 0;
 }
-
+/* 折叠按钮外层整行点击容器 */
+.toggle-wrapper {
+  width: 100%;
+  display: block;
+  padding: 8px 0; /* 上下内边距，加大手机触摸热区 */
+}
 @keyframes flash-highlight {
   0% { background-color: #e3f2fd; }
   50% { background-color: #ffffff; }
@@ -571,9 +576,11 @@ function buildPostHtml(post){
     <!-- <button class="btn del-btn" onclick="delPost(${post.id})">删除帖子</button> -->
     </div>
     <div class="divider"></div>
-    <button class="fold-btn" data-fold-pid="${post.id}" style="${post.replys.length===0?'color:#999;cursor:default;':''}">
-      ${post.replys.length}条回复 ${post.replys.length>0?(foldReplyIds.includes(post.id)?'▼':'▶'):''}
-    </button>
+    <div class="toggle-wrapper" data-pid="${post.id}" style="${post.replys.length===0 ? 'cursor:default;' : 'cursor:pointer;'}">
+      <button class="fold-btn" data-fold-pid="${post.id}" style="${post.replys.length===0?'color:#999;cursor:default;':''}">
+        ${post.replys.length}条回复 ${post.replys.length>0?(foldReplyIds.includes(post.id)?'▼':'▶'):''}
+      </button>
+    </div>
     <div class="reply-wrap" data-wrap-pid="${post.id}" style="${!foldReplyIds.includes(post.id) || post.replys.length===0 ? 'display:none' : ''}">${rHtml}</div>   
   </div>`;
 }
@@ -859,6 +866,25 @@ function bindFoldBtn(){
     }
   })
 }
+// 整行容器点击 → 模拟点击内部折叠按钮（事件委托，适配动态生成的元素）
+document.querySelector("#listBox").addEventListener("click", function(e){
+  // 找到点击的外层容器
+  const wrapper = e.target.closest(".toggle-wrapper");
+  if(!wrapper) return;
+
+  // 获取对应帖子ID、按钮、回复容器
+  const pid = wrapper.dataset.pid;
+  const btn = wrapper.querySelector(".fold-btn");
+  const replyWrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
+  if(!btn || !replyWrap) return;
+
+  // 无回复时直接拦截
+  const total = replyWrap.querySelectorAll(".reply-item").length;
+  if(total === 0) return;
+
+  // 模拟点击按钮，复用原有折叠逻辑
+  btn.click();
+});
 function closeReply(pid){
   const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
   const foldBtn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
