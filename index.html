@@ -677,20 +677,35 @@ popForm.onsubmit=async function(e){
   e.preventDefault();
   const fd=new FormData(this);
   const pid=hidPid.value;
-  if(!pid){
-    await fetch(`${API_BASE}/add`,{method:'POST',body:fd});
-  }else{
-    const targetName = targetUserDom.value;
-    let content = fd.get('content').trim();
-    fd.set('content', targetName + ' ' + content);
-    fd.append('pid',pid);
-    await fetch(`${API_BASE}/addReply`,{method:'POST',body:fd});
-    await refreshSinglePost(Number(pid));
+  let res;
+  try {
+    if(!pid){
+      // 新建帖子
+      res = await fetch(`${API_BASE}/add`,{method:'POST',body:fd});
+    }else{
+      // 回复帖子
+      const targetName = targetUserDom.value;
+      let content = fd.get('content').trim();
+      fd.set('content', targetName + ' ' + content);
+      fd.append('pid',pid);
+      res = await fetch(`${API_BASE}/addReply`,{method:'POST',body:fd});
+    }
+
+    // 接口正常返回
+    if(res.ok){
+      // 关闭弹窗、清空表单
+      maskDom.style.display='none';
+      popForm.reset();
+      clearMedia();
+      popOpen = false;
+      // 立即刷新整页列表（兼容所有浏览器，解决局部刷新失效）
+      await updateList();
+      startRefreshTimer();
+    }
+  } catch (err) {
+    console.error("提交失败：", err);
+    alert("提交失败，请稍后重试");
   }
-  popForm.reset();
-  clearMedia();
-  maskDom.style.display='none';
-  startRefreshTimer();
 }
 
 maskDom.addEventListener('click', function(e) {
