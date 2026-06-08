@@ -485,7 +485,7 @@ function openReplyPop(pid,authorName){
   clearMedia();
   hidPid.value=pid;
   hidRid.value='';
-  targetUserDom.value='@'+authorName;
+  targetUserDom.value=authorName;
   textareaDom.value='';
   textareaDom.placeholder='输入回复内容';
   replyTip.textContent='回复：@'+authorName;
@@ -497,7 +497,7 @@ function openSubReplyPop(pid,rid,atName){
   clearMedia();
   hidPid.value=pid;
   hidRid.value=rid;
-  targetUserDom.value='@'+atName;
+  targetUserDom.value=atName;
   textareaDom.value='';
   textareaDom.placeholder='输入回复内容';
   replyTip.textContent='回复：@'+atName;
