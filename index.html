@@ -264,12 +264,14 @@ textarea{
 <!-- 通知弹窗遮罩 -->
 <div class="notify-mask" id="notifyMask">
   <div class="notify-box" id="notifyWrap">
-  <!-- 通知操作按钮 -->
-      <div class="notify-btn-bar">
-        <button class="btn" id="readAllBtn" onclick="readAllNotify()">全部已读</button>
-        <button class="btn del-btn" id="clearNotifyBtn" onclick="clearAllNotify()">清空通知</button>
-      </div>
-      <div class="divider"></div>
+    <!-- 通知操作按钮（永远保留，不会被覆盖） -->
+    <div class="notify-btn-bar">
+      <button class="btn" id="readAllBtn" onclick="readAllNotify()">全部已读</button>
+      <button class="btn del-btn" id="clearNotifyBtn" onclick="clearAllNotify()">清空通知</button>
+    </div>
+    <div class="divider"></div>
+    <!-- 【新增】通知列表专属容器（这里的内容会被动态更新） -->
+    <div id="notifyListContent"></div>
   </div>
 </div>
 
@@ -448,6 +450,7 @@ const bellBtn = document.getElementById('bellBtn');
 const unReadBadge = document.getElementById('unReadBadge');
 const notifyMask = document.getElementById('notifyMask');
 const notifyWrap = document.getElementById('notifyWrap');
+const notifyListContent = document.getElementById('notifyListContent');
 
 // 缓存通知栏按钮DOM（页面仅查询一次）
 const readAllBtn = document.getElementById('readAllBtn');
@@ -598,7 +601,9 @@ async function getMyNotify(){
 }
 
 function renderNotify(){
-    // ========= 按钮状态控制（使用全局缓存） =========
+     // ========= 按钮状态控制 =========
+  const readAllBtn = document.getElementById('readAllBtn');
+  const clearNotifyBtn = document.getElementById('clearNotifyBtn');
   const totalNotify = notifyList.length;
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
 
