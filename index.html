@@ -565,24 +565,14 @@ async function getMyNotify(){
     });
     notifyList = await res.json();
 
-    // 调试日志（保留，方便排查）
-    console.log("===== 通知调试信息 =====");
-    console.log("当前用户昵称(UID)：", userNick);
-    console.log("后端返回通知列表：", notifyList);
-
-    // 遍历打印每条通知的状态
-    notifyList.forEach((item, idx) => {
-      console.log(`第${idx+1}条 | 接收人:${item.receive_uid} | is_read 值:`, item.is_read, "类型:", typeof item.is_read);
-    });
-
-    // 强转数字判断，兼容 null / undefined / 字符串等所有异常值
     const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
-    console.log("计算出的未读数量：", unReadCount);
 
-    // 控制角标显示/隐藏
-    unReadBadge.style.display = unReadCount > 0 ? 'grid' : 'none';
-    unReadBadge.innerText = unReadCount > 99 ? '99+' : unReadCount;
-    unReadBadge.offsetHeight; // 强制浏览器重绘，避免样式卡顿
+    // 延迟赋值，解决异步渲染被覆盖
+    setTimeout(() => {
+      unReadBadge.style.display = unReadCount > 0 ? 'grid' : 'none';
+      unReadBadge.innerText = unReadCount > 99 ? '99+' : unReadCount;
+      unReadBadge.offsetHeight;
+    }, 50);
 
   }catch(e){
     console.error("通知拉取异常：", e);
