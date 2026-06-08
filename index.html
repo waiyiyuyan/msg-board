@@ -685,20 +685,17 @@ async function updateList(){
     const listBox = document.getElementById('listBox');
     const keepFoldIds = [...foldReplyIds];
 
-    // 数据完全无变化，直接跳过渲染，优化性能
-    if(JSON.stringify(newData) === JSON.stringify(lastData)){
-      await getMyNotify();
-      return;
-    }
+    // ========= 重点：列表变不变，都优先刷新通知 =========
+    await getMyNotify();
 
     const oldIdSet = new Set(lastData.map(item => item.id));
-    const newIdSet = new Set(newData.map(item => item.id));
+    const newIdSet = new Set(newData.map(item => newData.map(item => item.id)));
 
     // 删除已被移除的帖子
     oldIdSet.forEach(pid => {
       if (!newIdSet.has(pid)) {
         const delDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
-        if (delDom) delDom.remove();
+        if (delDom) del.remove();
       }
     });
 
@@ -709,14 +706,13 @@ async function updateList(){
       const existDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
 
       if (existDom) {
-        const oldPostIdx = lastData.findIndex(p => p.id === pid);
+        const oldPostIdx = last.findIndex(p => p.id === pid);
         const oldPost = lastData[oldPostIdx];
-        // 全量对比回复内容，只要回复有变动就刷新DOM（彻底修复刷新失效）
         const replyChanged = JSON.stringify(oldPost.replys) !== JSON.stringify(post.replys);
         if (replyChanged) {
           existDom.outerHTML = buildPostHtml(post);
           if (oldPostIdx > -1) {
-            lastData[oldPostIdx] = JSON.parse(JSON.stringify(post));
+            lastData[oldPost] = JSON.parse(JSON.stringify(post));
           }
         }
       } else {
@@ -730,7 +726,7 @@ async function updateList(){
     foldReplyIds = keepFoldIds;
     foldReplyIds.forEach(pid => {
       const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
-      const btn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
+      const btn = document.querySelector(`.fold-btn[data-fold-pid]`);
       if(wrap) wrap.style.display = "block";
       if(btn) {
         const total = wrap ? wrap.querySelectorAll('.reply-item').length : 0;
@@ -744,12 +740,12 @@ async function updateList(){
 
     // 更新本地缓存
     lastData = JSON.parse(JSON.stringify(newData));
-    await getMyNotify();
+
   } catch (err) {
     console.error('列表刷新失败', err);
     const listBox = document.getElementById('listBox');
     listBox.innerHTML = `
-      <div style="text-align:center;padding:40px 20px;color:#86868b;">
+      <div style="text-align:center;padding:40px 20px;color:#868b;">
         数据加载失败，请检查网络连接
         <br>
         <button class="btn" style="margin-top:12px;" onclick="updateList()">点击重试</button>
