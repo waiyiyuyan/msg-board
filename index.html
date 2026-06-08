@@ -449,6 +449,10 @@ const unReadBadge = document.getElementById('unReadBadge');
 const notifyMask = document.getElementById('notifyMask');
 const notifyWrap = document.getElementById('notifyWrap');
 
+// 缓存通知栏按钮DOM（页面仅查询一次）
+const readAllBtn = document.getElementById('readAllBtn');
+const clearNotifyBtn = document.getElementById('clearNotifyBtn');
+
 // ========= 新增：textarea 自动高度函数 =========
 function autoResize(el) {
   el.style.height = 'auto';
@@ -594,21 +598,21 @@ async function getMyNotify(){
 }
 
 function renderNotify(){
-    // ========= 新增：按钮状态控制 =========
-  const readAllBtn = document.getElementById('readAllBtn');
-  const clearNotifyBtn = document.getElementById('clearNotifyBtn');
+    // ========= 按钮状态控制（使用全局缓存） =========
   const totalNotify = notifyList.length;
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
 
-  if (totalNotify === 0) {
-    readAllBtn.disabled = true;
-    clearNotifyBtn.disabled = true;
-  } else if (unReadCount === 0) {
-    readAllBtn.disabled = true;
-    clearNotifyBtn.disabled = false;
-  } else {
-    readAllBtn.disabled = false;
-    clearNotifyBtn.disabled = false;
+  if (readAllBtn && clearNotifyBtn) {
+    if (totalNotify === 0) {
+      readAllBtn.disabled = true;
+      clearNotifyBtn.disabled = true;
+    } else if (unReadCount === 0) {
+      readAllBtn.disabled = true;
+      clearNotifyBtn.disabled = false;
+    } else {
+      readAllBtn.disabled = false;
+      clearNotifyBtn.disabled = false;
+    }
   }
   // ======================================
   if(notifyList.length===0){
