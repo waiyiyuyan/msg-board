@@ -559,15 +559,33 @@ function buildPostHtml(post){
 
 async function getMyNotify(){
   try{
-    const res = await fetch(`${API_BASE}/getNotify?uid=` + encodeURIComponent(userNick), {
+    const uid = encodeURIComponent(userNick);
+    const res = await fetch(`${API_BASE}/get?uid=${uid}`, {
+    // 修正：你接口是 /getNotify 不是 /get，这里改对
+    const res = await fetch(`${API_BASE}/getNotify?uid=${uid}`, {
       credentials: "include"
     });
     notifyList = await res.json();
-    const unReadCount = notifyList.filter(item=>item.is_read === 0 || item.is_read === null).length;
-    unReadBadge.style.display = unReadCount>0 ? 'grid' : 'none';
-    unReadBadge.innerText = unReadCount>99 ? '99+' : unReadCount;
+
+    // ========= 调试日志（重点）=========
+    console.log("===== 通知调试信息 =====");
+    console.log("当前用户昵称(请求UID)：", userNick);
+    console.log("后端返回通知列表：", notifyList);
+
+    // 遍历打印每条通知的状态
+    notifyList.forEach((item, idx) => {
+      console.log(`第${idx+1}条通知 | 接收人:${item.receive_uid} | is_read:`, item.is_read, "类型:", typeof item.is_read);
+    });
+
+    // 健壮判断：只要不是 1 都算未读（兼容 0 / null / undefined）
+    const unReadCount = notifyList.filter(item => item.is_read !== 1).length;
+    console.log("最终未读数量：", unReadCount);
+    // =================================
+
+    unReadBadge.style.display = unReadCount > 0 ? 'grid' : 'none';
+    unReadBadge.innerText = unReadCount > 99 ? '99+' : unReadCount;
   }catch(e){
-    console.log('通知拉取失败',e);
+    console.error("通知拉取异常：", e);
   }
 }
 
