@@ -601,9 +601,7 @@ async function getMyNotify(){
 }
 
 function renderNotify(){
-     // ========= 按钮状态控制 =========
-  const readAllBtn = document.getElementById('readAllBtn');
-  const clearNotifyBtn = document.getElementById('clearNotifyBtn');
+  // 按钮状态控制
   const totalNotify = notifyList.length;
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
 
@@ -619,17 +617,18 @@ function renderNotify(){
       clearNotifyBtn.disabled = false;
     }
   }
-  // ======================================
-  if(notifyList.length===0){
-    notifyWrap.innerHTML = '<div class="empty-tip">暂无消息通知</div>';
+
+  // 只操作【列表子容器】，永远不修改父容器 notifyWrap（保护顶部按钮）
+  if(notifyList.length === 0){
+    notifyListContent.innerHTML = '<div class="empty-tip">暂无消息通知</div>';
     return;
   }
-  let html='';
+
+  let html = '';
   notifyList.forEach(item=>{
-    const isRead = item.is_read===1;
+    const isRead = item.is_read === 1;
     const textStyle = isRead ? 'style="color:#999"' : '';
     const dot = isRead ? '' : '● ';
-    // 把点击事件绑在外层 div，删除查看按钮
     html += `<div class="notify-item" onclick="jumpPost(${item.id},${item.target_msg_id},${item.reply_id})">
       <div>
         <div class="notify-txt" ${textStyle}>${dot}${item.reply_name}@了你：${item.reply_preview}</div>
@@ -637,7 +636,9 @@ function renderNotify(){
       </div>
     </div>`
   })
-  notifyWrap.innerHTML=html;
+
+  // 动态内容只写入列表容器，按钮完全保留
+  notifyListContent.innerHTML = html;
 }
 
 async function jumpPost(nid,pid,rid){
