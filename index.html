@@ -350,7 +350,7 @@ if (uploadBtn && fileSelector) {
 function setCookie(name,val,day=30){
   let d=new Date();
   d.setTime(d.getTime()+day*24*3600*1000);
-  document.cookie=name+"="+encodeURIComponent(val)+";expires="+d.toUTCString()+";path=/";
+  document.cookie = `${name}=${encodeURIComponent(val)};expires=${d.toUTCString()};path=/;SameSite=Lax;Secure`;
 }
 function getCookie(name){
   let arr=document.cookie.split('; ');
@@ -378,6 +378,10 @@ let lastData = [];
 let notifyList = [];
 let popOpen = false;
 let refreshTimer = null;
+// ========== 阶段三：刷新频率常量 ==========
+const NORMAL_INTERVAL = 6000;    // 前台激活：6秒刷新
+const BACKGROUND_INTERVAL = 30000; // 切后台/最小化：30秒刷新
+    
 const maskDom = document.getElementById('popMask');
 const popForm = document.getElementById('popForm');
 const textareaDom = popForm.querySelector('textarea');
@@ -665,6 +669,14 @@ async function updateList(){
     await getMyNotify();
   } catch (err) {
     console.error('列表刷新失败', err);
+    const listBox = document.getElementById('listBox');
+    listBox.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:#86868b;">
+        数据加载失败，请检查网络连接
+        <br>
+        <button class="btn" style="margin-top:12px;" onclick="updateList()">点击重试</button>
+      </div>
+    `;
   }
 }
 
@@ -698,26 +710,6 @@ function closeReply(pid){
   foldBtn.innerText = total+'条回复 ▶';
 }
 
-async function refreshSinglePost(pid) {
-  try {
-    const res = await fetch(`${API_BASE}/listAll`, {
-      credentials: "include"
-    });
-    const allData = await res.json();
-    const targetPost = allData.find(p => p.id === pid);
-    if (!targetPost) return;
-
-    const postDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
-    if (!postDom) return;
-
-    const newHtml = buildPostHtml(targetPost);
-    postDom.outerHTML = newHtml;
-    bindFoldBtn();
-    bindMediaEvents(document.querySelector(`.post-card[data-pid="${pid}"]`));
-  } catch (e) {
-    console.error("单条帖子刷新失败", e);
-  }
-}
 
 document.getElementById('openPopBtn').onclick=()=>{
   if(popOpen){
@@ -745,6 +737,9 @@ popForm.onsubmit=async function(e){
   const fd=new FormData(this);
   const pid=hidPid.value;
   let res;
+    // 防重复提交：禁用发布按钮
+  const submitBtn = this.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
   try {
     if(!pid){
       // 新建帖子
@@ -781,6 +776,9 @@ popForm.onsubmit=async function(e){
   } catch (err) {
     console.error("提交失败：", err);
     alert("提交失败，请稍后重试");
+  } finally {
+    // 无论成功/失败，恢复按钮
+    submitBtn.disabled = false;
   }
 }
 
@@ -812,13 +810,31 @@ function bindMediaEvents(container) {
   });
 }
 
-function startRefreshTimer() {
+/**
+ * 启动自动刷新定时器（支持动态间隔）
+ * @param {number} interval 刷新间隔(毫秒)
+ */
+function startRefreshTimer(interval = NORMAL_INTERVAL) {
+  // 先清空旧定时器，避免多个定时器并发
   if (refreshTimer) {
     clearInterval(refreshTimer);
   }
-  refreshTimer = setInterval(updateList, 6000);
-  console.log('✅ 启动自动刷新定时器');
+  refreshTimer = setInterval(updateList, interval);
+  console.log(`✅ 启动定时器，当前间隔：${interval / 1000} 秒`);
 }
+// ========== 阶段三：监听标签页 前台 / 后台 切换 ==========
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'hidden') {
+    console.log('📴 页面切后台，切换为 30 秒刷新');
+    startRefreshTimer(BACKGROUND_INTERVAL);
+  } else if (document.visibilityState === 'visible') {
+    console.log('📱 页面切回前台，立即刷新并恢复 6 秒频率');
+    // 先关闭旧定时器，再刷新，避免并发
+    if (refreshTimer) clearInterval(refreshTimer);
+    updateList();
+    startRefreshTimer(NORMAL_INTERVAL);
+  }
+});
 
 startRefreshTimer();
 (async function init() {
