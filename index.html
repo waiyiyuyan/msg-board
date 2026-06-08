@@ -529,10 +529,25 @@ async function jumpPost(nid,pid,rid){
   fd.append('nid',nid);
   await fetch(`${API_BASE}/setRead`,{method:'POST',body:fd});
 
-  if(!foldReplyIds.includes(pid)) foldReplyIds.push(pid);
   notifyMask.style.display='none';
+  // 先拉取最新数据并渲染
   await updateList();
 
+  const pidNum = Number(pid);
+  // 强制标记为展开
+  if(!foldReplyIds.includes(pidNum)){
+    foldReplyIds.push(pidNum);
+  }
+  // 强制修改DOM显隐和按钮文字
+  const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
+  const foldBtn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
+  if(wrap) wrap.style.display = "block";
+  if(foldBtn){
+    const total = wrap ? wrap.querySelectorAll('.reply-item').length : 0;
+    foldBtn.innerText = `${total}条回复 ▼`;
+  }
+
+  // 滚动到帖子
   const postDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
   if(!postDom) return;
   postDom.scrollIntoView({behavior:'smooth',block:'center'});
@@ -576,15 +591,29 @@ async function updateList(){
     const newData = await res.json();
     const listBox = document.getElementById('listBox');
 
-    // 清空现有列表，全量重渲染（解决已有帖子回复不更新）
+    // 暂存当前所有已展开的帖子ID
+    const keepFoldIds = [...foldReplyIds];
+    // 清空列表全量重绘
     listBox.innerHTML = "";
 
-    // 倒序渲染全部帖子
+    // 倒序渲染
     for (let i = newData.length - 1; i >= 0; i--) {
       const post = newData[i];
       const postHtml = buildPostHtml(post);
       listBox.insertAdjacentHTML('afterbegin', postHtml);
     }
+
+    // 刷新后恢复所有展开状态 + 同步DOM样式
+    foldReplyIds = keepFoldIds;
+    foldReplyIds.forEach(pid => {
+      const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
+      const btn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
+      if(wrap) wrap.style.display = "block";
+      if(btn) {
+        const total = wrap ? wrap.querySelectorAll('.reply-item').length : 0;
+        btn.innerText = `${total}条回复 ▼`;
+      }
+    });
 
     bindFoldBtn();
     bindMediaEvents(listBox);
