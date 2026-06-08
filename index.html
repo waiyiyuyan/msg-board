@@ -398,7 +398,9 @@ const noun = ['清茶','星河','孤岛','落日','白舟','云笺','寒川','�
 async function createNewNick(){
   while(true){
     let randName = adj[Math.floor(Math.random()*adj.length)] + "_" + noun[Math.floor(Math.random()*noun.length)] + Math.floor(Math.random()*900+100);
-    const res = await fetch(`${API_BASE}/checkNick?nick=` + encodeURIComponent(randName));
+    const res = await fetch(`${API_BASE}/checkNick?nick=` + encodeURIComponent(randName), {
+      credentials: "include"
+    });
     const json = await res.json();
     if(!json.exist){
       setCookie('userNick', randName);
@@ -493,7 +495,9 @@ function buildPostHtml(post){
 
 async function getMyNotify(){
   try{
-    const res = await fetch(`${API_BASE}/getNotify?uid=` + encodeURIComponent(userNick));
+    const res = await fetch(`${API_BASE}/getNotify?uid=` + encodeURIComponent(userNick), {
+      credentials: "include"
+    });
     notifyList = await res.json();
     const unReadCount = notifyList.filter(item=>item.is_read===0).length;
     unReadBadge.style.display = unReadCount>0 ? 'grid' : 'none';
@@ -527,7 +531,11 @@ function renderNotify(){
 async function jumpPost(nid,pid,rid){
   const fd=new FormData();
   fd.append('nid',nid);
-  await fetch(`${API_BASE}/setRead`,{method:'POST',body:fd});
+  await fetch(`${API_BASE}/setRead`,{
+  method:'POST',
+  body:fd,
+  credentials: "include"
+  });
 
   notifyMask.style.display='none';
   // 先拉取最新数据并渲染
@@ -587,7 +595,9 @@ bellBtn.onclick=()=>{
 async function updateList(){
   console.log('🔄 执行自动刷新');
   try{
-    const res = await fetch(`${API_BASE}/listAll`);
+    const res = await fetch(`${API_BASE}/listAll`, {
+      credentials: "include"
+    });
     const newData = await res.json();
     const listBox = document.getElementById('listBox');
     const keepFoldIds = [...foldReplyIds];
@@ -689,7 +699,9 @@ function closeReply(pid){
 
 async function refreshSinglePost(pid) {
   try {
-    const res = await fetch(`${API_BASE}/listAll`);
+    const res = await fetch(`${API_BASE}/listAll`, {
+      credentials: "include"
+    });
     const allData = await res.json();
     const targetPost = allData.find(p => p.id === pid);
     if (!targetPost) return;
@@ -735,14 +747,22 @@ popForm.onsubmit=async function(e){
   try {
     if(!pid){
       // 新建帖子
-      res = await fetch(`${API_BASE}/add`,{method:'POST',body:fd});
+      res = await fetch(`${API_BASE}/add`,{
+          method:'POST',
+          body:fd,
+          credentials: "include"
+        });
     }else{
       // 回复帖子
       const targetName = targetUserDom.value;
       let content = fd.get('content').trim();
       fd.set('content', targetName + ' ' + content);
       fd.append('pid',pid);
-      res = await fetch(`${API_BASE}/addReply`,{method:'POST',body:fd});
+      res = await fetch(`${API_BASE}/addReply`,{
+          method:'POST',
+          body:fd,
+          credentials: "include"
+        });
     }
 
     // 接口正常返回
