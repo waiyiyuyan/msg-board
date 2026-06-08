@@ -128,19 +128,17 @@ textarea{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  cursor: pointer; /* 鼠标悬浮变为手型，提示可点击 */
 }
+/* 可选：hover 背景高亮，增强点击反馈（按需保留） */
+.notify-item:hover {
+  background-color: #f8f8f8;
+}
+    
 .notify-item:last-child{border-bottom:none;}
 .notify-txt{font-size:14px;color:#333;line-height:1.4;}
 .notify-time{font-size:11px;color:#999;margin-top:4px;}
-.look-btn{
-  font-size:12px;
-  padding:3px 8px;
-  border:none;
-  background:#007aff;
-  color:#fff;
-  border-radius:6px;
-  cursor:pointer;
-}
+
 .empty-tip{text-align:center;padding:30px 0;color:#999;}
 
 /* 弹窗遮罩+发帖弹窗 */
@@ -590,12 +588,12 @@ function renderNotify(){
     const isRead = item.is_read===1;
     const textStyle = isRead ? 'style="color:#999"' : '';
     const dot = isRead ? '' : '● ';
-    html += `<div class="notify-item">
+    // 把点击事件绑在外层 div，删除查看按钮
+    html += `<div class="notify-item" onclick="jumpPost(${item.id},${item.target_msg_id},${item.reply_id})">
       <div>
         <div class="notify-txt" ${textStyle}>${dot}${item.reply_name}@了你：${item.reply_preview}</div>
         <div class="notify-time">${item.create_time}</div>
       </div>
-      <button class="look-btn" onclick="jumpPost(${item.id},${item.target_msg_id},${item.reply_id})">查看</button>
     </div>`
   })
   notifyWrap.innerHTML=html;
