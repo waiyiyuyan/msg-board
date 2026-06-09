@@ -419,7 +419,8 @@ async function readAllNotify() {
   }
 }
 async function clearAllNotify() {
-  const clearBtn = document.getElementById('clearNotify');
+  
+  const clearBtn = document.getElementById('clearNotifyBtn'); // ✅ 和HTML ID一致
   const uid = encodeURIComponent(userNick);
   clearBtn.disabled = true;
   try {
