@@ -863,20 +863,3 @@ function renderListByPush(newData) {
 
 // 页面卸载：关闭连接&定时器
 window.addEventListener("beforeunload", closeAllSocket);
-
-// ===================== 【页面初始化逻辑】=====================
-(async function init() {
-  // 1. 初始化昵称
-  if(!userNick){
-    userNick = await createNewNick();
-    popNick.value = userNick;
-  }else{
-    popNick.value = userNick;
-  }
-  // 2. 首次HTTP请求兜底（WS未就绪时展示数据）
-  await updateList();
-  // 3. 加载通知
-  await getMyNotify();
-  // 4. 初始化WebSocket长连接
-  initWebSocket();
-})();
