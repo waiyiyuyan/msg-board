@@ -48,7 +48,7 @@ if (uploadBtn && fileSelector) {
     if (file.size === 0) {
       return { ok: false, msg: "文件无效，请重新选择" };
     }
-    if (file.size > 50 * 1024 * 1024) {
+    if (file.size > 25 * 1024 * 1024) {
       return { ok: false, msg: "文件不能超过25MB" };
     }
     return { ok: true };
@@ -419,7 +419,7 @@ async function readAllNotify() {
   }
 }
 async function clearAllNotify() {
-  const clearBtn = document.getElementById('clearNotifyBtn');
+  const clearBtn = document.getElementById('clearNotify');
   const uid = encodeURIComponent(userNick);
   clearBtn.disabled = true;
   try {
@@ -481,7 +481,8 @@ async function updateList(){
       const pid = post.id;
       const existDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
       if (existDom) {
-        const oldPostIdx = lastData.findIndex(p => p.id);
+        const oldPostIdx = lastData.findIndex(p => p.id === post.id);
+        
         const oldPost = lastData[oldPostIdx];
         const replyChanged = JSON.stringify(oldPost.replys) !== JSON.stringify(post.replys);
         if (replyChanged) {
@@ -631,6 +632,8 @@ popForm.onsubmit=async function(e){
       popForm.reset();
       clearMedia();
       popOpen = false;
+      // 新增：发帖成功后500ms自动刷新列表（兜底）
+      setTimeout(() => updateList(), 500);
     }
   } catch (err) {
     console.error("提交失败：", err);
