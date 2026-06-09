@@ -342,7 +342,7 @@ if (uploadBtn && fileSelector) {
       return { ok: false, msg: "文件无效，请重新选择" };
     }
     if (file.size > 50 * 1024 * 1024) {
-      return { ok: false, msg: "文件不能超过50MB" };
+      return { ok: false, msg: "文件不能超过25MB" };
     }
     return { ok: true };
   }
