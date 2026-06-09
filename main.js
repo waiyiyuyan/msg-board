@@ -834,6 +834,4 @@ window.addEventListener("beforeunload", closeAllSocket);
   await getMyNotify();
   // 4. 初始化WebSocket长连接
   initWebSocket();
-  // 5. 绑定媒体事件
-  bindMediaEvents(document);
 })();
