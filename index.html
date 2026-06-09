@@ -348,49 +348,63 @@ if (uploadBtn && fileSelector) {
   }
 
   async function uploadFile(file) {
-    clearMedia();
-    mediaPreview.innerHTML = "<span>文件上传中，请稍候...</span>";
-    uploadBtn.disabled = true;
-    // 标记：开始上传，禁用发布按钮
-      isUploading = true;
-      const submitBtn = popForm.querySelector('button[type="submit"]');
-      if (submitBtn) submitBtn.disabled = true;
+  clearMedia();
+  mediaPreview.innerHTML = "<span>文件上传中，请稍候...</span>";
+  uploadBtn.disabled = true;
+  // 标记：开始上传，禁用发布按钮
+  isUploading = true;
+  const submitBtn = popForm.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // 【修复1：补充 credentials，和全站接口保持一致，解决跨域凭证问题】
+    const res = await fetch(UPLOAD_API, {
+      method: "POST",
+      body: formData,
+      credentials: "include"
+    });
+
+    if (!res.ok) throw new Error("图床服务异常");
+
+    // 【修复2：增加解析捕获 + 日志，方便调试】
+    let json;
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      json = await res.json();
+      console.log("接口原始返回数据：", json); // 浏览器控制台查看真实返回
+    } catch (parseErr) {
+      console.error("JSON解析失败：", parseErr);
+      throw new Error("接口返回格式错误");
+    }
 
-      const res = await fetch(UPLOAD_API, {
-        method: "POST",
-        body: formData
-      });
+    // 校验 url 字段
+    if (typeof json !== 'object' || json === null || !json.url) {
+      console.error("数据缺少 url 字段：", json);
+      throw new Error("返回数据异常");
+    }
 
-      if (!res.ok) throw new Error("图床服务异常");
-      const json = await res.json();
-      // ========== 核心修改：适配实际返回格式 ==========
-        // 原逻辑：判断数组 + src字段；新逻辑：判断对象 + url字段
-        if (typeof json !== 'object' || json === null || !json.url) throw new Error("返回数据异常");
-        // 原逻辑：拼接固定域名 + src；新逻辑：直接使用返回的完整URL
-        const fullUrl = json.url;
-        // ===============================================
-      currentMediaUrl = fullUrl;
-      mediaInput.value = fullUrl;
-      mediaPreview.innerHTML = "<span>上传成功</span><span class='remove-btn' onclick='clearMedia()'>移除</span>";
+    const fullUrl = json.url;
+    currentMediaUrl = fullUrl;
+    mediaInput.value = fullUrl;
+    mediaPreview.innerHTML = "<span>上传成功</span><span class='remove-btn' onclick='clearMedia()'>移除</span>";
 
-    } catch (err) {
-      let errMsg = "上传失败，请重试";
-      if (err.message.includes("1101") || err.message.includes("Worker threw exception")) {
-        errMsg = "文件过大，上传失败，请压缩后重试";
-      }
-      mediaPreview.innerHTML = "<span class='err-text'>" + errMsg + "</span>";
-      console.error("上传错误：", err);
-    } finally {
-      uploadBtn.disabled = false;
-        // 标记：上传结束，恢复发布按钮
+  } catch (err) {
+    let errMsg = "上传失败，请重试";
+    if (err.message.includes("1101") || err.message.includes("Worker threw exception")) {
+      errMsg = "文件过大，上传失败，请压缩后重试";
+    }
+    mediaPreview.innerHTML = "<span class='err-text'>" + errMsg + "</span>";
+    console.error("上传错误：", err);
+  } finally {
+    uploadBtn.disabled = false;
+    // 标记：上传结束，恢复发布按钮
     isUploading = false;
     const submitBtn = popForm.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = false;
-    }
   }
+}
 
   fileSelector.addEventListener("change", async function(e) {
     const file = e.target.files[0];
