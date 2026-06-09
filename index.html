@@ -981,17 +981,17 @@ document.getElementById('openPopBtn').onclick=()=>{
 popForm.onsubmit=async function(e){
   e.preventDefault();
     // ========= 核心拦截：图片正在上传，禁止提交 =========
-      if (isUploading) {
-        mediaPreview.innerHTML = '<span class="err-text">⚠️ 图片正在上传，请稍后再发布！</span>';
-        return;
-      }
+    if (isUploading) {
+    alert("图片正在上传，请稍后再发布！");
+    return;
+    }
+    
     const content = textareaDom.value.trim();
     const hasImg = mediaInput.value.trim() !== "";
     if (!content && !hasImg) {
-      mediaPreview.innerHTML = '<span class="err-text">⚠️ 请输入内容或上传图片</span>';
+      alert("请输入内容或上传图片");
       return;
     }
-    mediaPreview.innerHTML = "";
     
     
   const fd=new FormData(this);
