@@ -630,7 +630,7 @@ function buildPostHtml(post){
     ${renderMedia(post.media_urls || "")}
     <div class="post-btn-group">
       <button class="reply-small-btn" onclick="openReplyPop(${post.id},'${post.name}')">回复</button>
-    <!-- <button class="btn del-btn" onclick="delPost(${post.id})">删除帖子</button> -->
+    <button class="btn del-btn" onclick="delPost(${post.id})">删除帖子</button>
     </div>
     <div class="divider"></div>
     <div class="toggle-wrapper" data-pid="${post.id}" style="${post.replys.length===0 ? 'cursor:default;' : 'cursor:pointer;'}">
