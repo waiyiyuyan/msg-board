@@ -111,7 +111,7 @@ if (uploadBtn && fileSelector) {
     const submitBtn = popForm.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = false;
   }
-
+}
   fileSelector.addEventListener("change", async function(e) {
     const file = e.target.files[0];
     if (!file) return;
