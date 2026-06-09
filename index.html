@@ -868,6 +868,7 @@ function bindFoldBtn(){
   document.querySelectorAll('.fold-btn:not([data-btn-bound])').forEach(btn=>{
     btn.dataset.btnBound = "true";
     btn.onclick=function(){
+        e.stopPropagation();
       const pid = Number(this.dataset.foldPid);
       const wrap = document.querySelector('.reply-wrap[data-wrap-pid="' + pid + '"]');
       const total = wrap.querySelectorAll('.reply-item').length;
