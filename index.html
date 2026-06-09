@@ -451,6 +451,27 @@ let lastData = [];
 let notifyList = [];
 let popOpen = false;
 let refreshTimer = null;
+    // ========== 新增：回复展开/收起 通用函数 =========
+function toggleReplyFold(pid) {
+  const pidNum = Number(pid);
+  const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
+  const btn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
+  if (!wrap || !btn) return;
+
+  const total = wrap.querySelectorAll(".reply-item").length;
+  if (total === 0) return;
+
+  // 切换展开/收起状态
+  if (foldReplyIds.includes(pidNum)) {
+    foldReplyIds = foldReplyIds.filter(x => x !== pidNum);
+    wrap.style.display = 'none';
+    btn.innerText = total + '条回复 ▶';
+  } else {
+    foldReplyIds.push(pidNum);
+    wrap.style.display = 'block';
+    btn.innerText = total + '条回复 ▼';
+  }
+}
 // ========== 阶段三：刷新频率常量 ==========
 const NORMAL_INTERVAL = 15000;    // 前台激活：6秒刷新
 const BACKGROUND_INTERVAL = 30000; // 切后台/最小化：30秒刷新
@@ -864,45 +885,33 @@ async function updateList(){
   }
 }
 
-function bindFoldBtn(){
-  document.querySelectorAll('.fold-btn:not([data-btn-bound])').forEach(btn=>{
+function bindFoldBtn() {
+  document.querySelectorAll('.fold-btn:not([data-btn-bound])').forEach(btn => {
     btn.dataset.btnBound = "true";
-    btn.onclick=function(){
-        
-      const pid = Number(this.dataset.foldPid);
-      const wrap = document.querySelector('.reply-wrap[data-wrap-pid="' + pid + '"]');
-      const total = wrap.querySelectorAll('.reply-item').length;
-      if(total === 0) return;
-      if(foldReplyIds.includes(pid)){
-        foldReplyIds = foldReplyIds.filter(x=>x!==pid);
-        wrap.style.display='none';
-        this.innerText = total+'条回复 ▶';
-      }else{
-        foldReplyIds.push(pid);
-        wrap.style.display='block';
-        this.innerText = total+'条回复 ▼';
-      }
-    }
-  })
+    btn.onclick = function (e) {
+      // 仅阻止按钮自身事件向外干扰，不影响外层空白区
+      e.stopPropagation();
+      const pid = this.dataset.foldPid;
+      // 调用通用折叠方法
+      toggleReplyFold(pid);
+    };
+  });
 }
-// 整行容器点击 → 模拟点击内部折叠按钮（事件委托，适配动态生成的元素）
+
+// 整行空白区域点击 → 调用通用折叠函数
 document.querySelector("#listBox").addEventListener("click", function(e){
-  // 找到点击的外层容器
   const wrapper = e.target.closest(".toggle-wrapper");
   if(!wrapper) return;
 
-  // 获取对应帖子ID、按钮、回复容器
   const pid = wrapper.dataset.pid;
-  const btn = wrapper.querySelector(".fold-btn");
   const replyWrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
-  if(!btn || !replyWrap) return;
+  if(!replyWrap) return;
 
-  // 无回复时直接拦截
   const total = replyWrap.querySelectorAll(".reply-item").length;
   if(total === 0) return;
 
-  // 模拟点击按钮，复用原有折叠逻辑
-  btn.click();
+  // 直接调用公共方法，不再模拟按钮点击
+  toggleReplyFold(pid);
 });
 function closeReply(pid){
   const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
