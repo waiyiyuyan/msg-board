@@ -2,7 +2,7 @@
 const API_BASE = "https://mbapi.lovefree.de5.net";
 const UPLOAD_API = API_BASE + "/proxyUpload";
 // WebSocket 地址（CF强制wss，不可用ws）
-const WS_URL = "wss://mbapi.lovefree.de5.net";
+const WS_URL = "wss://mbapi.lovefree.de5.net"; // 正确变量名
 // 心跳约定（和后端保持一致）
 const PING_MSG = "ping";
 const PONG_MSG = "pong";
@@ -111,7 +111,6 @@ if (uploadBtn && fileSelector) {
     const submitBtn = popForm.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = false;
   }
-}
 
   fileSelector.addEventListener("change", async function(e) {
     const file = e.target.files[0];
@@ -158,7 +157,6 @@ let foldReplyIds = [];
 let lastData = [];
 let notifyList = [];
 let popOpen = false;
-// ========= 移除原有轮询定时器相关变量（refreshTimer / NORMAL_INTERVAL / BACKGROUND_INTERVAL 全部删除）=========
 let isUploading = false;
 
 // 图片放大预览 DOM
@@ -199,7 +197,6 @@ async function createNewNick(){
   const maxTry = 20;
   let tryCount = 0;
   while(tryCount < maxTry){
-    tryCount++;
     let randName = adj[Math.floor(Math.random()*adj.length)] + "_" + noun[Math.floor(Math.random()*noun.length)] + Math.floor(Math.random()*900+100);
     const res = await fetch(`${API_BASE}/checkNick?nick=` + encodeURIComponent(randName), {
       credentials: "include"
@@ -249,7 +246,6 @@ function openReplyPop(pid,authorName){
 }
 function openSubReplyPop(pid,rid,atName){
   clearMedia();
-  hidPid.value=pid;
   hidRid.value=rid;
   targetUserDom.value=atName;
   textareaDom.value='';
@@ -537,16 +533,18 @@ function bindFoldBtn() {
     };
   });
 }
+// ========== 修复：选择器缺失 pid 导致点击空白区失效 ==========
 document.querySelector("#listBox").addEventListener("click", function(e){
   const wrapper = e.target.closest(".toggle-wrapper");
   if(!wrapper) return;
   const pid = wrapper.dataset.pid;
-  const replyWrap = document.querySelector(`.reply-wrap[data-wrap-pid]`);
+  const replyWrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
   if(!replyWrap) return;
   const total = replyWrap.querySelectorAll(".reply-item").length;
   if(total === 0) return;
   toggleReplyFold(pid);
 });
+
 function closeReply(pid){
   const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
   const foldBtn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
@@ -675,7 +673,7 @@ imgPreviewMask.addEventListener('click', function (e) {
   if (e.target !== previewImg) {
     imgPreviewMask.style.display = 'none';
     previewImg.src = ""; 
-    document.body.style.overflow = ''; 
+    document.body.style.overflow = '';
   }
 });
 
@@ -704,7 +702,8 @@ function initWebSocket() {
     return;
   }
   isManualClose = false;
-  ws = new WebSocket(WS);
+  // ========== 核心修复：变量名 WS → WS_URL ==========
+  ws = new WebSocket(WS_URL);
 
   // 连接成功
   ws.onopen = function () {
@@ -731,12 +730,10 @@ function initWebSocket() {
       if (pongTimer) clearTimeout(pongTimer);
       return;
     }
-    // 解析后端推送的JSON数据（帖子列表）
+    // 解析后端推送的JSON数据
     try {
       const resData = JSON.parse(msg);
       if (resData.type === "list") {
-        // 复用原有渲染函数，刷新页面
-        lastData = JSON.parse(JSON.stringify(res.data));
         renderListByPush(resData.data);
         getMyNotify();
       }
