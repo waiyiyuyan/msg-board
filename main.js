@@ -723,6 +723,7 @@ function initWebSocket() {
     // 启动心跳定时器：定时发送 ping
     pingTimer = setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {
+        if (pongTimer) clearTimeout(pongTimer);
         console.log("📤 发送心跳 ping");
         ws.send(PING_MSG);
         // 开启pong超时检测
