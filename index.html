@@ -170,7 +170,6 @@ textarea{
   display:flex;
   flex-direction:column;
   gap:16px;
-  position: relative;  /* 新增这一行 */
 }
 .pop-post .btn{
   align-self:flex-end;
@@ -245,46 +244,6 @@ textarea{
   color: #f53f3f; /* 报错文字红色 */
   font-size: 14px;
 }
-
-    /* 气泡容器 */
-.tip-bubble {
-  display: none;
-  position: absolute;
-  left: 0;
-  top: 100%;
-  margin-top: 4px;
-  padding: 6px 10px;
-  background: #fff;
-  border: 1px solid #f53f3f;
-  border-radius: 4px;
-  font-size: 13px;
-  z-index: 99;
-  white-space: nowrap;
-}
-/* 气泡尖角 */
-.tip-bubble::before {
-  content: "";
-  position: absolute;
-  left: 12px;
-  top: -6px;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 6px solid #f53f3f;
-}
-.tip-bubble::after {
-  content: "";
-  position: absolute;
-  left: 12px;
-  top: -5px;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 5px solid #fff;
-}
-/* 感叹号颜色 */
-.tip-icon {
-  color: #ff9500;
-  margin-right: 4px;
-}
 </style>
 </head>
 <body>
@@ -323,10 +282,7 @@ textarea{
     <form id="popForm">
       <div id="replyTip" style="color:#999;font-size:13px;display:none;"></div>
       <textarea placeholder="输入回复内容" name="content"></textarea>
-      <div class="tip-bubble" id="tipBubble">
-          <span class="tip-icon">⚠️</span>
-          <span class="tip-text"></span>
-        </div>
+      
       <div style="display:flex; align-items:center; width:100%; gap:10px;">
         <!-- 左侧：上传提示/移除按钮（自动靠左） -->
         <span id="mediaBox" style="white-space: nowrap;"></span>
@@ -369,10 +325,6 @@ const uploadBtn = document.getElementById("uploadBtn");
 const fileSelector = document.getElementById("fileSelector");
 const mediaPreview = document.getElementById("mediaBox");
 const mediaInput = document.getElementById("mediaInput");
-
-    // 气泡DOM 分行标准写法（重点：分开写，不连写）
-const tipBubble = document.getElementById("tipBubble");
-const tipText = tipBubble.querySelector(".tip-text");
 
 function clearMedia() {
   currentMediaUrl = "";
@@ -564,10 +516,7 @@ function autoResize(el) {
   el.style.height = el.scrollHeight + 'px';
 }
 // 监听输入，实时自适应高度
-textareaDom.addEventListener('input', function(){
-  autoResize(textareaDom);
-  tipBubble.style.display = "none";
-});
+textareaDom.addEventListener('input', () => autoResize(textareaDom));
 
 let userNick=getCookie('userNick');
 const adj = ['晚风','青禾','屿鹿','星眠','浅墨','雾野','秋辞','南栀','枕雪','临江'];
@@ -1031,22 +980,18 @@ document.getElementById('openPopBtn').onclick=()=>{
 
 popForm.onsubmit=async function(e){
   e.preventDefault();
-    tipBubble.style.display = "none";
-
-// ========= 核心拦截：图片正在上传，禁止提交 =========
-if (isUploading) {
-  tipText.innerText = "图片正在上传，请稍后再发布！";
-  tipBubble.style.display = "block";
-  return;
-}
-
-const content = textareaDom.value.trim();
-const hasImg = mediaInput.value.trim();
-if (!content && !hasImg) {
-  tipText.innerText = "请输入内容或上传图片";
-  tipBubble.style.display = "block";
-  return;
-}
+    // ========= 核心拦截：图片正在上传，禁止提交 =========
+    if (isUploading) {
+    alert("图片正在上传，请稍后再发布！");
+    return;
+    }
+    
+    const content = textareaDom.value.trim();
+    const hasImg = mediaInput.value.trim() !== "";
+    if (!content && !hasImg) {
+      alert("请输入内容或上传图片");
+      return;
+    }
     
     
   const fd=new FormData(this);
