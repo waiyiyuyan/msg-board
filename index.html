@@ -234,27 +234,15 @@ textarea{
   border-radius: 4px;
 }
 
-/* 上传提示区样式：解决文字和移除按钮粘连 */
+/* 上传提示区域：文字+按钮居中对齐 */
 #mediaBox {
-  font-size: 14px;
-  display: inline-flex; /* 让文字和按钮同行 */
-  align-items: center; /* 垂直居中 */
-  gap: 8px; /* 文字和移除按钮的固定间距，避免粘在一起 */
+  display: inline-flex;
+  align-items: center; /* 文字和按钮垂直居中 */
+  gap: 8px; /* 文字与按钮之间固定间距 */
 }
 #mediaBox .err-text {
-  color: #f53f3f; /* 报错文字用红色，醒目 */
-}
-#mediaBox .remove-btn {
-  font-size: 12px;
-  padding: 3px 10px; /* 按钮内边距，变成小按钮 */
-  background: #e8f0fe; /* 浅蓝背景，和主按钮呼应 */
-  color: #007aff;
-  border: 1px solid #007aff; /* 加边框区分，不会和文字糊成一团 */
-  border-radius: 4px;
-  cursor: pointer;
-}
-#mediaBox .remove-btn:hover {
-  background: #d0e1fc; /* 鼠标悬浮加深，有交互反馈 */
+  color: #f53f3f; /* 报错文字红色 */
+  font-size: 14px;
 }
 </style>
 </head>
@@ -406,7 +394,11 @@ if (uploadBtn && fileSelector) {
     currentMediaUrl = fullUrl;
     mediaInput.value = fullUrl;
     
-    mediaPreview.innerHTML = `<span style="color:#34c759;">上传成功</span><button class='remove-btn' onclick='clearMedia()'>移除</button>`;
+    mediaPreview.innerHTML = `
+      <span style="color:#34c759; font-size:14px;">上传成功</span>
+      <button class="btn del-btn" onclick="clearMedia()" style="padding:4px 10px; font-size:12px;">移除</button>
+    `;
+      
 
   } catch (err) {
     let errMsg = "上传失败，请重试";
@@ -630,7 +622,7 @@ function buildPostHtml(post){
     ${renderMedia(post.media_urls || "")}
     <div class="post-btn-group">
       <button class="reply-small-btn" onclick="openReplyPop(${post.id},'${post.name}')">回复</button>
-    <button class="btn del-btn" onclick="delPost(${post.id})">删除帖子</button>
+    <!-- <button class="btn del-btn" onclick="delPost(${post.id})">删除帖子</button> -->
     </div>
     <div class="divider"></div>
     <div class="toggle-wrapper" data-pid="${post.id}" style="${post.replys.length===0 ? 'cursor:default;' : 'cursor:pointer;'}">
