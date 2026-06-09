@@ -695,15 +695,23 @@ function closeAllSocket() {
   ws = null;
 }
 
-/** 初始化 WebSocket 连接 */
+// 【修改】初始化 WebSocket 连接（增强日志 + 错误兜底）
 function initWebSocket() {
   // 防止重复创建连接
   if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+    console.log("🔵 WS 连接已存在，跳过重复初始化");
     return;
   }
   isManualClose = false;
-  // ========== 核心修复：变量名 WS → WS_URL ==========
-  ws = new WebSocket(WS_URL);
+  console.log("🔌 开始初始化 WS 连接，地址：", WS_URL);
+  
+  try {
+    ws = new WebSocket(WS_URL);
+  } catch (err) {
+    console.error("❌ 创建 WS 实例失败：", err);
+    reconnect(); // 创建失败也触发重连
+    return;
+  }
 
   // 连接成功
   ws.onopen = function () {
@@ -711,6 +719,7 @@ function initWebSocket() {
     // 启动心跳定时器：定时发送 ping
     pingTimer = setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {
+        console.log("📤 发送心跳 ping");
         ws.send(PING_MSG);
         // 开启pong超时检测
         pongTimer = setTimeout(() => {
@@ -722,31 +731,33 @@ function initWebSocket() {
     }, PING_INTERVAL);
   };
 
-  // 接收后端消息
+  // 接收后端消息（强化日志）
   ws.onmessage = function (e) {
-  const msg = e.data;
-  console.log("收到WS消息：", msg); // ✅ 新增日志
-  // 收到pong，清除超时计时器
-  if (msg === PONG_MSG) {
-    if (pongTimer) clearTimeout(pongTimer);
-    return;
-  }
-  // 解析后端推送的JSON数据
-  try {
-    const resData = JSON.parse(msg);
-    if (resData.type === "list") {
-      console.log("收到列表推送，开始渲染：", resData.data); // ✅ 新增日志
-      renderListByPush(resData.data);
-      getMyNotify();
+    const msg = e.data;
+    console.log("📥 收到 WS 消息：", msg); 
+    // 收到pong，清除超时计时器
+    if (msg === PONG_MSG) {
+      console.log("📥 收到心跳 pong，重置超时");
+      if (pongTimer) clearTimeout(pongTimer);
+      return;
     }
-  } catch (err) {
-    console.log("非业务消息：", msg, err);
-  }
-};
+    // 解析后端推送的JSON数据
+    try {
+      const resData = JSON.parse(msg);
+      console.log("📝 解析推送数据：", resData);
+      if (resData.type === "list") {
+        console.log("🔄 收到列表推送，开始渲染：", resData.data);
+        renderListByPush(resData.data);
+        getMyNotify();
+      }
+    } catch (err) {
+      console.warn("⚠️ 非JSON消息/解析失败：", msg, err);
+    }
+  };
 
-  // 连接关闭
-  ws.onclose = function () {
-    console.log("❌ WebSocket 连接关闭");
+  // 连接关闭（强化日志）
+  ws.onclose = function (event) {
+    console.log("❌ WebSocket 连接关闭，代码：", event.code, "原因：", event.reason);
     closeAllSocket();
     // 非手动关闭 → 自动重连
     if (!isManualClose) {
@@ -754,13 +765,45 @@ function initWebSocket() {
     }
   };
 
-  // 连接异常
+  // 连接异常（强化日志）
   ws.onerror = function (err) {
     console.error("❌ WebSocket 异常：", err);
     closeAllSocket();
     reconnect();
   };
 }
+
+// 【新增】页面初始化时强制打印WS状态
+(async function init() {
+  // 1. 初始化昵称
+  if(!userNick){
+    userNick = await createNewNick();
+    popNick.value = userNick;
+  }else{
+    popNick.value = userNick;
+  }
+  // 2. 首次HTTP请求兜底（WS未就绪时展示数据）
+  await updateList();
+  // 3. 加载通知
+  await getMyNotify();
+  // 4. 初始化WebSocket长连接（新增日志）
+  console.log("🚀 页面初始化完成，开始启动 WS 连接");
+  initWebSocket();
+  // 新增：5秒后检查WS状态
+  setTimeout(() => {
+    if (!ws) {
+      console.error("❌ 5秒后WS实例仍未创建");
+    } else {
+      const stateMap = {
+        0: "CONNECTING",
+        1: "OPEN",
+        2: "CLOSING",
+        3: "CLOSED"
+      };
+      console.log("🔍 5秒后WS状态：", stateMap[ws.readyState] || ws.readyState);
+    }
+  }, 5000);
+})();
 
 /** 自动重连 */
 function reconnect() {
