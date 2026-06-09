@@ -366,9 +366,12 @@ if (uploadBtn && fileSelector) {
 
       if (!res.ok) throw new Error("图床服务异常");
       const json = await res.json();
-      if (!Array.isArray(json) || json.length === 0 || !json[0].src) throw new Error("返回数据异常");
-
-      const fullUrl = "https://telegraph-image-92x.pages.dev" + json[0].src;
+      // ========== 核心修改：适配实际返回格式 ==========
+        // 原逻辑：判断数组 + src字段；新逻辑：判断对象 + url字段
+        if (typeof json !== 'object' || json === null || !json.url) throw new Error("返回数据异常");
+        // 原逻辑：拼接固定域名 + src；新逻辑：直接使用返回的完整URL
+        const fullUrl = json.url;
+        // ===============================================
       currentMediaUrl = fullUrl;
       mediaInput.value = fullUrl;
       mediaPreview.innerHTML = "<span>上传成功</span><span class='remove-btn' onclick='clearMedia()'>移除</span>";
