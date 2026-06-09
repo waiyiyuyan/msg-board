@@ -724,23 +724,25 @@ function initWebSocket() {
 
   // 接收后端消息
   ws.onmessage = function (e) {
-    const msg = e.data;
-    // 收到pong，清除超时计时器
-    if (msg === PONG_MSG) {
-      if (pongTimer) clearTimeout(pongTimer);
-      return;
+  const msg = e.data;
+  console.log("收到WS消息：", msg); // ✅ 新增日志
+  // 收到pong，清除超时计时器
+  if (msg === PONG_MSG) {
+    if (pongTimer) clearTimeout(pongTimer);
+    return;
+  }
+  // 解析后端推送的JSON数据
+  try {
+    const resData = JSON.parse(msg);
+    if (resData.type === "list") {
+      console.log("收到列表推送，开始渲染：", resData.data); // ✅ 新增日志
+      renderListByPush(resData.data);
+      getMyNotify();
     }
-    // 解析后端推送的JSON数据
-    try {
-      const resData = JSON.parse(msg);
-      if (resData.type === "list") {
-        renderListByPush(resData.data);
-        getMyNotify();
-      }
-    } catch (err) {
-      console.log("非业务消息：", msg);
-    }
-  };
+  } catch (err) {
+    console.log("非业务消息：", msg, err);
+  }
+};
 
   // 连接关闭
   ws.onclose = function () {
