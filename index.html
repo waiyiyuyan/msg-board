@@ -293,7 +293,7 @@ textarea{
   <div class="pop-post">
     <form id="popForm">
       <div id="replyTip" style="color:#999;font-size:13px;display:none;"></div>
-      <textarea placeholder="输入回复内容" name="content" required></textarea>
+      <textarea placeholder="输入回复内容" name="content"></textarea>
       
       <div style="display:flex; align-items:center; width:100%; gap:10px;">
         <!-- 左侧：上传提示/移除按钮（自动靠左） -->
@@ -993,6 +993,13 @@ popForm.onsubmit=async function(e){
     alert("图片正在上传，请稍后再发布！");
     return;
   }
+    // 文字 和 图片 二选一即可发布
+    const content = textareaDom.value.trim();
+    const hasImg = mediaInput.value.trim() !== '';
+    if (!content && !hasImg) {
+      alert("请输入内容或上传图片");
+      return;
+    }
   const fd=new FormData(this);
   const pid=hidPid.value;
   let res;
