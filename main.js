@@ -787,7 +787,7 @@ function renderListByPush(newData) {
     const pid = post.id;
     const existDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
     if (existDom) {
-      const oldPostIdx = lastData.findIndex(p => p.id);
+      const oldPostIdx = lastData.findIndex(p => p.id === post.id);
       const oldPost = lastData[oldPostIdx];
       const replyChanged = JSON.stringify(oldPost.replys) !== JSON.stringify(post.replys);
       if (replyChanged) {
