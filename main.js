@@ -254,6 +254,12 @@ function renderMedia(mediaUrl) {
 function renderNotify() {
   const totalNotify = notifyList.length;
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
+
+  setTimeout(() => {
+    unReadBadge.style.display = unReadCount > 0 ? 'grid' : 'none';
+    unReadBadge.innerText = unReadCount > 99 ? '99+' : unReadCount;
+  }, 20);
+  
   if (readAllBtn && clearNotifyBtn) {
     if (totalNotify === 0) {
       readAllBtn.disabled = true;
@@ -291,10 +297,7 @@ function renderNotify() {
   });
   notifyListContent.innerHTML = html;
 
-  setTimeout(() => {
-    unReadBadge.style.display = unReadCount > 0 ? 'grid' : 'none';
-    unReadBadge.innerText = unReadCount > 99 ? '99+' : unReadCount;
-  }, 20);
+  
 }
 
 // 跳转帖子 + 标记已读
