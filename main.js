@@ -287,21 +287,7 @@ function buildPostHtml(post){
     <div class="reply-time">${r.create_time}</div>
   </div>
   <div class="reply-text">
-    ${(() => {
-      // 1. 获取原始回复内容（后端拼接的：回复 昵称：xxx）
-      let content = parseLink(r.r_content);
-      // 2. 当前登录用户昵称（自己）
-      const myNick = userNick;
-      
-      // 3. 正则：匹配开头「回复 我的昵称：」，动态替换为「回复 你：」
-      if (myNick) {
-        const reg = new RegExp(`^回复 ${myNick}：`, 'g');
-        content = content.replace(reg, '回复 你：');
-      }
-      
-      // 4. 兼容纯图片无文字的场景
-      return content || '<span class="empty-reply">[图片回复]</span>';
-    })()}
+    ${parseLink(r.r_content) || '<span class="empty-reply">[图片回复]</span>'}
   </div>
   ${renderMedia(r.media_urls || "")}
   <div style="text-align:right;margin-top:4px;">
