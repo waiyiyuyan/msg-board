@@ -450,6 +450,7 @@ function openReplyPop(pid, targetName) {
   hidRid.value = '';
   targetUserDom.value = targetName;
   textareaDom.value = '';
+  textareaDom.placeholder = '';
   // textareaDom.placeholder = `回复 ${targetName}`;
   replyTip.style.display = 'block';
   replyTip.innerText = `回复 @${targetName}`;
@@ -466,6 +467,7 @@ function openSubReplyPop(pid, rid, targetName) {
   hidRid.value = rid;
   targetUserDom.value = targetName;
   textareaDom.value = '';
+  textareaDom.placeholder = '';
   // textareaDom.placeholder = `回复 ${targetName}`;
   replyTip.style.display = 'block';
   replyTip.innerText = `回复 @${targetName}`;
