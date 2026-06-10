@@ -252,3 +252,4 @@ textarea{
   color: #f53f3f; /* 报错文字红色 */
   font-size: 14px;
 }
+.empty-reply { color: #888; font-style: italic; }
