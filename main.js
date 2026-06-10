@@ -342,6 +342,11 @@ async function readAllNotify() {
       method: "POST",
       credentials: "include"
     });
+    // 本地更新：把所有通知标记为已读，即时刷新UI
+    notifyList.forEach(item => {
+      item.is_read = 1;
+    });
+    renderNotify();
   } catch (err) {
     console.error("全部已读出错：", err);
     alert("网络异常");
@@ -350,7 +355,6 @@ async function readAllNotify() {
   }
 }
 
-// 清空通知
 async function clearAllNotify() {
   const clearBtn = document.getElementById('clearNotifyBtn');
   const uid = encodeURIComponent(userNick);
@@ -362,6 +366,9 @@ async function clearAllNotify() {
       method: "POST",
       credentials: "include"
     });
+    // 本地清空通知列表，即时刷新UI
+    notifyList = [];
+    renderNotify();
   } catch (err) {
     console.error("清空通知出错：", err);
     alert("网络异常");
@@ -545,6 +552,8 @@ popForm.onsubmit = async function (e) {
       popForm.reset();
       clearMedia();
       popOpen = false;
+      // 提交关闭弹窗，同步清空占位文字
+      textareaDom.placeholder = '';
     }
   } catch (err) {
     alert("提交失败，请稍后重试");
@@ -559,6 +568,7 @@ maskDom.addEventListener('click', function (e) {
     popForm.reset();
     clearMedia();
     popOpen = false;
+    textareaDom.placeholder = '';
   }
 });
 notifyMask.addEventListener('click', function (e) {
@@ -601,7 +611,7 @@ function initWebSocket() {
   const wsUrl = "wss://mbapi.lovefree.de5.net/ws";
   ws = new WebSocket(wsUrl);
 
-  ws.onopen = () => {
+    ws.onopen = () => {
     console.log("WebSocket 连接成功");
     if (userNick) {
       ws.send(JSON.stringify({
@@ -610,17 +620,32 @@ function initWebSocket() {
       }));
     }
     startHeartbeat();
-      // ========== 新增：WS 每次连接成功（首次/重连）都主动拉取最新帖子列表 ==========
-    // 延迟一小段时间，避免和WS消息冲突
+
+    // 延迟执行：同时兜底拉取 帖子 + 通知（双重保险）
     setTimeout(async () => {
       try {
-        const res = await fetch(`${API_BASE}/listAll`, { credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
-          renderPosts(data); // 直接渲染最新全量帖子+回复
+        // 1. 拉取帖子列表（原有逻辑，保留）
+        const postRes = await fetch(`${API_BASE}/listAll`, { credentials: "include" });
+        if (postRes.ok) {
+          const postData = await postRes.json();
+          renderPosts(postData);
         }
+
+        // ========== 【新增】兜底拉取个人通知 核心修复 ==========
+        if (userNick) {
+          const notifyUrl = `${API_BASE}/getNotify?uid=${encodeURIComponent(userNick)}`;
+          const notifyRes = await fetch(notifyUrl, { credentials: "include" });
+          if (notifyRes.ok) {
+            const notifyData = await notifyRes.json();
+            notifyList = notifyData;   // 更新全局通知数据
+            renderNotify();            // 渲染通知 + 刷新铃铛角标
+            console.log("[前端] 重连兜底拉取通知完成，条数：", notifyData.length);
+          }
+        }
+        // =====================================================
+
       } catch (err) {
-        console.warn("重连后刷新列表失败", err);
+        console.warn("重连后刷新数据失败", err);
       }
     }, 300);
   };
