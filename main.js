@@ -286,7 +286,9 @@ function buildPostHtml(post){
           <div class="reply-name">${r.r_name}</div>
           <div class="reply-time">${r.create_time}</div>
         </div>
-        <div class="reply-text">${parseLink(r.r_content)}</div>
+        <div class="reply-text">
+          ${parseLink(r.r_content) || '<span class="empty-reply">[图片回复]</span>'}
+        </div>
         ${renderMedia(r.media_urls || "")}
         <div style="text-align:right;margin-top:4px;">
           ${extraBtn}
