@@ -247,9 +247,77 @@ textarea{
   display: inline-flex;
   align-items: center; /* 文字和按钮垂直居中 */
   gap: 8px; /* 文字与按钮之间固定间距 */
+  max-width: 260px;   /* 限制容器最大宽度，根据页面微调 */
+  flex-wrap: wrap;    /* 内容超长自动换行（核心） */
+  line-height: 1.5;
 }
 #mediaBox .err-text {
   color: #f53f3f; /* 报错文字红色 */
   font-size: 14px;
 }
 .empty-reply { color: #888; font-style: italic; }
+/* ========== 上传加载动画 全局样式 ========== */
+/* 1. 经典旋转加载圈 */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spin-loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e5e5ea;
+  border-top: 2px solid #007aff; /* 主题蓝 */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* 2. 三点跳动加载 */
+@keyframes bounce-dot {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.dot-loader span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #86868b;
+  animation: bounce-dot 1s ease-in-out infinite;
+}
+.dot-loader span:nth-child(2) { animation-delay: 0.2s; }
+.dot-loader span:nth-child(3) { animation-delay: 0.4s; }
+
+/* 3. 脉冲圆点（极简呼吸动画） */
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+.pulse-loader {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #007aff;
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+/* 4. 上传进度条样式（进阶方案用） */
+.progress-wrap {
+  width: 220px;
+}
+.progress-text {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 4px;
+}
+.progress-bar-bg {
+  height: 6px;
+  background: #e5e5ea;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: #34c759;
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
