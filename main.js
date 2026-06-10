@@ -276,25 +276,52 @@ function renderMedia(mediaUrl) {
 function buildPostHtml(post){
   let rHtml = '';
   if(post.replys&&post.replys.length>0){
-    post.replys.forEach((r, index)=>{
-      let extraBtn = "";
-      if(index === post.replys.length - 1){
-        extraBtn = `<button class="reply-small-btn" style="margin-right:8px;" onclick="closeReply(${post.id})">收起</button>`;
+  post.replys.forEach((r, index)=>{
+    let extraBtn = index === post.replys.length - 1 
+      ? `<button class="reply-small-btn" style="margin-right:8px;" onclick="closeReply(${post.id})">收起</button>` 
+      : "";
+
+    const myNick = userNick?.trim() || "";
+    const rawContent = parseLink(r.r_content);
+    let headText = r.r_name;
+    let showContent = rawContent;
+
+    // 1. 新数据：使用后端 to_user 字段判断（首选）
+    if (r.to_user) {
+      if (r.to_user === myNick) {
+        headText = `${r.r_name} 回复了你`;
+      } else {
+        headText = `${r.r_name} 回复了 ${r.to_user}`;
       }
-      rHtml += `<div class="reply-item" data-rid="${r.id}">
-        <div class="reply-head">
-          <div class="reply-name">${r.r_name}</div>
-          <div class="reply-time">${r.create_time}</div>
-        </div>
-        <div class="reply-text">${parseLink(r.r_content)}</div>
-        ${renderMedia(r.media_urls || "")}
-        <div style="text-align:right;margin-top:4px;">
-          ${extraBtn}
-          <button class="reply-small-btn" onclick="openSubReplyPop(${post.id},${r.id},'${r.r_name}')">回复</button>
-        </div>
-      </div>`
-    })
-  }
+    }
+    // 2. 历史旧数据兜底：正则解析旧前缀
+    else {
+      const reg = /^回复\s+(.+?)：/;
+      const match = rawContent.match(reg);
+      if (match) {
+        const oldTarget = match[1];
+        headText = oldTarget === myNick ? `${r.r_name} 回复了你` : `${r.r_name} 回复了 ${oldTarget}`;
+        showContent = rawContent.replace(reg, "");
+      }
+    }
+
+    // 兼容纯图片、无文字回复
+    showContent = showContent || '<span class="empty-reply">[图片回复]</span>';
+
+    rHtml += `<div class="reply-item" data-rid="${r.id}">
+      <div class="reply-head">
+        <div class="reply-name">${headText}</div>
+        <div class="reply-time">${r.create_time}</div>
+      </div>
+      <div class="reply-text">${showContent}</div>
+      ${renderMedia(r.media_urls || "")}
+      <div style="text-align:right;margin-top:4px;">
+        ${extraBtn}
+        <button class="reply-small-btn" onclick="openSubReplyPop(${post.id},${r.id},'${r.r_name}')">回复</button>
+      </div>
+    </div>`
+  })
+}
   return `<div class="post-card" data-pid="${post.id}">
     <div class="post-info">
       <span class="post-author">${post.name}</span>
