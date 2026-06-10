@@ -439,6 +439,40 @@ function closeReply(pid) {
   if (foldBtn) foldBtn.innerText = total + '条回复 ▶';
 }
 
+// ===================== 【新增】回复弹窗函数（解决onclick未定义错误） =====================
+// 回复主帖子
+function openReplyPop(pid, targetName) {
+  if (notifyMask.style.display === 'flex') notifyMask.style.display = 'none';
+  hidPid.value = pid;
+  hidRid.value = '';
+  targetUserDom.value = targetName;
+  textareaDom.value = '';
+  textareaDom.placeholder = `回复 ${targetName}`;
+  replyTip.style.display = 'block';
+  replyTip.innerText = `回复 @${targetName}`;
+  maskDom.style.display = 'flex';
+  popOpen = true;
+  autoResize(textareaDom);
+  textareaDom.focus();
+}
+
+// 回复子回复（楼中楼）
+function openSubReplyPop(pid, rid, targetName) {
+  if (notifyMask.style.display === 'flex') notifyMask.style.display = 'none';
+  hidPid.value = pid;
+  hidRid.value = rid;
+  targetUserDom.value = targetName;
+  textareaDom.value = '';
+  textareaDom.placeholder = `回复 ${targetName}`;
+  replyTip.style.display = 'block';
+  replyTip.innerText = `回复 @${targetName}`;
+  maskDom.style.display = 'flex';
+  popOpen = true;
+  autoResize(textareaDom);
+  textareaDom.focus();
+}
+// =====================================================================================
+
 // 删帖
 async function delPost(postId) {
   if (!confirm("确定要删除该帖子吗？\n帖子、所有回复、相关通知都会一并清空！")) return;
