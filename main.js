@@ -24,7 +24,8 @@ if (uploadBtn && fileSelector) {
     const allowMime = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowMime.includes(file.type)) return { ok: false, msg: "仅支持 JPG/PNG/GIF/WEBP 图片" };
     if (file.size === 0) return { ok: false, msg: "文件无效，请重新选择" };
-    if (file.size > 50 * 1024 * 1024) return { ok: false, msg: "文件不能超过25MB" };
+    // 修复：文案与代码保持一致 50MB
+    if (file.size > 50 * 1024 * 1024) return { ok: false, msg: "文件不能超过50MB" };
     return { ok: true };
   }
 
@@ -340,9 +341,6 @@ async function readAllNotify() {
       method: "POST",
       credentials: "include"
     });
-    if (res.ok) {
-      // 数据由 WS 自动推送，无需手动拉取
-    }
   } catch (err) {
     console.error("全部已读出错：", err);
     alert("网络异常");
@@ -363,9 +361,6 @@ async function clearAllNotify() {
       method: "POST",
       credentials: "include"
     });
-    if (res.ok) {
-      // 数据由 WS 自动推送，无需手动拉取
-    }
   } catch (err) {
     console.error("清空通知出错：", err);
     alert("网络异常");
@@ -409,6 +404,8 @@ function renderPosts(data) {
     if (btn) btn.innerText = `${wrap.querySelectorAll(".reply-item").length}条回复 ▼`;
   });
   bindFoldBtn();
+  // 帖子渲染完成后绑定图片事件
+  bindMediaEvents(listBox);
 }
 
 function bindFoldBtn() {
@@ -548,12 +545,18 @@ imgPreviewMask.addEventListener('click', function (e) {
   }
 });
 
-// ===================== 核心：WebSocket 初始化 + 心跳 + 重连 =====================
+// ===================== 核心：WebSocket 初始化 + 心跳 + 重连 + 兜底 =====================
 let ws = null;
 let heartbeatTimer = null;
 const HEARTBEAT_INTERVAL = 20000; // 20秒心跳（低于CF 30s空闲限制）
 
 function initWebSocket() {
+  // 重连前：关闭旧连接、清空旧心跳
+  if (ws && ws.readyState !== WebSocket.CLOSED) {
+    ws.close();
+  }
+  clearInterval(heartbeatTimer);
+
   const wsUrl = "wss://mbapi.lovefree.de5.net/ws";
   ws = new WebSocket(wsUrl);
 
@@ -610,6 +613,33 @@ function initWebSocket() {
     clearInterval(heartbeatTimer);
     setTimeout(initWebSocket, 3000);
   };
+
+  // ========== 首屏数据兜底：2秒未收到 INIT_DATA 自动拉取旧接口 ==========
+  let initDataFallbackTimer = setTimeout(async () => {
+    if (lastData.length === 0) {
+      try {
+        const res = await fetch(`${API_BASE}/listAll`, { credentials: "include" });
+        const data = await res.json();
+        renderPosts(data);
+      } catch (e) {
+        console.log("首屏兜底拉取数据失败", e);
+      }
+    }
+  }, 2000);
+
+  // 收到首屏数据，销毁兜底定时器
+  const rawOnMsg = ws.onmessage;
+  ws.onmessage = function (e) {
+    try {
+      const data = JSON.parse(e.data);
+      if (data.type === "INIT_DATA") {
+        clearTimeout(initDataFallbackTimer);
+      }
+      rawOnMsg.call(this, e);
+    } catch (err) {
+      console.error("WS 消息解析失败", err);
+    }
+  };
 }
 
 // 心跳保活（防止 Cloudflare 30s 空闲断开）
@@ -624,14 +654,23 @@ function startHeartbeat() {
 
 // 页面加载完成后初始化
 window.addEventListener("load", async () => {
-  // 初始化昵称
+  // 优先启动 WebSocket（解决时序丢失首屏数据）
+  initWebSocket();
+
+  // 异步初始化昵称，不阻塞 WS
   if (!userNick) {
-    userNick = await createNewNick();
-    popNick.value = userNick;
+    createNewNick().then(nick => {
+      userNick = nick;
+      popNick.value = userNick;
+      // 昵称生成后补发 USER_UID
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: "USER_UID",
+          uid: userNick
+        }));
+      }
+    });
   } else {
     popNick.value = userNick;
   }
-  // 启动 WebSocket
-  initWebSocket();
-  bindMediaEvents(document);
 });
