@@ -282,19 +282,17 @@ function buildPostHtml(post){
         extraBtn = `<button class="reply-small-btn" style="margin-right:8px;" onclick="closeReply(${post.id})">收起</button>`;
       }
       rHtml += `<div class="reply-item" data-rid="${r.id}">
-  <div class="reply-head">
-    <div class="reply-name">${r.r_name}</div>
-    <div class="reply-time">${r.create_time}</div>
-  </div>
-  <div class="reply-text">
-    ${parseLink(r.r_content) || '<span class="empty-reply">[图片回复]</span>'}
-  </div>
-  ${renderMedia(r.media_urls || "")}
-  <div style="text-align:right;margin-top:4px;">
-    ${extraBtn}
-    <button class="reply-small-btn" onclick="openSubReplyPop(${post.id},${r.id},'${r.r_name}')">回复</button>
-  </div>
-</div>`
+        <div class="reply-head">
+          <div class="reply-name">${r.r_name}</div>
+          <div class="reply-time">${r.create_time}</div>
+        </div>
+        <div class="reply-text">${parseLink(r.r_content)}</div>
+        ${renderMedia(r.media_urls || "")}
+        <div style="text-align:right;margin-top:4px;">
+          ${extraBtn}
+          <button class="reply-small-btn" onclick="openSubReplyPop(${post.id},${r.id},'${r.r_name}')">回复</button>
+        </div>
+      </div>`
     })
   }
   return `<div class="post-card" data-pid="${post.id}">
@@ -800,4 +798,4 @@ imgPreviewMask.addEventListener('click', function (e) {
 (async function init() {
   await updateList();
   bindMediaEvents(document);
-})();
+})(); 
