@@ -608,6 +608,19 @@ function initWebSocket() {
       }));
     }
     startHeartbeat();
+      // ========== 新增：WS 每次连接成功（首次/重连）都主动拉取最新帖子列表 ==========
+    // 延迟一小段时间，避免和WS消息冲突
+    setTimeout(async () => {
+      try {
+        const res = await fetch(`${API_BASE}/listAll`, { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          renderPosts(data); // 直接渲染最新全量帖子+回复
+        }
+      } catch (err) {
+        console.warn("重连后刷新列表失败", err);
+      }
+    }, 300);
   };
 
   // ========== 【核心修改】新增 SYS_LOG 日志解析 + 全类型消息调试 ==========
