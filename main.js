@@ -306,7 +306,7 @@ function buildPostHtml(post){
     }
 
     // 兼容纯图片、无文字回复
-    showContent = showContent || '<span class="empty-reply">[图片回复]</span>';
+    showContent = showContent || '';
 
     rHtml += `<div class="reply-item" data-rid="${r.id}">
       <div class="reply-head">
