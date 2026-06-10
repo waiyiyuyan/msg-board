@@ -516,6 +516,8 @@ document.getElementById('openPopBtn').onclick = () => {
     maskDom.style.display = 'flex';
     popOpen = true;
     autoResize(textareaDom);
+    // 新增：发帖弹窗打开后，输入框自动获取焦点
+    textareaDom.focus();
   }
 };
 
