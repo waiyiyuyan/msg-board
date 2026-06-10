@@ -382,17 +382,21 @@ bellBtn.onclick = () => {
   }
 };
 
-// 渲染帖子列表
+// 渲染帖子列表（修复顺序颠倒问题：最新帖子在最顶部）
 function renderPosts(data) {
   lastData = data;
   const keepFoldIds = [...foldReplyIds];
-  listBox.innerHTML = "";
+  let allHtml = "";
 
+  // 按数组顺序拼接所有帖子（后端已按DESC排序，直接拼接即可）
   data.forEach(post => {
-    const html = buildPostHtml(post);
-    listBox.insertAdjacentHTML('afterbegin', html);
+    allHtml += buildPostHtml(post);
   });
 
+  // 一次性赋值，避免多次DOM操作+顺序颠倒
+  listBox.innerHTML = allHtml;
+
+  // 还原展开状态（原有逻辑不变）
   foldReplyIds = keepFoldIds;
   foldReplyIds.forEach(pid => {
     const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
@@ -402,6 +406,9 @@ function renderPosts(data) {
   });
   bindFoldBtn();
   bindMediaEvents(listBox);
+
+  // 新增：渲染完成后打印日志，确认渲染了多少条
+  console.log(`[前端] 帖子渲染完成，共 ${data.length} 条，最新ID：${data[0]?.id}`);
 }
 
 function bindFoldBtn() {
