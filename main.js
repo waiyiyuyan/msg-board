@@ -24,7 +24,6 @@ if (uploadBtn && fileSelector) {
     const allowMime = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowMime.includes(file.type)) return { ok: false, msg: "仅支持 JPG/PNG/GIF/WEBP 图片" };
     if (file.size === 0) return { ok: false, msg: "文件无效，请重新选择" };
-    // 修复：文案与代码保持一致 50MB
     if (file.size > 50 * 1024 * 1024) return { ok: false, msg: "文件不能超过50MB" };
     return { ok: true };
   }
@@ -101,7 +100,7 @@ function parseLink(text) {
   return escapeTxt.replace(linkReg, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 }
 
-// 全局数据缓存（仅由 WS 推送更新，不再主动查库）
+// 全局数据缓存
 let foldReplyIds = [];
 let lastData = [];
 let notifyList = [];
@@ -251,7 +250,7 @@ function renderMedia(mediaUrl) {
   return "";
 }
 
-// 渲染通知列表 + 按钮状态（保留光标/禁用逻辑）
+// 渲染通知列表 + 按钮状态
 function renderNotify() {
   const totalNotify = notifyList.length;
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
@@ -292,7 +291,6 @@ function renderNotify() {
   });
   notifyListContent.innerHTML = html;
 
-  // 通知角标
   setTimeout(() => {
     unReadBadge.style.display = unReadCount > 0 ? 'grid' : 'none';
     unReadBadge.innerText = unReadCount > 99 ? '99+' : unReadCount;
@@ -384,7 +382,7 @@ bellBtn.onclick = () => {
   }
 };
 
-// 渲染帖子列表（纯前端渲染，数据来自 WS）
+// 渲染帖子列表
 function renderPosts(data) {
   lastData = data;
   const keepFoldIds = [...foldReplyIds];
@@ -395,7 +393,6 @@ function renderPosts(data) {
     listBox.insertAdjacentHTML('afterbegin', html);
   });
 
-  // 还原展开状态
   foldReplyIds = keepFoldIds;
   foldReplyIds.forEach(pid => {
     const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
@@ -404,7 +401,6 @@ function renderPosts(data) {
     if (btn) btn.innerText = `${wrap.querySelectorAll(".reply-item").length}条回复 ▼`;
   });
   bindFoldBtn();
-  // 帖子渲染完成后绑定图片事件
   bindMediaEvents(listBox);
 }
 
@@ -548,10 +544,9 @@ imgPreviewMask.addEventListener('click', function (e) {
 // ===================== 核心：WebSocket 初始化 + 心跳 + 重连 + 兜底 =====================
 let ws = null;
 let heartbeatTimer = null;
-const HEARTBEAT_INTERVAL = 20000; // 20秒心跳（低于CF 30s空闲限制）
+const HEARTBEAT_INTERVAL = 20000;
 
 function initWebSocket() {
-  // 重连前：关闭旧连接、清空旧心跳
   if (ws && ws.readyState !== WebSocket.CLOSED) {
     ws.close();
   }
@@ -560,40 +555,50 @@ function initWebSocket() {
   const wsUrl = "wss://mbapi.lovefree.de5.net/ws";
   ws = new WebSocket(wsUrl);
 
-  // 连接成功
   ws.onopen = () => {
     console.log("WebSocket 连接成功");
-    // 上报当前用户昵称，用于后端推送个人通知
     if (userNick) {
       ws.send(JSON.stringify({
         type: "USER_UID",
         uid: userNick
       }));
     }
-    // 启动心跳保活
     startHeartbeat();
   };
 
-  // 接收后端推送消息
+  // ========== 【核心修改】新增 SYS_LOG 日志解析 + 全类型消息调试 ==========
   ws.onmessage = (e) => {
     try {
       const data = JSON.parse(e.data);
+      console.log("[WS] 收到消息：", data.type, data);
+
       switch (data.type) {
-        // 首屏初始化数据
         case "INIT_DATA":
+          console.log("[WS] 收到首屏帖子数据");
           lastData = data.posts || [];
           renderPosts(lastData);
           notifyList = data.notify || [];
           renderNotify();
           break;
-        // 帖子/回复/删帖 更新
+
         case "POST_DATA":
+          console.log("[WS] 收到帖子更新广播，开始渲染");
           renderPosts(data.posts || []);
           break;
-        // 个人通知 更新
+
         case "NOTIFY_DATA":
+          console.log("[WS] 收到通知更新");
           notifyList = data.notify || [];
           renderNotify();
+          break;
+
+        // 后端系统日志（推送到浏览器控制台）
+        case "SYS_LOG":
+          if (data.level === "error") {
+            console.error("[后端日志]", data.content);
+          } else {
+            console.log("[后端日志]", data.content);
+          }
           break;
       }
     } catch (err) {
@@ -601,20 +606,17 @@ function initWebSocket() {
     }
   };
 
-  // 连接关闭，自动重连
   ws.onclose = () => {
     clearInterval(heartbeatTimer);
     console.log("WebSocket 连接断开，3秒后重连");
     setTimeout(initWebSocket, 3000);
   };
 
-  // 连接错误，自动重连
   ws.onerror = () => {
     clearInterval(heartbeatTimer);
     setTimeout(initWebSocket, 3000);
   };
 
-  // ========== 首屏数据兜底：2秒未收到 INIT_DATA 自动拉取旧接口 ==========
   let initDataFallbackTimer = setTimeout(async () => {
     if (lastData.length === 0) {
       try {
@@ -627,7 +629,6 @@ function initWebSocket() {
     }
   }, 2000);
 
-  // 收到首屏数据，销毁兜底定时器
   const rawOnMsg = ws.onmessage;
   ws.onmessage = function (e) {
     try {
@@ -642,7 +643,7 @@ function initWebSocket() {
   };
 }
 
-// 心跳保活（防止 Cloudflare 30s 空闲断开）
+// 心跳保活
 function startHeartbeat() {
   clearInterval(heartbeatTimer);
   heartbeatTimer = setInterval(() => {
@@ -654,15 +655,12 @@ function startHeartbeat() {
 
 // 页面加载完成后初始化
 window.addEventListener("load", async () => {
-  // 优先启动 WebSocket（解决时序丢失首屏数据）
   initWebSocket();
 
-  // 异步初始化昵称，不阻塞 WS
   if (!userNick) {
     createNewNick().then(nick => {
       userNick = nick;
       popNick.value = userNick;
-      // 昵称生成后补发 USER_UID
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
           type: "USER_UID",
