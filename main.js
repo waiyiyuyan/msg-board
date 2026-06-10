@@ -511,7 +511,7 @@ document.getElementById('openPopBtn').onclick = () => {
 popForm.onsubmit = async function (e) {
   e.preventDefault();
   if (isUploading) {
-    alert("上传中...");
+    alert("图片正在上传，请稍后再发布！");
     return;
   }
   const content = textareaDom.value.trim();
