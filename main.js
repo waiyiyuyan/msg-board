@@ -30,7 +30,7 @@ if (uploadBtn && fileSelector) {
 
   async function uploadFile(file) {
     clearMedia();
-    mediaPreview.innerHTML = "<div class="spin-loader"></div>";
+    mediaPreview.innerHTML = `<div class="spin-loader"></div>`;
     uploadBtn.disabled = true;
     isUploading = true;
     const submitBtn = popForm.querySelector('button[type="submit"]');
