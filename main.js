@@ -288,9 +288,18 @@ function buildPostHtml(post){
 
     // 1. 新数据：使用后端 to_user 字段判断（首选）
     if (r.to_user) {
-      if (r.to_user === myNick) {
+      const replySender = r.r_name;
+      const replyTarget = r.to_user;
+      // 自己发的回复 → 替换为「你」
+      if (replySender === myNick) {
+        headText = `你 回复了 ${replyTarget}`;
+      }
+      // 别人回复我
+      else if (replyTarget === myNick) {
         headText = `${r.r_name} 回复了你`;
-      } else {
+      }
+      // 别人回复其他人
+      else {
         headText = `${r.r_name} 回复了 ${r.to_user}`;
       }
     }
@@ -300,7 +309,15 @@ function buildPostHtml(post){
       const match = rawContent.match(reg);
       if (match) {
         const oldTarget = match[1];
-        headText = oldTarget === myNick ? `${r.r_name} 回复了你` : `${r.r_name} 回复了 ${oldTarget}`;
+        const replySender = r.r_name;
+        // 旧数据同步规则：自己回复别人显示「你」
+        if (replySender === myNick) {
+          headText = `你 回复了 ${oldTarget}`;
+        } else if (oldTarget === myNick) {
+          headText = `${r.r_name} 回复了你`;
+        } else {
+          headText = `${r.r_name} 回复了 ${oldTarget}`;
+        }
         showContent = rawContent.replace(reg, "");
       }
     }
