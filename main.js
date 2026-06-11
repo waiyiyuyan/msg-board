@@ -505,6 +505,11 @@ function openReplyPop(pid, targetName) {
   popOpen = true;
   autoResize(textareaDom);
   textareaDom.focus();
+  // 给弹窗头像、昵称赋值
+  const popAvatar = document.getElementById('popupUserAvatar');
+  const popNickText = document.getElementById('popupUserNick');
+  if (popAvatar) popAvatar.src = userAvatar;
+  if (popNickText) popNickText.innerText = userNick;
 }
 
 // 回复子回复（楼中楼）
@@ -522,6 +527,11 @@ function openSubReplyPop(pid, rid, targetName) {
   popOpen = true;
   autoResize(textareaDom);
   textareaDom.focus();
+  // 给弹窗头像、昵称赋值
+  const popAvatar = document.getElementById('popupUserAvatar');
+  const popNickText = document.getElementById('popupUserNick');
+  if (popAvatar) popAvatar.src = userAvatar;
+  if (popNickText) popNickText.innerText = userNick;
 }
 // =====================================================================================
 
@@ -558,6 +568,11 @@ document.getElementById('openPopBtn').onclick = () => {
     autoResize(textareaDom);
     // 新增：发帖弹窗打开后，输入框自动获取焦点
     textareaDom.focus();
+    // 给弹窗头像、昵称赋值
+    const popAvatar = document.getElementById('popupUserAvatar');
+    const popNickText = document.getElementById('popupUserNick');
+    if (popAvatar) popAvatar.src = userAvatar;
+    if (popNickText) popNickText.innerText = userNick;
   }
 };
 
