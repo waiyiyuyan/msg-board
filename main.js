@@ -293,7 +293,7 @@ function renderNotify() {
     const dot = isRead ? '' : '● ';
     html += `<div class="notify-item" onclick="jumpPost(${item.id},${item.target_msg_id},${item.reply_id})">
       <div>
-        <div class="notify-txt" ${textStyle}>${dot}${item.reply_name}回复了你：${item.reply_preview}</div>
+        <div class="notify-txt" ${textStyle}>${dot}${item.reply_name} 回复了你：${item.reply_preview}</div>
         <div class="notify-time">${item.create_time}</div>
       </div>
     </div>`;
