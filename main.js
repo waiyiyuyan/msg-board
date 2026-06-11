@@ -794,7 +794,14 @@ function initWebSocket() {
         const extraBtn = `<button class="reply-small-btn" style="margin-right:8px;" onclick="closeReply(${targetPid})">收起</button>`;
         const replyHtml = `<div class="reply-item" data-rid="${replyItem.id}" data-pid="${replyItem.msg_id}">
           <div class="reply-head">
-            <div class="reply-name">${headText}</div>
+            <!-- 新增：头像+昵称 容器，和静态回复保持一致 -->
+            <div class="reply-avatar-row" style="display: flex; align-items: center; gap: 6px;">
+              <img class="reply-avatar" 
+                   src="${getAvatarUrl(replyItem.r_name)}" 
+                   alt="头像"
+                   onerror="this.style.display='none'">
+              <div class="reply-name">${headText}</div>
+            </div>
             <div class="reply-time">${replyItem.create_time}</div>
           </div>
           <div class="reply-text">${showContent}</div>
