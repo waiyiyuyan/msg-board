@@ -896,18 +896,34 @@ function startHeartbeat() {
 window.addEventListener("load", async () => {
   initWebSocket();
 
-  if (!userNick) {
-    createNewNick().then(nick => {
-      userNick = nick;
-      popNick.value = userNick;
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({
-          type: "USER_UID",
-          uid: userNick
-        }));
-      }
-    });
-  } else {
+  // 本地已有昵称：直接复用，并生成对应头像
+  if (userNick) {
     popNick.value = userNick;
+    // 根据已有昵称，自动生成头像地址
+    userAvatar = getAvatarUrl(userNick);
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type: "USER_UID",
+        uid: userNick
+      }));
+    }
+  } 
+  // 无昵称：调用新的本地昵称函数生成
+  else {
+    const newNick = await fetchRandomNick();
+    userNick = newNick;
+    // 昵称持久化到 Cookie（30天有效期）
+    setCookie("userNick", newNick);
+    // 生成对应头像地址
+    userAvatar = getAvatarUrl(newNick);
+    popNick.value = userNick;
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type: "USER_UID",
+        uid: userNick
+      }));
+    }
   }
 });
