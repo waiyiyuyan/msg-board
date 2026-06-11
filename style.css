@@ -192,7 +192,6 @@ textarea{
 }
 /* 折叠按钮外层整行点击容器 */
 .toggle-wrapper {
-  width: 100%;
   display: block;
   padding: 8px 0; /* 上下内边距，加大手机触摸热区 */
 }
