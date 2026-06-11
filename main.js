@@ -124,33 +124,55 @@ function getAvatarUrl(nick) {
 
 /**
  * POST 请求第三方接口 获取随机昵称
- * 接口：https://www.okeytool.com/random-nickname
- * 表单参数：count=1
- * @returns {Promise<string>} 随机昵称
+ * 接口地址：https://openapi.lddgo.net/base/gservice/api/v1/GenerateNameEx
+ * 请求方式：POST + JSON 请求体
+ * 请求参数：
+ *   count: 1        // 生成昵称数量
+ *   locale: zh_CN   // 语言：中文
+ *   sex: null       // 不区分性别
+ *   lastName: ""     // 不指定姓氏前缀
+ *   firstName: ""    // 不指定名字前缀
+ *   unique: true    // 保证昵称唯一
+ * @returns {Promise<string>} 随机昵称字符串
  */
 async function fetchRandomNick() {
   try {
-    const response = await fetch("https://www.okeytool.com/random-nickname", {
+    // 新接口地址
+    const apiUrl = "https://openapi.lddgo.net/base/gservice/api/v1/GenerateNameEx";
+    // 接口请求参数
+    const postParams = {
+      count: 1,
+      locale: "zh_CN",
+      sex: null,
+      lastName: "",
+      firstName: "",
+      unique: true
+    };
+
+    const response = await fetch(apiUrl, {
       method: "POST",
+      // JSON 格式请求头
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/json"
       },
-      body: "count=1" // 表单数据
+      // 对象转为 JSON 字符串提交
+      body: JSON.stringify(postParams)
     });
 
     if (!response.ok) {
-      throw new Error("昵称接口请求失败");
+      throw new Error(`接口请求失败，HTTP 状态码：${response.status}`);
     }
 
     const resData = await response.json();
-    // 接口返回格式：{"code":1,"msg":"success","data":["昵称"]}
-    if (resData.code === 1 && Array.isArray(resData.data) && resData.data.length > 0) {
-      return resData.data[0];
-    }
-    throw new Error("昵称数据解析异常");
+    // 打印原始返回数据，用于适配解析规则
+    console.log("【新昵称接口 原始返回】", resData);
+
+    // 临时占位，拿到返回格式后再修改这里
+    throw new Error("等待适配接口返回格式");
+
   } catch (err) {
     console.error("【获取随机昵称失败】", err);
-    // 接口异常兜底：生成访客昵称（和原逻辑一致）
+    // 兜底昵称逻辑不变
     return "访客_" + Math.random().toString(36).slice(2, 8);
   }
 }
