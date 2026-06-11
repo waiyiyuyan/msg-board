@@ -697,66 +697,88 @@ function initWebSocket() {
           bindFoldBtn();
           bindMediaEvents(listBox);
           break;
-          // 2. 新回复：追加到对应帖子的回复区
-        case "NEW_REPLY":
-          console.log("[前端] 解析新回复增量消息，所属帖子ID：", data.targetPid, data.item);
-          const targetPid = data.targetPid;
-          const replyItem = data.item;
-          // 找到当前帖子的回复容器
-          const replyWrap = document.querySelector(`.reply-wrap[data-wrap-pid="${targetPid}"]`);
-          const foldBtn = document.querySelector(`.fold-btn[data-fold-pid="${targetPid}"]`);
-          if (!replyWrap || !foldBtn) break;
-
-          // 复用原有回复HTML拼接逻辑，生成单条回复DOM
-          const myNick = userNick?.trim() || "";
-          const rawContent = parseLink(replyItem.r_content);
-          let headText = replyItem.r_name;
-          let showContent = rawContent;
-
-          if (replyItem.to_user) {
-            const replySender = replyItem.r_name;
-            const replyTarget = replyItem.to_user;
-            if (replySender === myNick) headText = `你 回复了 ${replyTarget}`;
-            else if (replyTarget === myNick) headText = `${replyItem.r_name} 回复了你`;
-            else headText = `${replyItem.r_name} 回复了 ${replyTarget}`;
-          } else {
-            const reg = /^回复\s+(.+?)：/;
-            const match = rawContent.match(reg);
-            if (match) {
-              const oldTarget = match[1];
-              const replySender = replyItem.r_name;
-              if (replySender === myNick) headText = `你 回复了 ${oldTarget}`;
-              else if (oldTarget === myNick) headText = `${replyItem.r_name} 回复了你`;
-              else headText = `${replyItem.r_name} 回复了 ${oldTarget}`;
-              showContent = rawContent.replace(reg, "");
-            }
-          }
-          showContent = showContent || '';
-          // 新回复永远是最后一条，显示【收起】按钮
-          const extraBtn = `<button class="reply-small-btn" style="margin-right:8px;" onclick="closeReply(${targetPid})">收起</button>`;
-          const replyHtml = `<div class="reply-item" data-rid="${replyItem.id}" data-pid="${replyItem.msg_id}">
-            <div class="reply-head">
-              <div class="reply-name">${headText}</div>
-              <div class="reply-time">${replyItem.create_time}</div>
-            </div>
-            <div class="reply-text">${showContent}</div>
-            ${renderMedia(replyItem.media_urls || "")}
-            <div style="text-align:right;margin-top:4px;">
-              ${extraBtn}
-              <button class="reply-small-btn" onclick="openSubReplyPop(${targetPid},${replyItem.id},'${replyItem.r_name}')">回复</button>
-            </div>
-          </div>`;
-
-          // 追加回复到容器内
-          replyWrap.insertAdjacentHTML("beforeend", replyHtml);
-          
-          // 更新回复数量文本
-          const totalReply = replyWrap.querySelectorAll(".reply-item").length;
-          foldBtn.innerText = totalReply + '条回复 ▼';
-          
-          // 绑定图片预览事件
-          bindMediaEvents(replyWrap);
+        // 2. 新回复：追加到对应帖子的回复区
+      case "NEW_REPLY":
+        console.log("[前端] 解析新回复增量消息，所属帖子ID：", data.targetPid, data.item);
+        const targetPid = data.targetPid;
+        const replyItem = data.item;
+      
+        // ========== 核心修复：先找父帖子容器，再从容器内找子元素（绝对不会找错） ==========
+        // 1. 先通过唯一PID找到整个帖子容器（全局唯一）
+        const postCard = document.querySelector(`.post-card[data-pid="${targetPid}"]`);
+        if (!postCard) {
+          console.warn("[警告] 未找到目标帖子容器，PID：", targetPid);
           break;
+        }
+        // 2. 从帖子容器内部找回复容器和折叠按钮（不会受页面其他元素干扰）
+        const replyWrap = postCard.querySelector(".reply-wrap");
+        const foldBtn = postCard.querySelector(".fold-btn");
+        const toggleWrapper = postCard.querySelector(".toggle-wrapper");
+        if (!replyWrap || !foldBtn || !toggleWrapper) {
+          console.warn("[警告] 帖子内未找到回复容器/折叠按钮，PID：", targetPid);
+          break;
+        }
+        // =================================================================================
+      
+        // 复用原有回复HTML拼接逻辑，生成单条回复DOM
+        const myNick = userNick?.trim() || "";
+        const rawContent = parseLink(replyItem.r_content);
+        let headText = replyItem.r_name;
+        let showContent = rawContent;
+      
+        if (replyItem.to_user) {
+          const replySender = replyItem.r_name;
+          const replyTarget = replyItem.to_user;
+          if (replySender === myNick) headText = `你 回复了 ${replyTarget}`;
+          else if (replyTarget === myNick) headText = `${replyItem.r_name} 回复了你`;
+          else headText = `${replyItem.r_name} 回复了 ${replyTarget}`;
+        } else {
+          const reg = /^回复\s+(.+?)：/;
+          const match = rawContent.match(reg);
+          if (match) {
+            const oldTarget = match[1];
+            const replySender = replyItem.r_name;
+            if (replySender === myNick) headText = `你 回复了 ${oldTarget}`;
+            else if (oldTarget === myNick) headText = `${replyItem.r_name} 回复了你`;
+            else headText = `${replyItem.r_name} 回复了 ${oldTarget}`;
+            showContent = rawContent.replace(reg, "");
+          }
+        }
+        showContent = showContent || '';
+        // 新回复永远是最后一条，显示【收起】按钮
+        const extraBtn = `<button class="reply-small-btn" style="margin-right:8px;" onclick="closeReply(${targetPid})">收起</button>`;
+        const replyHtml = `<div class="reply-item" data-rid="${replyItem.id}" data-pid="${replyItem.msg_id}">
+          <div class="reply-head">
+            <div class="reply-name">${headText}</div>
+            <div class="reply-time">${replyItem.create_time}</div>
+          </div>
+          <div class="reply-text">${showContent}</div>
+          ${renderMedia(replyItem.media_urls || "")}
+          <div style="text-align:right;margin-top:4px;">
+            ${extraBtn}
+            <button class="reply-small-btn" onclick="openSubReplyPop(${targetPid},${replyItem.id},'${replyItem.r_name}')">回复</button>
+          </div>
+        </div>`;
+      
+        // 追加回复到容器内
+        replyWrap.insertAdjacentHTML("beforeend", replyHtml);
+        console.log("[调试] 新回复已追加到容器，PID：", targetPid);
+      
+        // ========== 修复：移除原0条回复残留的禁用样式 ==========
+        foldBtn.style.color = "";
+        foldBtn.style.cursor = "";
+        toggleWrapper.style.cursor = "";
+      
+        // 更新回复数量文本 + 自动匹配箭头
+        const totalReply = replyWrap.querySelectorAll(".reply-item").length;
+        const pidNum = Number(targetPid);
+        const arrow = foldReplyIds.includes(pidNum) ? '▼' : '▶';
+        foldBtn.innerText = totalReply + '条回复 ' + arrow;
+        console.log("[调试] 回复数已更新为：", totalReply);
+      
+        // 绑定图片预览事件
+        bindMediaEvents(replyWrap);
+        break;
 
         // 3. 删除帖子：直接移除对应DOM
         case "DELETE_POST":
