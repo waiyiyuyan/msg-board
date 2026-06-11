@@ -123,52 +123,37 @@ function getAvatarUrl(nick) {
 }
 
 /**
- * POST 请求第三方接口 获取随机昵称
- * 接口地址：https://openapi.lddgo.net/base/gservice/api/v1/GenerateNameEx
- * 请求方式：POST + JSON 请求体
- * 请求参数：
- *   count: 1        // 生成昵称数量
- *   locale: zh_CN   // 语言：中文
- *   sex: null       // 不区分性别
- *   lastName: ""     // 不指定姓氏前缀
- *   firstName: ""    // 不指定名字前缀
- *   unique: true    // 保证昵称唯一
+ * GET 请求第三方接口 获取随机昵称
+ * 接口地址：https://api.mir6.com/api/sjname
+ * 请求方式：GET
+ * 返回格式：纯文本字符串（中文昵称）
  * @returns {Promise<string>} 随机昵称字符串
  */
 async function fetchRandomNick() {
   try {
     // 新接口地址
-    const apiUrl = "https://openapi.lddgo.net/base/gservice/api/v1/GenerateNameEx";
-    // 接口请求参数
-    const postParams = {
-      count: 1,
-      locale: "zh_CN",
-      sex: null,
-      lastName: "",
-      firstName: "",
-      unique: true
-    };
+    const apiUrl = "https://api.mir6.com/api/sjname";
 
+    // GET 请求，无需请求体、无需JSON请求头
     const response = await fetch(apiUrl, {
-      method: "POST",
-      // JSON 格式请求头
-      headers: {
-        "Content-Type": "application/json"
-      },
-      // 对象转为 JSON 字符串提交
-      body: JSON.stringify(postParams)
+      method: "GET"
     });
 
     if (!response.ok) {
       throw new Error(`接口请求失败，HTTP 状态码：${response.status}`);
     }
 
-    const resData = await response.json();
-    // 打印原始返回数据，用于适配解析规则
-    console.log("【新昵称接口 原始返回】", resData);
+    // 接口直接返回 纯文本 昵称，使用 text() 解析
+    const nickName = await response.text();
+    // 去除首尾空白字符（防接口返回多余空格/换行）
+    const trimNick = nickName.trim();
 
-    // 临时占位，拿到返回格式后再修改这里
-    throw new Error("等待适配接口返回格式");
+    // 校验非空后返回
+    if (trimNick) {
+      console.log("【获取随机昵称成功】", trimNick);
+      return trimNick;
+    }
+    throw new Error("接口返回昵称内容为空");
 
   } catch (err) {
     console.error("【获取随机昵称失败】", err);
