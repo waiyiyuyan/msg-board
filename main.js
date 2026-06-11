@@ -260,7 +260,7 @@ function buildPostHtml(post) {
   return `<div class="post-card" data-pid="${post.id}">
     <div class="post-info">
       <!-- 头像 + 昵称 组合容器 -->
-      <div class="post-avatar-row" style="display: flex; align-items: flex-center; gap: 8px;">
+      <div class="post-avatar-row" style="display: flex; align-items: center; gap: 8px;">
         <img class="post-avatar" 
              src="${getAvatarUrl(post.name)}" 
              alt="头像"
