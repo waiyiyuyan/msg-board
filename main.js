@@ -763,6 +763,16 @@ function initWebSocket() {
         // 追加回复到容器内
         replyWrap.insertAdjacentHTML("beforeend", replyHtml);
         console.log("[调试] 新回复已追加到容器，PID：", targetPid);
+
+          // ========== 新增：只保留最后一条回复的收起按钮 ==========
+      const allReplies = replyWrap.querySelectorAll(".reply-item");
+      // 如果回复数≥2，移除上一条（倒数第二条）的收起按钮
+      if (allReplies.length >= 2) {
+        const prevLastReply = allReplies[allReplies.length - 2];
+        const prevCloseBtn = prevLastReply.querySelector('button[onclick^="closeReply"]');
+        if (prevCloseBtn) prevCloseBtn.remove();
+      }
+      // ======================================================
       
         // ========== 修复：移除原0条回复残留的禁用样式 ==========
         foldBtn.style.color = "";
