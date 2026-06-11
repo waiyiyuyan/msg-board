@@ -490,14 +490,14 @@ function openReplyPop(pid, targetName) {
   hidRid.value = '';
   targetUserDom.value = targetName;
   textareaDom.value = '';
-  textareaDom.placeholder = '';
+  textareaDom.placeholder = '分享你的想法';
   // textareaDom.placeholder = `回复 ${targetName}`;
   replyTip.style.display = 'block';
   replyTip.innerText = `回复 @${targetName}`;
   maskDom.style.display = 'flex';
   popOpen = true;
   autoResize(textareaDom);
-  textareaDom.focus();
+  
   // 给弹窗头像、昵称赋值
   const popAvatar = document.getElementById('popupUserAvatar');
   const popNickText = document.getElementById('popupUserNick');
@@ -512,14 +512,13 @@ function openSubReplyPop(pid, rid, targetName) {
   hidRid.value = rid;
   targetUserDom.value = targetName;
   textareaDom.value = '';
-  textareaDom.placeholder = '';
+  textareaDom.placeholder = '分享你的想法';
   // textareaDom.placeholder = `回复 ${targetName}`;
   replyTip.style.display = 'block';
   replyTip.innerText = `回复 @${targetName}`;
   maskDom.style.display = 'flex';
   popOpen = true;
   autoResize(textareaDom);
-  textareaDom.focus();
   // 给弹窗头像、昵称赋值
   const popAvatar = document.getElementById('popupUserAvatar');
   const popNickText = document.getElementById('popupUserNick');
@@ -559,8 +558,6 @@ document.getElementById('openPopBtn').onclick = () => {
     maskDom.style.display = 'flex';
     popOpen = true;
     autoResize(textareaDom);
-    // 新增：发帖弹窗打开后，输入框自动获取焦点
-    textareaDom.focus();
     // 给弹窗头像、昵称赋值
     const popAvatar = document.getElementById('popupUserAvatar');
     const popNickText = document.getElementById('popupUserNick');
