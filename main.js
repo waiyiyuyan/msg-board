@@ -259,7 +259,14 @@ function buildPostHtml(post) {
   }
   return `<div class="post-card" data-pid="${post.id}">
     <div class="post-info">
-      <span class="post-author">${post.name}</span>
+      <!-- 头像 + 昵称 组合容器 -->
+      <div class="post-avatar-row" style="display: flex; align-items: flex-end; gap: 8px;">
+        <img class="post-avatar" 
+             src="${getAvatarUrl(post.name)}" 
+             alt="头像"
+             onerror="this.style.display='none'">
+        <span class="post-author">${post.name}</span>
+      </div>
       <span class="post-time">${post.create_time}</span>
     </div>
     <div class="post-content">${parseLink(post.content)}</div>
