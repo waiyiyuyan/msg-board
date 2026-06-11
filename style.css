@@ -223,6 +223,22 @@ textarea{
 .post-avatar-row {
   line-height: 1;
 }
+/* ========== 回复条目 头像+昵称 样式 ========== */
+/* 回复头像：正方形，尺寸略小于帖子头像，视觉层级区分，风格统一 */
+.reply-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 0;          /* 正方形头像 */
+  object-fit: cover;
+  display: block;
+  border: 1px solid #e5e5ea;
+  background-color: #f2f2f7;  /* 头像加载兜底底色 */
+}
+
+/* 回复头像+昵称容器：预留扩展样式 */
+.reply-avatar-row {
+  line-height: 1;
+}
 .pop-post form{
   display:flex;
   flex-direction:column;
