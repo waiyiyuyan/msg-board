@@ -111,15 +111,15 @@ let isUploading = false;
 let userAvatar = "";
 
 /**
- * 根据昵称生成 DiceBear 头像链接
+ * 根据昵称生成头像链接（Picsum 官方标准，固定头像）
  * @param {string} nick 用户名/昵称
- * @returns {string} 头像SVG地址
+ * @returns {string} 头像地址
  */
 function getAvatarUrl(nick) {
   if (!nick) return "";
-  // 编码中文/特殊字符，防止头像接口异常
   const seed = encodeURIComponent(nick);
-  return `https://api.dicebear.com/10.x/lorelei/svg?seed=${seed}`;
+  // 官方标准，同昵称=同一张图
+  return `https://picsum.photos/seed/${seed}/200/200`;
 }
 
 /**
