@@ -226,8 +226,8 @@ textarea{
 /* ========== 回复条目 头像+昵称 样式 ========== */
 /* 回复头像：正方形，尺寸略小于帖子头像，视觉层级区分，风格统一 */
 .reply-avatar {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: 0;          /* 正方形头像 */
   object-fit: cover;
   display: block;
