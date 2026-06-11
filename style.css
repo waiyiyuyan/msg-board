@@ -178,7 +178,7 @@ textarea{
 /* 头像+昵称 整行容器：横向居中排列 */
 .popup-avatar-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;  /* 关键：元素底部对齐 */
   gap: 10px;               /* 头像和昵称之间的间距 */
   padding-bottom: 8px;
   margin-bottom: 8px;
