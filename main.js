@@ -245,9 +245,15 @@ function buildPostHtml(post) {
       showContent = showContent || '';
       rHtml += `<div class="reply-item" data-rid="${r.id}" data-pid="${r.msg_id}">
         <div class="reply-head">
+        <div class="reply-avatar-row" style="display: flex; align-items: center; gap: 6px;">
+          <img class="reply-avatar" 
+               src="${getAvatarUrl(r.r_name)}" 
+               alt="头像"
+               onerror="this.style.display='none'">
           <div class="reply-name">${headText}</div>
-          <div class="reply-time">${r.create_time}</div>
         </div>
+        <div class="reply-time">${r.create_time}</div>
+      </div>
         <div class="reply-text">${showContent}</div>
         ${renderMedia(r.media_urls || "")}
         <div style="text-align:right;margin-top:4px;">
