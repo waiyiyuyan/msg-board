@@ -123,45 +123,22 @@ function getAvatarUrl(nick) {
 }
 
 /**
- * GET 请求第三方接口 获取随机昵称
- * 接口地址：https://randomdatatool.com/api/internet/username?count=1
- * 请求方式：GET
- * 返回格式：JSON 对象，昵称存放在 data 数组第一项
- * 示例返回：{"status":"success","data":["Sanford_Kohler62"],"count":1}
- * @returns {Promise<string>} 随机昵称字符串
+ * 本地生成随机访客昵称（无外部接口）
+ * 格式：访客_ + 18位随机字符，加长字符降低重复概率
+ * @returns {Promise<string>} 随机访客昵称字符串
  */
 async function fetchRandomNick() {
   try {
-    // 替换为最新接口地址
-    const apiUrl = "https://randomdatatool.com/api/internet/username?count=1";
+    // 生成 18 位随机字符（36进制：数字+小写字母）
+    const randomStr = Math.random().toString(36).slice(2, 20);
+    const nickName = "访客_" + randomStr;
 
-    // 标准 GET 请求
-    const response = await fetch(apiUrl, {
-      method: "GET"
-    });
-
-    if (!response.ok) {
-      throw new Error(`接口请求失败，HTTP 状态码：${response.status}`);
-    }
-
-    // 接口返回 JSON 格式，使用 json() 解析
-    const resData = await response.json();
-    console.log("【接口原始返回数据】", resData);
-
-    // 按接口结构解析：取 data 数组第一个昵称
-    if (resData.status === "success" && Array.isArray(resData.data) && resData.data.length > 0) {
-      const nickName = resData.data[0].trim();
-      if (nickName) {
-        console.log("【获取随机昵称成功】", nickName);
-        return nickName;
-      }
-    }
-
-    throw new Error("接口数据解析异常，未获取到昵称");
+    console.log("【生成本地访客昵称】", nickName);
+    return nickName;
 
   } catch (err) {
-    console.error("【获取随机昵称失败】", err);
-    // 兜底昵称逻辑保持不变
+    console.error("【生成昵称异常】", err);
+    // 极端异常兜底（最短随机串）
     return "访客_" + Math.random().toString(36).slice(2, 8);
   }
 }
