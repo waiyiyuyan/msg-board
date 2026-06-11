@@ -172,26 +172,6 @@ textareaDom.addEventListener('input', () => autoResize(textareaDom));
 
 // 昵称生成
 let userNick = getCookie('userNick');
-const adj = ['晚风', '青禾', '屿鹿', '星眠', '浅墨', '雾野', '秋辞', '南栀', '枕雪', '临江'];
-const noun = ['清茶', '星河', '孤岛', '落日', '白舟', '云笺', '寒川', '青衫', '暮雪', '闲舟'];
-async function createNewNick() {
-  const maxTry = 20;
-  let tryCount = 0;
-  while (tryCount < maxTry) {
-    tryCount++;
-    const randName = adj[Math.floor(Math.random() * adj.length)] + "_" + noun[Math.floor(Math.random() * noun.length)] + Math.floor(Math.random() * 900 + 100);
-    const res = await fetch(`${API_BASE}/checkNick?nick=${encodeURIComponent(randName)}`, { credentials: "include" });
-    const json = await res.json();
-    if (!json.exist) {
-      setCookie('userNick', randName);
-      return randName;
-    }
-  }
-  const fallbackName = "访客_" + Math.random().toString(36).slice(2, 8);
-  setCookie('userNick', fallbackName);
-  return fallbackName;
-}
-
 // 回复展开/收起
 function toggleReplyFold(pid) {
   const pidNum = Number(pid);
