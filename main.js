@@ -229,14 +229,14 @@ function buildPostHtml(post) {
     ${renderMedia(post.media_urls || "")}
     <!-- 合并后的操作行：回复按钮 + 展开折叠按钮 同行显示 -->
     <div class="post-action-row">
-      <div class="post-btn-group">
-        <button class="reply-small-btn" onclick="openReplyPop(${post.id},'${post.name}')">回复</button>
-      </div>
-
       <div class="toggle-wrapper" data-pid="${post.id}" style="${post.replys.length === 0 ? 'cursor:default;' : 'cursor:pointer;'}">
         <button class="fold-btn" data-fold-pid="${post.id}" style="${post.replys.length === 0 ? 'color:#999;cursor:default;' : ''}">
           ${post.replys.length}条回复 ${post.replys.length > 0 ? (foldReplyIds.includes(post.id) ? '▼' : '▶') : ''}
         </button>
+      </div>
+      
+      <div class="post-btn-group">
+        <button class="reply-small-btn" onclick="openReplyPop(${post.id},'${post.name}')">回复</button>
       </div>
     </div>
     <div class="reply-wrap" data-wrap-pid="${post.id}" style="${!foldReplyIds.includes(post.id) || post.replys.length === 0 ? 'display:none' : ''}">${rHtml}</div>
