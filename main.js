@@ -106,6 +106,55 @@ let lastData = [];
 let notifyList = [];
 let popOpen = false;
 let isUploading = false;
+// ===================== 新增：昵称&头像 全局变量 + 工具函数 =====================
+// 当前用户头像地址
+let userAvatar = "";
+
+/**
+ * 根据昵称生成 DiceBear 头像链接
+ * @param {string} nick 用户名/昵称
+ * @returns {string} 头像SVG地址
+ */
+function getAvatarUrl(nick) {
+  if (!nick) return "";
+  // 编码中文/特殊字符，防止头像接口异常
+  const seed = encodeURIComponent(nick);
+  return `https://api.dicebear.com/10.x/lorelei/svg?seed=${seed}`;
+}
+
+/**
+ * POST 请求第三方接口 获取随机昵称
+ * 接口：https://www.okeytool.com/random-nickname
+ * 表单参数：count=1
+ * @returns {Promise<string>} 随机昵称
+ */
+async function fetchRandomNick() {
+  try {
+    const response = await fetch("https://www.okeytool.com/random-nickname", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "count=1" // 表单数据
+    });
+
+    if (!response.ok) {
+      throw new Error("昵称接口请求失败");
+    }
+
+    const resData = await response.json();
+    // 接口返回格式：{"code":1,"msg":"success","data":["昵称"]}
+    if (resData.code === 1 && Array.isArray(resData.data) && resData.data.length > 0) {
+      return resData.data[0];
+    }
+    throw new Error("昵称数据解析异常");
+  } catch (err) {
+    console.error("【获取随机昵称失败】", err);
+    // 接口异常兜底：生成访客昵称（和原逻辑一致）
+    return "访客_" + Math.random().toString(36).slice(2, 8);
+  }
+}
+// ==============================================================================
 
 // DOM 节点缓存
 const imgPreviewMask = document.getElementById('imgPreviewMask');
