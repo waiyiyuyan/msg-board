@@ -195,7 +195,6 @@ textarea{
   border: 1px solid #e5e5ea;
   background-color: #f2f2f7; /* 头像加载中兜底底色 */
 }
-
 /* 弹窗昵称文字：长文本自动省略，防止布局挤压 */
 .popup-nick {
   font-size: 15px;
@@ -206,6 +205,23 @@ textarea{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ========== 帖子头部 头像+昵称 样式 ========== */
+/* 帖子头像：正方形，和弹窗头像规格统一 */
+.post-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 0;          /* 正方形 */
+  object-fit: cover;
+  display: block;
+  border: 1px solid #e5e5ea;
+  background-color: #f2f2f7;  /* 加载兜底底色 */
+}
+
+/* 帖子头部头像昵称容器：内部已行内样式控制对齐，此处仅预留扩展 */
+.post-avatar-row {
+  line-height: 1;
 }
 .pop-post form{
   display:flex;
