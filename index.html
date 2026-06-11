@@ -36,11 +36,16 @@
     <div id="notifyListContent"></div>
   </div>
 </div>
-
 <!-- 统一共用弹窗：发帖+所有回复共用 -->
 <div class="mask" id="popMask">
   <div class="pop-post">
     <form id="popForm">
+      <!-- 新增：弹窗顶部 头像 + 昵称 展示区域 -->
+      <div class="popup-avatar-row">
+        <img class="popup-avatar" id="popupUserAvatar" alt="用户头像">
+        <span class="popup-nick" id="popupUserNick"></span>
+      </div>
+
       <div id="replyTip" style="color:#999;font-size:13px;display:none;"></div>
       <textarea name="content"></textarea>
       
