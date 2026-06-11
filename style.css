@@ -217,8 +217,7 @@ textarea{
   width: 100%;          /* 宽度自适应父容器（帖子卡片），和文字同宽 */
   height: 180px;         /* 固定高度，可自行修改数值 */
   border-radius: 8px;
-  border: 1px solid #e5e5ea;
-  padding: 1px;
+  border: 1px solid #7c7c7c;
   margin: 8px 0;
   object-fit: cover;     /* 等比例铺满容器，超出部分裁剪 */
   object-position: center; /* 图片居中 */
