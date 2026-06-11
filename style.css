@@ -174,6 +174,39 @@ textarea{
   border-radius:8px;
   padding:20px;
 }
+/* ========== 弹窗顶部 头像+昵称 样式 ========== */
+/* 头像+昵称 整行容器：横向居中排列 */
+.popup-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;               /* 头像和昵称之间的间距 */
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #e5e5ea; /* 分割线，和全站分割线样式统一 */
+}
+
+/* 弹窗头像：圆形、固定尺寸 */
+.popup-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 0;        /* 正方形头像（关键修改） */
+  object-fit: cover;
+  display: block;
+  border: 1px solid #e5e5ea;
+  background-color: #f2f2f7; /* 头像加载中兜底底色 */
+}
+
+/* 弹窗昵称文字：长文本自动省略，防止布局挤压 */
+.popup-nick {
+  font-size: 15px;
+  color: #007aff;
+  font-weight: 500;
+  /* 长昵称防溢出：超出部分显示省略号 */
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .pop-post form{
   display:flex;
   flex-direction:column;
