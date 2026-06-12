@@ -19,6 +19,10 @@ body{background:#f2f2f7;padding:14px;max-width:700px;margin:0 auto;padding-botto
 .del-btn{background:#ff3b30;}
 .divider{height:1px;background:#e5e5ea;margin:16px 0;}
 .reply-wrap{padding-top:12px;padding-bottom:85px;}
+/* 弹窗内回复区域：保留少量底部边距，不拥挤 */
+.notice-full-modal .reply-wrap {
+  padding-bottom: 16px;
+}
 .reply-item{padding:8px 0;border-bottom:1px solid #eee;display:flex;flex-direction:column;}
 .reply-item:last-child{border-bottom:none;}
 .reply-head{display:flex;justify-content:space-between;align-items:center;}
