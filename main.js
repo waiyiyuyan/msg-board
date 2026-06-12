@@ -337,8 +337,9 @@ function renderNotify() {
   
 }
 
-// 跳转帖子 + 标记已读
+// 跳转帖子 + 标记已读（改造：改为打开全屏弹窗，废弃页面滚动/主页面闪烁）
 async function jumpPost(nid, pid, rid) {
+  // 1. 保留原有核心：标记该条通知为已读
   const fd = new FormData();
   fd.append('nid', nid);
   const uid = encodeURIComponent(userNick);
@@ -348,25 +349,11 @@ async function jumpPost(nid, pid, rid) {
     credentials: "include"
   });
 
+  // 2. 保留原有逻辑：关闭通知栏
   notifyMask.style.display = 'none';
-  const pidNum = Number(pid);
-  if (!foldReplyIds.includes(pidNum)) foldReplyIds.push(pidNum);
 
-  const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
-  const foldBtn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
-  if (wrap) wrap.style.display = "block";
-  if (foldBtn) foldBtn.innerText = `${wrap.querySelectorAll(".reply-item").length}条回复 ▼`;
-
-  const postDom = document.querySelector(`.post-card[data-pid="${pid}"]`);
-  if (postDom) postDom.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  setTimeout(() => {
-    const replyDom = document.querySelector(`.reply-item[data-rid="${rid}"]`);
-    if (replyDom) {
-      replyDom.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      replyDom.classList.add('flash');
-      replyDom.addEventListener('animationend', () => replyDom.classList.remove('flash'), { once: true });
-    }
-  }, 120);
+  // 3. 调用全屏弹窗，传入帖子ID、回复ID
+  openNoticeModal(pid, rid);
 }
 
 // 全部标记通知已读
