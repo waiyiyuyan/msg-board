@@ -21,6 +21,7 @@ body{background:#f2f2f7;padding:14px;max-width:700px;margin:0 auto;padding-botto
 .reply-wrap{padding-top:12px;padding-bottom:85px;}
 /* 弹窗内回复区域：保留少量底部边距，不拥挤 */
 .notice-full-modal .reply-wrap {
+  padding-top: 8px;   /* 微调顶部间距 */
   padding-bottom: 16px;
 }
 .reply-item{padding:8px 0;border-bottom:1px solid #eee;display:flex;flex-direction:column;}
