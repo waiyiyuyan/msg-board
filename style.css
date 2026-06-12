@@ -394,3 +394,25 @@ textarea{
   margin: 10px 0;
   width: 100%;
 }
+
+/* ===================== 通知详情全屏弹窗 样式 ===================== */
+/* 弹窗外层容器：全屏遮罩、默认隐藏、最高层级 */
+.notice-full-modal {
+  display: none;          /* 默认隐藏 */
+  position: fixed;        /* 固定定位，悬浮在页面上层 */
+  top: 0;
+  left: 0;
+  width: 100vw;           /* 宽度占满视口 */
+  height: 100vh;          /* 高度占满视口 */
+  background-color: #fff; /* 背景白色，和主页面统一 */
+  z-index: 99999;         /* 全站最高层级，盖住所有弹窗/内容 */
+}
+
+/* 内部内容容器：支持滚动、内边距 */
+.modal-content {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;       /* 内容超出高度时，仅容器内部纵向滚动 */
+  padding: 1rem;          /* 四周留白，防止内容贴边 */
+  box-sizing: border-box; /* 内边距不会撑大容器尺寸 */
+}
