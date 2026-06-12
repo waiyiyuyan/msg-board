@@ -22,7 +22,7 @@ body{background:#f2f2f7;padding:14px;max-width:700px;margin:0 auto;padding-botto
 /* 弹窗内回复区域：保留少量底部边距，不拥挤 */
 .notice-full-modal .reply-wrap {
   padding-top: 8px;   /* 微调顶部间距 */
-  padding-bottom: 8px;
+  padding-bottom: 4px;
 }
 .reply-item{padding:8px 0;border-bottom:1px solid #eee;display:flex;flex-direction:column;}
 .reply-item:last-child{border-bottom:none;}
@@ -401,29 +401,22 @@ textarea{
 }
 
 /* ===================== 通知详情全屏弹窗 样式 ===================== */
+/* 外层容器：保留原生全屏、默认隐藏，无任何改动，绝对安全 */
 .notice-full-modal {
-  display: none;          /* 默认隐藏，核心：防止页面常驻遮罩 */
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #fff; /* 手机端全屏白色底色 */
+  background-color: #fff;
   z-index: 200;
+  /* 给外层增加内边距，防止卡片贴屏幕边缘 */
+  padding: 20px;
   box-sizing: border-box;
-  padding: 16px;
 }
 
-/* 伪元素：单独制作 半透明遮罩（电脑端生效） */
-.notice-full-modal::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.25); /* 半透明黑遮罩，可改透明度 */
-  display: none; /* 默认隐藏 */
-  z-index: -1; /* 置于内容下层，不遮挡点击 */
-}
-
+/* 内部内容容器：基础样式 */
 .modal-content {
   width: 100%;
   height: 100%;
@@ -432,32 +425,28 @@ textarea{
   box-sizing: border-box;
 }
 
-/* ========== 手机端 < 768px：纯原版全屏，无半透明遮罩 ========== */
+/* ========== 手机端（宽度 < 768px）：完全保留原版全屏效果 ========== */
 @media (max-width: 767px) {
-  /* 手机端隐藏半透明遮罩，恢复纯白 */
-  .notice-full-modal::before {
-    display: none;
-  }
   .modal-content {
     width: 100%;
     height: 100%;
   }
 }
 
-/* ========== 电脑端 ≥ 768px：半透明遮罩 + 内容居中卡片 ========== */
+/* ========== 电脑端（宽度 ≥ 768px）：卡片双居中（核心修复） ========== */
 @media (min-width: 768px) {
-  /* 电脑端启用半透明遮罩 */
-  .notice-full-modal::before {
-    display: block;
-  }
-
   .modal-content {
-    max-width: 700px;   /* 和主页宽度一致 */
+    /* 宽度和主页主体对齐 */
+    max-width: 700px;
     width: 100%;
-    max-height: 85vh;   /* 卡片最大高度 */
+    /* 限制最大高度，避免撑满屏幕 */
+    max-height: 85vh;
     height: auto;
-    margin: auto;       /* 水平+垂直 双居中，解决靠左问题 */
-    background-color: #fff; /* 卡片白底 */
+
+    /* 核心：水平 + 垂直 双居中（传统布局最稳写法） */
+    margin: auto;
+
+    /* 美化样式，可随意删除 */
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   }
