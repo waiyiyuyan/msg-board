@@ -940,7 +940,14 @@ function initWebSocket() {
         if (cachePost && cachePost.replys) {
           cachePost.replys.push(replyItem);
         }
-        // ======================================================
+          // ======================================================
+          // ========== 新增：如果当前通知弹窗已打开，且是同一条帖子，自动刷新弹窗 ==========
+        if (isNoticeModalOpen && Number(currentModalPostId) === Number(targetPid)) {
+          // 刷新弹窗内容，不需要闪烁动画
+          renderNoticeModalContent(currentModalPostId, currentModalReplyId, false);
+        }
+        // ======================================================================
+        
         break;
 
         // 3. 删除帖子：直接移除对应DOM
