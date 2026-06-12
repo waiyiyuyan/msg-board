@@ -813,6 +813,44 @@ function initWebSocket() {
         case "NOTIFY_DATA":
           console.log("[WS] 收到通知更新");
           notifyList = data.notify || [];
+          // ========== 新增：自动标记已读逻辑 ==========
+          // 仅当 通知弹窗已打开 时，执行判断
+          if (isNoticeModalOpen && currentModalPostId !== null) {
+            // 筛选出【未读】通知
+            const unReadList = notifyList.filter(item => Number(item.is_read) !== 1);
+            if (unReadList.length > 0) {
+              // 取最新一条未读通知（后端通知按时间排序，最后一条为最新）
+              const latestNotify = unReadList[unReadList.length - 1];
+              const notifyPostId = Number(latestNotify.target_msg_id);
+              const currentPostId = Number(currentModalPostId);
+        
+              // 判断：新通知 属于 当前弹窗正在查看的帖子
+              if (notifyPostId === currentPostId) {
+                const nid = latestNotify.id;
+                const uid = encodeURIComponent(userNick);
+        
+                // 异步调用接口：标记该通知为已读（不阻塞页面）
+                (async () => {
+                  try {
+                    const fd = new FormData();
+                    fd.append('nid', nid);
+                    await fetch(`${API_BASE}/setRead?uid=${uid}`, {
+                      method: "POST",
+                      body: fd,
+                      credentials: "include"
+                    });
+                    // 本地同步更新状态，避免刷新延迟
+                    latestNotify.is_read = 1;
+                    // 重新渲染通知栏（更新角标、文字样式）
+                    renderNotify();
+                  } catch (err) {
+                    console.warn("自动标记通知已读失败", err);
+                  }
+                })();
+              }
+            }
+          }
+          // ==========================================
           renderNotify();
           break;
 
