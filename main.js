@@ -106,6 +106,7 @@ let lastData = [];
 let notifyList = [];
 let popOpen = false;
 let isUploading = false;
+let isNoticeModalOpen = false; // 通知全屏弹窗状态锁
 // ===================== 新增：昵称&头像 全局变量 + 工具函数 =====================
 // 当前用户头像地址
 let userAvatar = "";
@@ -162,6 +163,9 @@ const notifyListContent = document.getElementById('notifyListContent');
 const readAllBtn = document.getElementById('readAllBtn');
 const clearNotifyBtn = document.getElementById('clearNotifyBtn');
 const listBox = document.getElementById('listBox');
+// 新增：通知详情全屏弹窗 DOM 节点
+const noticeFullModal = document.getElementById('noticeFullModal');
+const noticeModalContent = document.getElementById('noticeModalContent');
 
 // textarea 自适应高度
 function autoResize(el) {
@@ -481,6 +485,44 @@ function closeReply(pid) {
   if (wrap) wrap.style.display = 'none';
   if (foldBtn) foldBtn.innerText = total + '条回复 ▶';
 }
+
+// ========== 新增：通知全屏弹窗 基础控制函数 ==========
+/**
+ * 打开通知详情全屏弹窗
+ * @param {string|number} postId 帖子ID
+ * @param {string|number} replyId 回复ID
+ */
+async function openNoticeModal(postId, replyId) {
+  // 状态锁：弹窗已打开则直接拦截，禁止重复弹出
+  if (isNoticeModalOpen) return;
+
+  isNoticeModalOpen = true;
+  // 显示全屏弹窗
+  noticeFullModal.style.display = 'block';
+  // 锁定底层页面：禁止滚动、防止底层误触
+  document.body.style.overflow = 'hidden';
+
+  // 临时日志（后续这里会加渲染逻辑，当前仅占位）
+  console.log("【打开通知弹窗】帖子ID:", postId, "回复ID:", replyId);
+}
+
+/**
+ * 关闭通知详情全屏弹窗
+ */
+function closeNoticeModal() {
+  if (!isNoticeModalOpen) return;
+
+  // 隐藏全屏弹窗
+  noticeFullModal.style.display = 'none';
+  // 恢复底层页面滚动
+  document.body.style.overflow = '';
+  // 重置弹窗状态锁
+  isNoticeModalOpen = false;
+
+  // 按方案优化：关闭弹窗后 自动重新打开通知栏，方便连续查看多条通知
+  notifyMask.style.display = 'flex';
+}
+// =====================================================
 
 // ===================== 【新增】回复弹窗函数（解决onclick未定义错误） =====================
 // 回复主帖子
