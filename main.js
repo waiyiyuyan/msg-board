@@ -481,7 +481,6 @@ function closeReply(pid) {
   if (foldBtn) foldBtn.innerText = total + '条回复 ▶';
 }
 
-// ========== 新增：通知全屏弹窗 基础控制函数 ==========
 /**
  * 打开通知详情全屏弹窗
  * @param {string|number} postId 帖子ID
@@ -497,8 +496,40 @@ async function openNoticeModal(postId, replyId) {
   // 锁定底层页面：禁止滚动、防止底层误触
   document.body.style.overflow = 'hidden';
 
-  // 临时日志（后续这里会加渲染逻辑，当前仅占位）
   console.log("【打开通知弹窗】帖子ID:", postId, "回复ID:", replyId);
+
+  // 1. 从全局缓存中查找对应帖子
+  const targetPost = lastData.find(item => Number(item.id) === Number(postId));
+
+  // 2. 兜底：帖子不存在/已被删除
+  if (!targetPost) {
+    noticeModalContent.innerHTML = `<div style="text-align:center;margin-top:50px;font-size:16px;color:#666;">该帖子已被删除或不存在</div>`;
+    return;
+  }
+
+  // 3. 渲染帖子+回复（isModal=true 启用弹窗渲染规则）
+  const postHtml = buildPostHtml(targetPost, true);
+  noticeModalContent.innerHTML = postHtml;
+
+  // 4. 弹窗内自动展开回复列表（打开通知默认看回复，无需手动展开）
+  const replyWrap = noticeModalContent.querySelector(`.reply-wrap[data-wrap-pid="${postId}"]`);
+  const foldBtn = noticeModalContent.querySelector(`.fold-btn[data-fold-pid="${postId}"]`);
+  if (replyWrap) replyWrap.style.display = "block";
+  if (foldBtn) foldBtn.innerText = `${replyWrap.querySelectorAll(".reply-item").length}条回复 ▼`;
+
+  // 5. 定位目标回复 + 保留闪烁动画（和原逻辑一致，延时等待DOM渲染完成）
+  setTimeout(() => {
+    const targetReply = noticeModalContent.querySelector(`.reply-item[data-rid="${replyId}"]`);
+    if (targetReply) {
+      // 弹窗内部滚动到目标回复
+      targetReply.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // 保留闪烁提示动画
+      targetReply.classList.add('flash');
+      targetReply.addEventListener('animationend', () => {
+        targetReply.classList.remove('flash');
+      }, { once: true });
+    }
+  }, 120);
 }
 
 /**
