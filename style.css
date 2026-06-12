@@ -435,7 +435,7 @@ textarea{
     max-width: 700px;
     width: 100%;
     /* 限制最大高度，避免撑满屏幕 */
-    max-height: 85vh;
+    max-height: 90vh;
     height: auto;
 
     /* 核心：水平 + 垂直 双居中（传统布局最稳写法） */
