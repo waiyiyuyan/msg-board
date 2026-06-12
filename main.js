@@ -809,6 +809,8 @@ function initWebSocket() {
           // 绑定新节点的折叠/图片事件
           bindFoldBtn();
           bindMediaEvents(listBox);
+          // 同步更新全局缓存（新帖子插在数组头部）
+          lastData.unshift(data.item);
           break;
         // 2. 新回复：追加到对应帖子的回复区
       case "NEW_REPLY":
@@ -908,6 +910,12 @@ function initWebSocket() {
       
         // 绑定图片预览事件
         bindMediaEvents(replyWrap);
+          // ========== 新增：同步更新全局缓存里的回复数据 ==========
+        const cachePost = lastData.find(p => Number(p.id) === Number(targetPid));
+        if (cachePost && cachePost.replys) {
+          cachePost.replys.push(replyItem);
+        }
+        // ======================================================
         break;
 
         // 3. 删除帖子：直接移除对应DOM
