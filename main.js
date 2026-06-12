@@ -488,8 +488,9 @@ function closeReply(pid) {
  * 渲染通知弹窗内容（独立抽离，用于首次打开 + 实时刷新）
  * @param {string|number} postId 帖子ID
  * @param {string|number} replyId 回复ID
+ * @param {boolean} needFlash 是否需要闪烁定位动画，默认 true
  */
-function renderNoticeModalContent(postId, replyId) {
+function renderNoticeModalContent(postId, replyId, needFlash = true) {
   // 1. 从全局缓存查找帖子
   const targetPost = lastData.find(item => Number(item.id) === Number(postId));
 
@@ -509,17 +510,19 @@ function renderNoticeModalContent(postId, replyId) {
   if (replyWrap) replyWrap.style.display = "block";
   if (foldBtn) foldBtn.innerText = `${replyWrap.querySelectorAll(".reply-item").length}条回复 ▼`;
 
-  // 5. 定位目标回复 + 闪烁动画
-  setTimeout(() => {
-    const targetReply = noticeModalContent.querySelector(`.reply-item[data-rid="${replyId}"]`);
-    if (targetReply) {
-      targetReply.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      targetReply.classList.add('flash');
-      targetReply.addEventListener('animationend', () => {
-        targetReply.classList.remove('flash');
-      }, { once: true });
-    }
-  }, 120);
+  // 5. 仅当 needFlash = true 时，才执行滚动+闪烁动画
+  if (needFlash) {
+    setTimeout(() => {
+      const targetReply = noticeModalContent.querySelector(`.reply-item[data-rid="${replyId}"]`);
+      if (targetReply) {
+        targetReply.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetReply.classList.add('flash');
+        targetReply.addEventListener('animationend', () => {
+          targetReply.classList.remove('flash');
+        }, { once: true });
+      }
+    }, 120);
+  }
 }
 
 /**
@@ -687,9 +690,9 @@ popForm.onsubmit = async function (e) {
       popOpen = false;
       // 提交关闭弹窗，同步清空占位文字
       textareaDom.placeholder = '';
-      // 新增：如果通知弹窗正在打开，立刻刷新弹窗内容
+      // 新增：如果通知弹窗正在打开，立刻刷新弹窗内容（刷新时关闭闪烁动画）
       if (isNoticeModalOpen && currentModalPostId) {
-        renderNoticeModalContent(currentModalPostId, currentModalReplyId);
+        renderNoticeModalContent(currentModalPostId, currentModalReplyId, false);
       }
     }
   } catch (err) {
