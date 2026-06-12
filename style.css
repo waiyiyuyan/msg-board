@@ -395,50 +395,24 @@ textarea{
   width: 100%;
 }
 
-/* ===================== 通知详情弹窗 样式（适配手机/电脑） ===================== */
-/* 外层遮罩：永远全屏固定定位，用来做背景遮罩 + 居中内容 */
+/* ===================== 通知详情全屏弹窗 样式 ===================== */
+/* 弹窗外层容器：全屏遮罩、默认隐藏 */
 .notice-full-modal {
   display: none;
   position: fixed;
-  inset: 0;          /* 简写 top/left/right/bottom = 0 */
-  background-color: rgba(0, 0, 0, 0.25); /* 半透明遮罩（替代纯白全屏） */
-  z-index: 200;      /* 层级保持不变，不影响原有逻辑 */
-  /* 弹性布局：让内部卡片居中 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  box-sizing: border-box;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #fff;
+  z-index: 200;
 }
 
-/* 内部内容卡片（通用基础样式） */
+/* 内部内容容器：支持滚动、内边距 */
 .modal-content {
-  background-color: #fff;
-  border-radius: 8px;  /* 和全站卡片圆角统一 */
-  overflow-y: auto;    /* 内容超出滚动 */
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
   padding: 1rem;
   box-sizing: border-box;
-}
-
-/* ========== 移动端：屏幕宽度 < 768px（手机/平板），保留全屏效果 ========== */
-@media (max-width: 767px) {
-  .modal-content {
-    width: 100%;
-    height: 100%;
-    border-radius: 0; /* 手机端去掉圆角，全屏更自然 */
-  }
-}
-
-/* ========== 电脑端：屏幕宽度 ≥ 768px，改为居中卡片（重点） ========== */
-@media (min-width: 768px) {
-  .modal-content {
-    /* 宽度：和你主页 max-width:700px 保持一致，刚好覆盖主贴区域 */
-    max-width: 700px;
-    width: 100%;
-    /* 高度：限制最大高度，不会无限拉长，可自行修改数值 */
-    max-height: 85vh; 
-    height: auto;
-    /* 增加轻微阴影，提升桌面端质感（可选删除） */
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-  }
 }
