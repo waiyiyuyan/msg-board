@@ -107,6 +107,9 @@ let notifyList = [];
 let popOpen = false;
 let isUploading = false;
 let isNoticeModalOpen = false; // 通知全屏弹窗状态锁
+// 新增：记录当前通知弹窗展示的帖子ID、回复ID，用于实时刷新
+let currentModalPostId = null;
+let currentModalReplyId = null;
 // ===================== 新增：昵称&头像 全局变量 + 工具函数 =====================
 // 当前用户头像地址
 let userAvatar = "";
@@ -482,6 +485,44 @@ function closeReply(pid) {
 }
 
 /**
+ * 渲染通知弹窗内容（独立抽离，用于首次打开 + 实时刷新）
+ * @param {string|number} postId 帖子ID
+ * @param {string|number} replyId 回复ID
+ */
+function renderNoticeModalContent(postId, replyId) {
+  // 1. 从全局缓存查找帖子
+  const targetPost = lastData.find(item => Number(item.id) === Number(postId));
+
+  // 2. 帖子不存在兜底
+  if (!targetPost) {
+    noticeModalContent.innerHTML = `<div style="text-align:center;margin-top:50px;font-size:16px;color:#666;">该帖子已被删除或不存在</div>`;
+    return;
+  }
+
+  // 3. 渲染帖子+回复（弹窗模式 isModal=true）
+  const postHtml = buildPostHtml(targetPost, true);
+  noticeModalContent.innerHTML = postHtml;
+
+  // 4. 弹窗内自动展开回复列表
+  const replyWrap = noticeModalContent.querySelector(`.reply-wrap[data-wrap-pid="${postId}"]`);
+  const foldBtn = noticeModalContent.querySelector(`.fold-btn[data-fold-pid="${postId}"]`);
+  if (replyWrap) replyWrap.style.display = "block";
+  if (foldBtn) foldBtn.innerText = `${replyWrap.querySelectorAll(".reply-item").length}条回复 ▼`;
+
+  // 5. 定位目标回复 + 闪烁动画
+  setTimeout(() => {
+    const targetReply = noticeModalContent.querySelector(`.reply-item[data-rid="${replyId}"]`);
+    if (targetReply) {
+      targetReply.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetReply.classList.add('flash');
+      targetReply.addEventListener('animationend', () => {
+        targetReply.classList.remove('flash');
+      }, { once: true });
+    }
+  }, 120);
+}
+
+/**
  * 打开通知详情全屏弹窗
  * @param {string|number} postId 帖子ID
  * @param {string|number} replyId 回复ID
@@ -498,38 +539,12 @@ async function openNoticeModal(postId, replyId) {
 
   console.log("【打开通知弹窗】帖子ID:", postId, "回复ID:", replyId);
 
-  // 1. 从全局缓存中查找对应帖子
-  const targetPost = lastData.find(item => Number(item.id) === Number(postId));
+  // 记录当前弹窗ID，用于后续实时刷新
+  currentModalPostId = postId;
+  currentModalReplyId = replyId;
 
-  // 2. 兜底：帖子不存在/已被删除
-  if (!targetPost) {
-    noticeModalContent.innerHTML = `<div style="text-align:center;margin-top:50px;font-size:16px;color:#666;">该帖子已被删除或不存在</div>`;
-    return;
-  }
-
-  // 3. 渲染帖子+回复（isModal=true 启用弹窗渲染规则）
-  const postHtml = buildPostHtml(targetPost, true);
-  noticeModalContent.innerHTML = postHtml;
-
-  // 4. 弹窗内自动展开回复列表（打开通知默认看回复，无需手动展开）
-  const replyWrap = noticeModalContent.querySelector(`.reply-wrap[data-wrap-pid="${postId}"]`);
-  const foldBtn = noticeModalContent.querySelector(`.fold-btn[data-fold-pid="${postId}"]`);
-  if (replyWrap) replyWrap.style.display = "block";
-  if (foldBtn) foldBtn.innerText = `${replyWrap.querySelectorAll(".reply-item").length}条回复 ▼`;
-
-  // 5. 定位目标回复 + 保留闪烁动画（和原逻辑一致，延时等待DOM渲染完成）
-  setTimeout(() => {
-    const targetReply = noticeModalContent.querySelector(`.reply-item[data-rid="${replyId}"]`);
-    if (targetReply) {
-      // 弹窗内部滚动到目标回复
-      targetReply.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // 保留闪烁提示动画
-      targetReply.classList.add('flash');
-      targetReply.addEventListener('animationend', () => {
-        targetReply.classList.remove('flash');
-      }, { once: true });
-    }
-  }, 120);
+  // 调用独立渲染函数
+  renderNoticeModalContent(postId, replyId);
 }
 
 /**
@@ -547,6 +562,9 @@ function closeNoticeModal() {
 
   // 按方案优化：关闭弹窗后 自动重新打开通知栏，方便连续查看多条通知
   notifyMask.style.display = 'flex';
+  // 新增：关闭弹窗时清空记录的ID
+  currentModalPostId = null;
+  currentModalReplyId = null;
 }
 // =====================================================
 
@@ -669,6 +687,10 @@ popForm.onsubmit = async function (e) {
       popOpen = false;
       // 提交关闭弹窗，同步清空占位文字
       textareaDom.placeholder = '';
+      // 新增：如果通知弹窗正在打开，立刻刷新弹窗内容
+      if (isNoticeModalOpen && currentModalPostId) {
+        renderNoticeModalContent(currentModalPostId, currentModalReplyId);
+      }
     }
   } catch (err) {
     alert("提交失败，请稍后重试");
