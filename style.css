@@ -395,24 +395,48 @@ textarea{
   width: 100%;
 }
 
-/* ===================== 通知详情全屏弹窗 样式 ===================== */
-/* 弹窗外层容器：全屏遮罩、默认隐藏 */
+/* ===================== 通知详情弹窗 样式（半透明遮罩+居中卡片） ===================== */
 .notice-full-modal {
-  display: none;
+  display: none;          /* 默认隐藏，核心！不会常驻遮罩 */
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: #fff;
+  inset: 0;
   z-index: 200;
+  box-sizing: border-box;
+  padding: 16px;
 }
 
-/* 内部内容容器：支持滚动、内边距 */
+/* 仅当弹窗被JS设置为显示时，启用居中布局 + 半透明背景 */
+.notice-full-modal[style*="display: block"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.25); /* 半透明遮罩 */
+}
+
 .modal-content {
-  width: 100%;
-  height: 100%;
+  background-color: #fff;
   overflow-y: auto;
   padding: 1rem;
   box-sizing: border-box;
+}
+
+/* 手机端：全屏样式 */
+@media (max-width: 767px) {
+  .modal-content {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+}
+
+/* 电脑端：居中卡片 */
+@media (min-width: 768px) {
+  .modal-content {
+    max-width: 700px;
+    width: 100%;
+    max-height: 85vh;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
 }
