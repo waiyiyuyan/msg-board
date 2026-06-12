@@ -194,14 +194,22 @@ function toggleReplyFold(pid) {
   }
 }
 
-// 渲染单条帖子HTML
-function buildPostHtml(post) {
+// 渲染单条帖子HTML // isModal: false=主页面渲染(默认)  true=通知弹窗内渲染
+function buildPostHtml(post, isModal = false) {
   let rHtml = '';
   if (post.replys && post.replys.length > 0) {
     post.replys.forEach((r, index) => {
-      let extraBtn = index === post.replys.length - 1
-        ? `<button class="reply-small-btn" style="margin-right:8px;" onclick="closeReply(${post.id})">收起</button>`
-        : "";
+      // 根据渲染场景区分按钮：主页面=收起 / 弹窗=关闭
+    let extraBtn = "";
+    if (index === post.replys.length - 1) {
+      if (isModal) {
+        // 弹窗内：改为【关闭】按钮，点击关闭全屏弹窗
+        extraBtn = `<button class="reply-small-btn" style="margin-right:8px;" onclick="closeNoticeModal()">关闭</button>`;
+      } else {
+        // 主页面：保留原有【收起】按钮和逻辑
+        extraBtn = `<button class="reply-small-btn" style="margin-right:8px;" onclick="closeReply(${post.id})">收起</button>`;
+      }
+    }
       const myNick = userNick?.trim() || "";
       const rawContent = parseLink(r.r_content);
       let headText = r.r_name;
