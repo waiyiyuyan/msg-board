@@ -467,9 +467,10 @@ function updateLoadTip() {
   if (!tipEl) return;
 
   if (!hasMore) {
-    tipEl.innerText = "没有更多内容了";
-    tipEl.style.color = "#86868b";
-    tipEl.style.cursor = "default";
+    // 数据加载完毕：变为回到顶部按钮
+    tipEl.innerText = "-- 回到顶部 --";
+    tipEl.style.color = "#007aff";
+    tipEl.style.cursor = "pointer";
   } else if (isLoading) {
     tipEl.innerText = "加载中...";
     tipEl.style.color = "#86868b";
@@ -479,6 +480,14 @@ function updateLoadTip() {
     tipEl.style.color = "#007aff";
     tipEl.style.cursor = "pointer";
   }
+}
+
+// 平滑回到页面顶部
+function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
 
 // 初始化加载：获取首批10条最新帖子
@@ -513,13 +522,18 @@ async function initLoadPosts() {
     updateLoadTip();
   }
 }
-// 绑定底部加载更多点击事件
+// 绑定底部元素点击事件
 document.addEventListener("DOMContentLoaded", function () {
   const loadTip = document.getElementById("loadTip");
   if (loadTip) {
     loadTip.addEventListener("click", function () {
-      // 只有非加载中、还有更多数据时，才触发加载
-      if (!isLoading && hasMore) {
+      // 状态1：无更多数据 → 点击回到顶部
+      if (!hasMore) {
+        scrollToTop();
+        return;
+      }
+      // 状态2：有更多数据且非加载中 → 点击加载更多
+      if (!isLoading) {
         loadMorePosts();
       }
     });
