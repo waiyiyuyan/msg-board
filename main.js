@@ -467,7 +467,7 @@ function updateLoadTip() {
   if (!tipEl) return;
 
   if (!hasMore) {
-    tipEl.innerText = "没有更多历史内容了";
+    tipEl.innerText = "没有更多内容了";
     tipEl.style.color = "#86868b";
     tipEl.style.cursor = "default";
   } else if (isLoading) {
@@ -475,7 +475,7 @@ function updateLoadTip() {
     tipEl.style.color = "#86868b";
     tipEl.style.cursor = "default";
   } else {
-    tipEl.innerText = "-- 加载更多历史 --";
+    tipEl.innerText = "-- 加载更多 --";
     tipEl.style.color = "#007aff";
     tipEl.style.cursor = "pointer";
   }
