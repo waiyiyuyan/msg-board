@@ -115,7 +115,6 @@ let postDataList = [];   // 历史帖子分页缓存数组
 let lastCursor = "";     // 当前分页游标（最后一条帖子ID）
 let isLoading = false;   // 加载锁，防止重复请求
 let hasMore = true;      // 是否还有更多历史数据
-let lastScrollTop = 0;   // 记录上一次滚动位置，用于判断滑动方向
 // ===================== 新增：昵称&头像 全局变量 + 工具函数 =====================
 // 当前用户头像地址
 let userAvatar = "";
@@ -462,16 +461,23 @@ function renderPosts(data) {
   console.log(`[前端] 帖子渲染完成，共 ${data.length} 条，最新ID：${data[0]?.id}`);
 }
 
-// 更新底部加载提示文案
+// 更新底部加载提示文案 + 点击状态
 function updateLoadTip() {
   const tipEl = document.getElementById("loadTip");
   if (!tipEl) return;
+
   if (!hasMore) {
     tipEl.innerText = "没有更多历史内容了";
+    tipEl.style.color = "#86868b";
+    tipEl.style.cursor = "default";
   } else if (isLoading) {
     tipEl.innerText = "加载中...";
+    tipEl.style.color = "#86868b";
+    tipEl.style.cursor = "default";
   } else {
-    tipEl.innerText = "上滑加载更多";
+    tipEl.innerText = "-- 加载更多历史 --";
+    tipEl.style.color = "#007aff";
+    tipEl.style.cursor = "pointer";
   }
 }
 
@@ -507,7 +513,18 @@ async function initLoadPosts() {
     updateLoadTip();
   }
 }
-
+// 绑定底部加载更多点击事件
+document.addEventListener("DOMContentLoaded", function () {
+  const loadTip = document.getElementById("loadTip");
+  if (loadTip) {
+    loadTip.addEventListener("click", function () {
+      // 只有非加载中、还有更多数据时，才触发加载
+      if (!isLoading && hasMore) {
+        loadMorePosts();
+      }
+    });
+  }
+});
 // 加载更多：根据游标加载下一批历史数据（局部追加渲染）
 async function loadMorePosts() {
   // 前置拦截：加载中 / 无更多数据
@@ -1166,24 +1183,4 @@ window.addEventListener("load", async () => {
       }));
     }
   }
-});
-
-// 滚动监听：触底 + 上滑 触发加载更多
-window.addEventListener("scroll", function () {
-  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-  const windowHeight = window.innerHeight;
-  const documentHeight = document.documentElement.scrollHeight;
-
-  // 1. 判断是否滚动到底部（预留50px阈值，提前触发更顺滑）
-  const isBottom = scrollTop + windowHeight >= documentHeight - 50;
-  // 2. 判断是否为上滑（当前滚动位置 < 上一次位置 = 向上滑动）
-  const isScrollUp = scrollTop < lastScrollTop;
-
-  // 满足条件：触底 + 上滑 + 非加载中 + 有更多数据 → 触发加载
-  if (isBottom && isScrollUp) {
-    loadMorePosts();
-  }
-
-  // 更新上一次滚动位置
-  lastScrollTop = scrollTop;
 });
