@@ -110,6 +110,12 @@ let isNoticeModalOpen = false; // 通知全屏弹窗状态锁
 // 新增：记录当前通知弹窗展示的帖子ID、回复ID，用于实时刷新
 let currentModalPostId = null;
 let currentModalReplyId = null;
+// ========== 分页核心状态 ==========
+let postDataList = [];   // 历史帖子分页缓存数组
+let lastCursor = "";     // 当前分页游标（最后一条帖子ID）
+let isLoading = false;   // 加载锁，防止重复请求
+let hasMore = true;      // 是否还有更多历史数据
+let lastScrollTop = 0;   // 记录上一次滚动位置，用于判断滑动方向
 // ===================== 新增：昵称&头像 全局变量 + 工具函数 =====================
 // 当前用户头像地址
 let userAvatar = "";
@@ -456,6 +462,97 @@ function renderPosts(data) {
   console.log(`[前端] 帖子渲染完成，共 ${data.length} 条，最新ID：${data[0]?.id}`);
 }
 
+// 更新底部加载提示文案
+function updateLoadTip() {
+  const tipEl = document.getElementById("loadTip");
+  if (!tipEl) return;
+  if (!hasMore) {
+    tipEl.innerText = "没有更多历史内容了";
+  } else if (isLoading) {
+    tipEl.innerText = "加载中...";
+  } else {
+    tipEl.innerText = "上滑加载更多";
+  }
+}
+
+// 初始化加载：获取首批10条最新帖子
+async function initLoadPosts() {
+  if (isLoading) return;
+  isLoading = true;
+  updateLoadTip();
+
+  try {
+    const res = await fetch(`${API_BASE}/initPosts`, { credentials: "include" });
+    const data = await res.json();
+
+    if (data.code === 0) {
+      // 存入分页缓存
+      postDataList = data.list;
+      // 同步到全局 lastData，兼容原有弹窗、删除等所有逻辑
+      lastData = [...data.list];
+      lastCursor = data.lastCursor;
+      hasMore = data.hasMore;
+
+      // 全量渲染首批数据（复用原有渲染函数）
+      renderPosts(lastData);
+      updateLoadTip();
+      console.log("[分页] 初始化完成，加载", data.list.length, "条");
+    }
+  } catch (e) {
+    console.error("[分页] 初始化加载失败", e);
+    const tipEl = document.getElementById("loadTip");
+    if (tipEl) tipEl.innerText = "加载失败，刷新重试";
+  } finally {
+    isLoading = false;
+    updateLoadTip();
+  }
+}
+
+// 加载更多：根据游标加载下一批历史数据（局部追加渲染）
+async function loadMorePosts() {
+  // 前置拦截：加载中 / 无更多数据
+  if (isLoading || !hasMore) return;
+  isLoading = true;
+  updateLoadTip();
+
+  try {
+    const res = await fetch(`${API_BASE}/loadMorePosts?cursor=${lastCursor}`, { credentials: "include" });
+    const data = await res.json();
+
+    if (data.code === 0 && data.list.length > 0) {
+      // 追加到分页缓存
+      postDataList.push(...data.list);
+      // 同步到全局 lastData
+      lastData.push(...data.list);
+      lastCursor = data.lastCursor;
+      hasMore = data.hasMore;
+
+      // 局部追加渲染：只把新数据拼到列表末尾，不重绘整页
+      let newHtml = "";
+      data.list.forEach(post => {
+        newHtml += buildPostHtml(post);
+      });
+      listBox.insertAdjacentHTML("beforeend", newHtml);
+
+      // 给新节点绑定折叠、图片预览事件
+      bindFoldBtn();
+      bindMediaEvents(listBox);
+      updateLoadTip();
+      console.log("[分页] 追加加载完成，新增", data.list.length, "条");
+    } else {
+      hasMore = false;
+      updateLoadTip();
+    }
+  } catch (e) {
+    console.error("[分页] 加载更多失败", e);
+    const tipEl = document.getElementById("loadTip");
+    if (tipEl) tipEl.innerText = "加载失败，上滑重试";
+  } finally {
+    isLoading = false;
+    updateLoadTip();
+  }
+}
+
 function bindFoldBtn() {
   document.querySelectorAll('.fold-btn:not([data-btn-bound])').forEach(btn => {
     btn.dataset.btnBound = "true";
@@ -761,31 +858,21 @@ function initWebSocket() {
     }
     startHeartbeat();
 
-    // 延迟执行：同时兜底拉取 帖子 + 通知（双重保险）
     setTimeout(async () => {
       try {
-        // 1. 拉取帖子列表（原有逻辑，保留）
-        const postRes = await fetch(`${API_BASE}/listAll`, { credentials: "include" });
-        if (postRes.ok) {
-          const postData = await postRes.json();
-          renderPosts(postData);
-        }
-
-        // ========== 【新增】兜底拉取个人通知 核心修复 ==========
+        // 只兜底拉取通知，帖子由分页接口初始化
         if (userNick) {
           const notifyUrl = `${API_BASE}/getNotify?uid=${encodeURIComponent(userNick)}`;
           const notifyRes = await fetch(notifyUrl, { credentials: "include" });
           if (notifyRes.ok) {
             const notifyData = await notifyRes.json();
-            notifyList = notifyData;   // 更新全局通知数据
-            renderNotify();            // 渲染通知 + 刷新铃铛角标
+            notifyList = notifyData;
+            renderNotify();
             console.log("[前端] 重连兜底拉取通知完成，条数：", notifyData.length);
           }
         }
-        // =====================================================
-
       } catch (err) {
-        console.warn("重连后刷新数据失败", err);
+        console.warn("重连后刷新通知失败", err);
       }
     }, 300);
   };
@@ -798,9 +885,8 @@ function initWebSocket() {
 
       switch (data.type) {
         case "INIT_DATA":
-          console.log("[WS] 收到首屏帖子数据");
-          lastData = data.posts || [];
-          renderPosts(lastData);
+          console.log("[WS] 收到初始化数据");
+          // 只更新通知，帖子由分页接口负责初始化，避免全量覆盖
           notifyList = data.notify || [];
           renderNotify();
           break;
@@ -1015,14 +1101,9 @@ function initWebSocket() {
   };
 
   let initDataFallbackTimer = setTimeout(async () => {
-    if (lastData.length === 0) {
-      try {
-        const res = await fetch(`${API_BASE}/listAll`, { credentials: "include" });
-        const data = await res.json();
-        renderPosts(data);
-      } catch (e) {
-        console.log("首屏兜底拉取数据失败", e);
-      }
+  if (lastData.length === 0) {
+      console.log("[分页] WebSocket 超时，兜底分页初始化");
+      initLoadPosts();
     }
   }, 2000);
 
@@ -1052,6 +1133,7 @@ function startHeartbeat() {
 
 // 页面加载完成后初始化
 window.addEventListener("load", async () => {
+  initLoadPosts();
   initWebSocket();
 
   // 本地已有昵称：直接复用，并生成对应头像
@@ -1084,4 +1166,24 @@ window.addEventListener("load", async () => {
       }));
     }
   }
+});
+
+// 滚动监听：触底 + 上滑 触发加载更多
+window.addEventListener("scroll", function () {
+  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  const windowHeight = window.innerHeight;
+  const documentHeight = document.documentElement.scrollHeight;
+
+  // 1. 判断是否滚动到底部（预留50px阈值，提前触发更顺滑）
+  const isBottom = scrollTop + windowHeight >= documentHeight - 50;
+  // 2. 判断是否为上滑（当前滚动位置 < 上一次位置 = 向上滑动）
+  const isScrollUp = scrollTop < lastScrollTop;
+
+  // 满足条件：触底 + 上滑 + 非加载中 + 有更多数据 → 触发加载
+  if (isBottom && isScrollUp) {
+    loadMorePosts();
+  }
+
+  // 更新上一次滚动位置
+  lastScrollTop = scrollTop;
 });
