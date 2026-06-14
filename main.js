@@ -54,8 +54,10 @@ if (uploadBtn && fileSelector) {
       currentMediaUrl = json.url;
       mediaInput.value = json.url;
       mediaPreview.innerHTML = `
+      <div style="display: inline-flex; align-items: center; gap: 8px;">
         <span style="color:#34c759; font-size:14px;">上传成功</span>
         <button class="reply-small-btn del-btn" onclick="clearMedia()">移除</button>
+      </div>
       `;
     } catch (err) {
       let errMsg = "上传失败，请重试";
