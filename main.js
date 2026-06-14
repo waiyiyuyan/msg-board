@@ -293,12 +293,16 @@ function buildPostHtml(post, isModal = false) {
   </div>`;
 }
 
-// 渲染图片
+// 渲染图片：自动走代理，解决国内访问问题
 function renderMedia(mediaUrl) {
   if (!mediaUrl) return "";
   const lowerUrl = mediaUrl.toLowerCase();
+  // 你的图片代理服务地址
+  const IMG_PROXY = "https://imgvideop.lovefree.de5.net/?url=";
+
   if (lowerUrl.endsWith(".png") || lowerUrl.endsWith(".jpg") || lowerUrl.endsWith(".jpeg") || lowerUrl.endsWith(".gif") || lowerUrl.endsWith(".webp")) {
-    return `<img class="msg-media-img" src="${mediaUrl}" alt="">`;
+    const proxySrc = IMG_PROXY + encodeURIComponent(mediaUrl);
+    return `<img class="msg-media-img" src="${proxySrc}" alt="">`;
   }
   return "";
 }
