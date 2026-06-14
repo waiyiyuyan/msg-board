@@ -21,10 +21,17 @@ if (uploadBtn && fileSelector) {
   });
 
   function checkFile(file) {
-    const allowMime = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-    if (!allowMime.includes(file.type)) return { ok: false, msg: "仅支持 JPG/PNG/GIF/WEBP 图片" };
+    const allowMime = [
+      "image/jpeg", "image/png", "image/gif", "image/webp",
+      "video/mp4", "video/webm"
+    ];
+    if (!allowMime.includes(file.type)) {
+      return { ok: false, msg: "仅支持 JPG/PNG/GIF/WEBP 图片、MP4/WEBM 视频" };
+    }
     if (file.size === 0) return { ok: false, msg: "文件无效，请重新选择" };
-    if (file.size > 10 * 1024 * 1024) return { ok: false, msg: "文件不能超过10MB" };
+    if (file.size > 20 * 1024 * 1024) {
+      return { ok: false, msg: "文件不能超过20MB，请压缩后重试" };
+    }
     return { ok: true };
   }
 
@@ -293,17 +300,28 @@ function buildPostHtml(post, isModal = false) {
   </div>`;
 }
 
-// 渲染图片：自动走代理，解决国内访问问题
+// 渲染媒体：图片视频统一走通用代理
 function renderMedia(mediaUrl) {
   if (!mediaUrl) return "";
   const lowerUrl = mediaUrl.toLowerCase();
-  // 你的图片代理服务地址
-  const IMG_PROXY = "https://imgvideop.lovefree.de5.net/?url=";
+  // 通用代理地址（你现有的图片代理域名）
+  const PROXY_PREFIX = "https://imgvideop.lovefree.de5.net/?url=";
+  const proxySrc = PROXY_PREFIX + encodeURIComponent(mediaUrl);
 
-  if (lowerUrl.endsWith(".png") || lowerUrl.endsWith(".jpg") || lowerUrl.endsWith(".jpeg") || lowerUrl.endsWith(".gif") || lowerUrl.endsWith(".webp")) {
-    const proxySrc = IMG_PROXY + encodeURIComponent(mediaUrl);
+  // 图片
+  const imgExts = [".png", ".jpg", ".jpeg", ".gif", ".webp"];
+  if (imgExts.some(ext => lowerUrl.endsWith(ext))) {
     return `<img class="msg-media-img" src="${proxySrc}" alt="">`;
   }
+
+  // 视频
+  if (lowerUrl.endsWith(".mp4") || lowerUrl.endsWith(".webm")) {
+    return `<video class="msg-media-img" controls playsinline style="max-width:100%; border-radius:6px;">
+      <source src="${proxySrc}" type="video/mp4">
+      您的浏览器不支持视频播放
+    </video>`;
+  }
+
   return "";
 }
 
