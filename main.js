@@ -304,7 +304,7 @@ function buildPostHtml(post, isModal = false) {
 function renderMedia(mediaUrl) {
   if (!mediaUrl) return "";
   const lowerUrl = mediaUrl.toLowerCase();
-  // 通用代理地址（你现有的图片代理域名）
+  // 通用代理地址（图片视频共用同一个）
   const PROXY_PREFIX = "https://imgvideop.lovefree.de5.net/?url=";
   const proxySrc = PROXY_PREFIX + encodeURIComponent(mediaUrl);
 
@@ -314,10 +314,9 @@ function renderMedia(mediaUrl) {
     return `<img class="msg-media-img" src="${proxySrc}" alt="">`;
   }
 
-  // 视频
+  // 视频：修复竖屏裁剪问题，完整显示不裁切
   if (lowerUrl.endsWith(".mp4") || lowerUrl.endsWith(".webm")) {
-    const proxySrc = VIDEO_PROXY + encodeURIComponent(mediaUrl);
-    return `<video class="msg-media-img" controls playsinline style="max-width:100%; border-radius:6px;">
+    return `<video class="msg-media-img" controls playsinline style="max-width:100%; max-height:70vh; object-fit:contain; background:#000; border-radius:6px;">
       <source src="${proxySrc}" type="video/mp4">
       您的浏览器不支持视频播放
     </video>`;
