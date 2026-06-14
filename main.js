@@ -24,7 +24,7 @@ if (uploadBtn && fileSelector) {
     const allowMime = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowMime.includes(file.type)) return { ok: false, msg: "仅支持 JPG/PNG/GIF/WEBP 图片" };
     if (file.size === 0) return { ok: false, msg: "文件无效，请重新选择" };
-    if (file.size > 50 * 1024 * 1024) return { ok: false, msg: "文件不能超过50MB" };
+    if (file.size > 10 * 1024 * 1024) return { ok: false, msg: "文件不能超过10MB" };
     return { ok: true };
   }
 
