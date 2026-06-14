@@ -866,6 +866,7 @@ notifyMask.addEventListener('click', function (e) {
 });
 
 function bindMediaEvents(container) {
+  // 图片：绑定点击放大事件
   container.querySelectorAll('img.msg-media-img:not([data-event-bound])').forEach(img => {
     img.dataset.eventBound = "true";
     img.style.cursor = "zoom-in";
@@ -877,10 +878,20 @@ function bindMediaEvents(container) {
     img.onerror = function () { this.style.display = 'none'; };
   });
 
-  // 视频元素：加载失败自动隐藏
+  // 视频：绑定播放互斥逻辑 + 加载失败隐藏
   container.querySelectorAll('video.msg-media-img:not([data-event-bound])').forEach(video => {
     video.dataset.eventBound = "true";
     video.onerror = function () { this.style.display = 'none'; };
+
+    // 核心：播放时自动暂停其他所有视频
+    video.addEventListener('play', function () {
+      const allVideos = document.querySelectorAll('video.msg-media-img');
+      allVideos.forEach(v => {
+        if (v !== video) {
+          v.pause();
+        }
+      });
+    });
   });
 }
 
