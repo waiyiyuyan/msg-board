@@ -35,42 +35,91 @@ if (uploadBtn && fileSelector) {
     return { ok: true };
   }
 
-  async function uploadFile(file) {
-    clearMedia();
-    mediaPreview.innerHTML = `<div class="spin-loader"></div>`;
-    uploadBtn.disabled = true;
-    isUploading = true;
-    const submitBtn = popForm.querySelector('button[type="submit"]');
-    if (submitBtn) submitBtn.disabled = true;
+async function uploadFile(file) {
+  clearMedia();
+  uploadBtn.disabled = true;
+  isUploading = true;
+  const submitBtn = popForm.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch(UPLOAD_API, { method: "POST", body: formData, credentials: "include" });
-      if (!res.ok) throw new Error("图床服务异常");
-      const json = await res.json();
-      if (!json.url) throw new Error("返回数据异常");
+  // 进度条DOM
+  const progressWrap = document.getElementById('uploadProgressWrap');
+  const progressBar = document.getElementById('uploadProgressBar');
+  const progressText = document.getElementById('progressText');
+  // 显示并重置进度
+  progressWrap.style.display = 'block';
+  progressBar.style.width = '0%';
+  progressText.innerText = '0%';
 
-      currentMediaUrl = json.url;
-      mediaInput.value = json.url;
-      mediaPreview.innerHTML = `
-      <div style="display: inline-flex; align-items: center; gap: 8px;">
-        <span style="color:#34c759; font-size:14px; line-height: 1;">上传成功</span>
-        <button class="reply-small-btn del-btn" onclick="clearMedia()" style="margin-top: 0;">移除</button>
-      </div>
-      `;
-    } catch (err) {
-      let errMsg = "上传失败，请重试";
-      if (err.message.includes("1101") || err.message.includes("Worker threw exception")) errMsg = "文件过大，上传失败，请压缩后重试";
-      mediaPreview.innerHTML = `<span class='err-text'>${errMsg}</span>`;
-      console.error("上传错误：", err);
-    } finally {
-      uploadBtn.disabled = false;
-      isUploading = false;
-      const submitBtn = popForm.querySelector('button[type="submit"]');
-      if (submitBtn) submitBtn.disabled = false;
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // 改用 XHR 实现上传进度监听
+    const result = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", UPLOAD_API);
+      xhr.withCredentials = true;
+
+      // 上传进度事件
+      xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          progressBar.style.width = percent + "%";
+          progressText.innerText = percent + "%";
+        }
+      };
+
+      xhr.onload = function () {
+        progressWrap.style.display = 'none';
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const json = JSON.parse(xhr.responseText);
+            resolve(json);
+          } catch (parseErr) {
+            reject(new Error("返回数据异常"));
+          }
+        } else {
+          reject(new Error("图床服务异常"));
+        }
+      };
+
+      xhr.onerror = () => {
+        progressWrap.style.display = 'none';
+        reject(new Error("网络请求失败"));
+      };
+
+      xhr.send(formData);
+    });
+
+    if (!result.url) throw new Error("返回数据异常");
+
+    currentMediaUrl = result.url;
+    mediaInput.value = result.url;
+    mediaPreview.innerHTML = `
+    <div style="display: inline-flex; align-items: center; gap: 8px;">
+      <span style="color:#34c759; font-size:14px; line-height: 1;">上传成功</span>
+      <button class="reply-small-btn del-btn" onclick="clearMedia()" style="margin-top: 0;">移除</button>
+    </div>
+    `;
+  } catch (err) {
+    let errMsg = "上传失败，请重试";
+    if (err.message.includes("1101") || err.message.includes("Worker threw exception")) {
+      errMsg = "文件过大，上传失败，请压缩后重试";
     }
+    mediaPreview.innerHTML = `<span class='err-text'>${errMsg}</span>`;
+    console.error("上传错误：", err);
+  } finally {
+    // 无论成功/失败，隐藏进度条
+    const progressWrap = document.getElementById('uploadProgressWrap');
+    if (progressWrap) progressWrap.style.display = 'none';
+
+    uploadBtn.disabled = false;
+    isUploading = false;
+    const submitBtn = popForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = false;
   }
+}
 
   fileSelector.addEventListener("change", async function (e) {
     const file = e.target.files[0];
