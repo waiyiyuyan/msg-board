@@ -317,7 +317,7 @@ function renderMedia(mediaUrl) {
   // 视频
   if (lowerUrl.endsWith(".mp4") || lowerUrl.endsWith(".webm")) {
     const proxySrc = VIDEO_PROXY + encodeURIComponent(mediaUrl);
-    return `<video class="msg-media-img" controls playsinline style="max-width:100%; max-height:70vh; object-fit:contain; background:#000; border-radius:6px;">
+    return `<video class="msg-media-img" controls playsinline style="max-width:100%; border-radius:6px;">
       <source src="${proxySrc}" type="video/mp4">
       您的浏览器不支持视频播放
     </video>`;
