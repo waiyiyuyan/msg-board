@@ -866,7 +866,7 @@ notifyMask.addEventListener('click', function (e) {
 });
 
 function bindMediaEvents(container) {
-  container.querySelectorAll('.msg-media-img:not([data-event-bound])').forEach(img => {
+  container.querySelectorAll('img.msg-media-img:not([data-event-bound])').forEach(img => {
     img.dataset.eventBound = "true";
     img.style.cursor = "zoom-in";
     img.onclick = function () {
@@ -875,6 +875,12 @@ function bindMediaEvents(container) {
       document.body.style.overflow = 'hidden';
     };
     img.onerror = function () { this.style.display = 'none'; };
+  });
+
+  // 视频元素：加载失败自动隐藏
+  container.querySelectorAll('video.msg-media-img:not([data-event-bound])').forEach(video => {
+    video.dataset.eventBound = "true";
+    video.onerror = function () { this.style.display = 'none'; };
   });
 }
 
