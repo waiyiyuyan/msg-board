@@ -56,7 +56,7 @@ if (uploadBtn && fileSelector) {
       mediaPreview.innerHTML = `
       <div style="display: inline-flex; align-items: center; gap: 8px;">
         <span style="color:#34c759; font-size:14px; line-height: 1;">上传成功</span>
-        <button class="reply-small-btn del-btn" onclick="clearMedia()" style="margin-top: 0; transform: translateY(-1px);">移除</button>
+        <button class="reply-small-btn del-btn" onclick="clearMedia()" style="margin-top: 0;">移除</button>
       </div>
       `;
     } catch (err) {
