@@ -753,8 +753,36 @@ async function openNoticeModal(postId, replyId) {
   currentModalPostId = postId;
   currentModalReplyId = replyId;
 
-  // 调用独立渲染函数
-  renderNoticeModalContent(postId, replyId);
+  // 1. 先查本地缓存，命中则直接渲染（保持原有秒开体验）
+  const localPost = lastData.find(item => Number(item.id) === Number(postId));
+  if (localPost) {
+    renderNoticeModalContent(postId, replyId);
+    return;
+  }
+
+  // 2. 本地未命中，显示加载中状态，请求后端兜底
+  noticeModalContent.innerHTML = `<div style="text-align:center;margin-top:50px;font-size:16px;color:#666;">加载中...</div>`;
+
+  try {
+    const res = await fetch(`${API_BASE}/getPostDetail?id=${postId}`, { credentials: "include" });
+    const result = await res.json();
+
+    if (result.code === 0 && result.data) {
+      // 3. 拉取成功，回填到本地缓存，下次点击无需重复请求
+      const exist = lastData.find(item => Number(item.id) === Number(result.data.id));
+      if (!exist) {
+        lastData.push(result.data);
+      }
+      // 复用原有渲染函数，正常渲染帖子+回复
+      renderNoticeModalContent(postId, replyId);
+    } else {
+      // 4. 后端确认帖子不存在，显示最终提示
+      noticeModalContent.innerHTML = `<div style="text-align:center;margin-top:50px;font-size:16px;color:#666;">该帖子已被删除或不存在</div>`;
+    }
+  } catch (err) {
+    console.error("拉取帖子详情失败", err);
+    noticeModalContent.innerHTML = `<div style="text-align:center;margin-top:50px;font-size:16px;color:#666;">加载失败，请稍后重试</div>`;
+  }
 }
 
 /**
