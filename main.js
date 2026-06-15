@@ -11,13 +11,12 @@ const mediaInput = document.getElementById("mediaInput");
 function clearMedia() {
   currentMediaUrl = "";
   mediaInput.value = "";
-  // 只清空提示文字，保留进度条DOM结构
+  // 只清空状态提示，不动进度条DOM
+  const statusEl = document.getElementById('mediaStatus');
+  if (statusEl) statusEl.innerHTML = "";
+  // 隐藏进度条
   const progressWrap = document.getElementById('uploadProgressWrap');
-  if(progressWrap){
-    mediaPreview.innerHTML = progressWrap.outerHTML;
-  }else{
-    mediaPreview.innerHTML = "";
-  }
+  if (progressWrap) progressWrap.style.display = "none";
   uploadBtn.disabled = false;
 }
 
@@ -42,19 +41,21 @@ if (uploadBtn && fileSelector) {
   }
 
 async function uploadFile(file) {
-  // 先获取进度条DOM（提前获取，避免被清空）
-  const progressWrap = document.getElementById('uploadProgressWrap');
-  const progressBar = document.getElementById('uploadProgressBar');
-  const progressText = document.getElementById('progressText');
-
   clearMedia();
   uploadBtn.disabled = true;
   isUploading = true;
   const submitBtn = popForm.querySelector('button[type="submit"]');
   if (submitBtn) submitBtn.disabled = true;
 
-  // 显示并重置进度
-  if(progressWrap && progressBar && progressText){
+  // 获取常驻DOM（不会被销毁，引用一直有效）
+  const statusEl = document.getElementById('mediaStatus');
+  const progressWrap = document.getElementById('uploadProgressWrap');
+  const progressBar = document.getElementById('uploadProgressBar');
+  const progressText = document.getElementById('progressText');
+
+  // 显示加载动画 + 进度条
+  if (statusEl) statusEl.innerHTML = `<div class="spin-loader"></div>`;
+  if (progressWrap && progressBar && progressText) {
     progressWrap.style.display = 'block';
     progressBar.style.width = '0%';
     progressText.innerText = '0%';
@@ -64,13 +65,12 @@ async function uploadFile(file) {
     const formData = new FormData();
     formData.append("file", file);
 
-    // 改用 XHR 实现上传进度监听
+    // XHR 上传 + 进度监听
     const result = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open("POST", UPLOAD_API);
       xhr.withCredentials = true;
 
-      // 上传进度事件
       xhr.upload.onprogress = function (e) {
         if (e.lengthComputable && progressBar && progressText) {
           const percent = Math.round((e.loaded / e.total) * 100);
@@ -80,7 +80,6 @@ async function uploadFile(file) {
       };
 
       xhr.onload = function () {
-        if(progressWrap) progressWrap.style.display = 'none';
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
             const json = JSON.parse(xhr.responseText);
@@ -93,11 +92,7 @@ async function uploadFile(file) {
         }
       };
 
-      xhr.onerror = () => {
-        if(progressWrap) progressWrap.style.display = 'none';
-        reject(new Error("网络请求失败"));
-      };
-
+      xhr.onerror = () => reject(new Error("网络请求失败"));
       xhr.send(formData);
     });
 
@@ -105,22 +100,24 @@ async function uploadFile(file) {
 
     currentMediaUrl = result.url;
     mediaInput.value = result.url;
-    mediaPreview.innerHTML = `
-    <div style="display: inline-flex; align-items: center; gap: 8px;">
-      <span style="color:#34c759; font-size:14px; line-height: 1;">上传成功</span>
-      <button class="reply-small-btn del-btn" onclick="clearMedia()" style="margin-top: 0;">移除</button>
-    </div>
-    `;
+    // 成功提示只写入状态区，不覆盖进度条
+    if (statusEl) {
+      statusEl.innerHTML = `
+      <div style="display: inline-flex; align-items: center; gap: 8px;">
+        <span style="color:#34c759; font-size:14px; line-height: 1;">上传成功</span>
+        <button class="reply-small-btn del-btn" onclick="clearMedia()" style="margin-top: 0;">移除</button>
+      </div>
+      `;
+    }
   } catch (err) {
     let errMsg = "上传失败，请重试";
     if (err.message.includes("1101") || err.message.includes("Worker threw exception")) {
       errMsg = "文件过大，上传失败，请压缩后重试";
     }
-    mediaPreview.innerHTML = `<span class='err-text'>${errMsg}</span>`;
+    if (statusEl) statusEl.innerHTML = `<span class='err-text'>${errMsg}</span>`;
     console.error("上传错误：", err);
   } finally {
-    // 无论成功/失败，隐藏进度条
-    const progressWrap = document.getElementById('uploadProgressWrap');
+    // 结束后隐藏进度条
     if (progressWrap) progressWrap.style.display = 'none';
 
     uploadBtn.disabled = false;
@@ -135,7 +132,8 @@ async function uploadFile(file) {
     if (!file) return;
     const checkRes = checkFile(file);
     if (!checkRes.ok) {
-      mediaPreview.innerHTML = `<span class='err-text'>${checkRes.msg}</span>`;
+      const statusEl = document.getElementById('mediaStatus');
+      if (statusEl) statusEl.innerHTML = `<span class='err-text'>${checkRes.msg}</span>`;
       fileSelector.value = "";
       return;
     }
