@@ -203,7 +203,7 @@ function getAvatarUrl(nick) {
 async function fetchRandomNick() {
   try {
     // 生成 18 位随机字符（36进制：数字+小写字母）
-    const randomStr = Math.random().toString(36).slice(2, 20);
+    const randomStr = Math.random().toString(36).slice(2, 7);
     const nickName = "访客_" + randomStr;
 
     console.log("【生成本地访客昵称】", nickName);
@@ -212,7 +212,7 @@ async function fetchRandomNick() {
   } catch (err) {
     console.error("【生成昵称异常】", err);
     // 极端异常兜底（最短随机串）
-    return "访客_" + Math.random().toString(36).slice(2, 8);
+    return "访客_" + Math.random().toString(36).slice(2, 7);
   }
 }
 // ==============================================================================
