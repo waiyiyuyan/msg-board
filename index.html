@@ -65,15 +65,12 @@
           </div>
         </span>
     
-        <!-- 关键：中间的占位元素，自动填满剩余空间，把右边按钮推到最右侧 -->
-        <div style="flex: 1;"></div>
-    
-        <!-- 右侧：按钮组（自动靠右） -->
-        <div style="display:flex; align-items:center; gap:10px;">
-            <button type="button" class="btn" id="uploadBtn">传图/视频</button>
-            <button class="btn" type="submit">发布</button>
+        <!-- 右侧：按钮组，强制横向不换行，缩小间距和按钮尺寸 -->
+        <div style="display:flex; align-items:center; gap:6px; flex-shrink:0; white-space:nowrap;">
+            <button type="button" class="btn" id="uploadBtn" style="font-size:14px; padding:6px 10px;">上传媒体</button>
+            <button class="btn" type="submit" style="font-size:14px; padding:6px 10px;">发布</button>
         </div>
-    
+      
         <input type="hidden" name="media" id="mediaInput" value="">
     </div>
         
