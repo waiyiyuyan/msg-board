@@ -11,7 +11,13 @@ const mediaInput = document.getElementById("mediaInput");
 function clearMedia() {
   currentMediaUrl = "";
   mediaInput.value = "";
-  mediaPreview.innerHTML = "";
+  // 只清空提示文字，保留进度条DOM结构
+  const progressWrap = document.getElementById('uploadProgressWrap');
+  if(progressWrap){
+    mediaPreview.innerHTML = progressWrap.outerHTML;
+  }else{
+    mediaPreview.innerHTML = "";
+  }
   uploadBtn.disabled = false;
 }
 
@@ -36,20 +42,23 @@ if (uploadBtn && fileSelector) {
   }
 
 async function uploadFile(file) {
+  // 先获取进度条DOM（提前获取，避免被清空）
+  const progressWrap = document.getElementById('uploadProgressWrap');
+  const progressBar = document.getElementById('uploadProgressBar');
+  const progressText = document.getElementById('progressText');
+
   clearMedia();
   uploadBtn.disabled = true;
   isUploading = true;
   const submitBtn = popForm.querySelector('button[type="submit"]');
   if (submitBtn) submitBtn.disabled = true;
 
-  // 进度条DOM
-  const progressWrap = document.getElementById('uploadProgressWrap');
-  const progressBar = document.getElementById('uploadProgressBar');
-  const progressText = document.getElementById('progressText');
   // 显示并重置进度
-  progressWrap.style.display = 'block';
-  progressBar.style.width = '0%';
-  progressText.innerText = '0%';
+  if(progressWrap && progressBar && progressText){
+    progressWrap.style.display = 'block';
+    progressBar.style.width = '0%';
+    progressText.innerText = '0%';
+  }
 
   try {
     const formData = new FormData();
@@ -63,7 +72,7 @@ async function uploadFile(file) {
 
       // 上传进度事件
       xhr.upload.onprogress = function (e) {
-        if (e.lengthComputable) {
+        if (e.lengthComputable && progressBar && progressText) {
           const percent = Math.round((e.loaded / e.total) * 100);
           progressBar.style.width = percent + "%";
           progressText.innerText = percent + "%";
@@ -71,7 +80,7 @@ async function uploadFile(file) {
       };
 
       xhr.onload = function () {
-        progressWrap.style.display = 'none';
+        if(progressWrap) progressWrap.style.display = 'none';
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
             const json = JSON.parse(xhr.responseText);
@@ -85,7 +94,7 @@ async function uploadFile(file) {
       };
 
       xhr.onerror = () => {
-        progressWrap.style.display = 'none';
+        if(progressWrap) progressWrap.style.display = 'none';
         reject(new Error("网络请求失败"));
       };
 
