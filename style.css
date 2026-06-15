@@ -135,11 +135,17 @@ textarea{
 .notify-box{
   width:min(90%,460px);
   max-height:70vh;
-  overflow:auto;
   background:#fff;
   border-radius:8px;
   padding:16px;
   pointer-events:auto;
+  display:flex;
+  flex-direction:column;
+}
+
+#notifyListContent {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .notify-item{
