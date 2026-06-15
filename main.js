@@ -701,9 +701,13 @@ function renderNoticeModalContent(postId, replyId, needFlash = true) {
   // 1. 从全局缓存查找帖子
   const targetPost = lastData.find(item => Number(item.id) === Number(postId));
 
-  // 2. 帖子不存在兜底
   if (!targetPost) {
-    noticeModalContent.innerHTML = `<div style="text-align:center;margin-top:50px;font-size:16px;color:#666;">该帖子已被删除或不存在</div>`;
+    noticeModalContent.innerHTML = `
+      <div style="text-align:center;margin-top:50px;">
+        <div style="font-size:16px;color:#666;margin-bottom:20px;">该帖子已被删除或不存在</div>
+        <button class="btn" onclick="closeNoticeModal()">关闭</button>
+      </div>
+    `;
     return;
   }
 
@@ -781,7 +785,12 @@ async function openNoticeModal(postId, replyId) {
     }
   } catch (err) {
     console.error("拉取帖子详情失败", err);
-    noticeModalContent.innerHTML = `<div style="text-align:center;margin-top:50px;font-size:16px;color:#666;">加载失败，请稍后重试</div>`;
+    noticeModalContent.innerHTML = `
+    <div style="text-align:center;margin-top:50px;">
+      <div style="font-size:16px;color:#666;margin-bottom:20px;">加载失败，请稍后重试</div>
+      <button class="btn" onclick="closeNoticeModal()">关闭</button>
+    </div>
+  `;
   }
 }
 
