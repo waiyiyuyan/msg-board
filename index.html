@@ -50,9 +50,11 @@
       <textarea name="content"></textarea>
       
       <div style="display:flex; align-items:center; width:100%; gap:10px;">
-        <!-- 左侧：上传提示/进度条/移除按钮（自动靠左） -->
+       <!-- 左侧：上传提示/进度条/移除按钮（自动靠左） -->
       <span id="mediaBox" style="white-space: nowrap; display: inline-block; min-width: 180px;">
-        <!-- 上传进度条区域，默认隐藏 -->
+        <!-- 状态提示区：加载动画/成功/错误都放这里 -->
+        <div id="mediaStatus"></div>
+        <!-- 进度条：常驻DOM，永远不被覆盖 -->
         <div id="uploadProgressWrap" style="display: none; margin: 4px 0;">
           <div style="width:100%;height:8px;background:#eee;border-radius:4px;overflow:hidden;">
             <div id="uploadProgressBar" style="width:0%;height:100%;background:#007aff;transition:width 0.1s linear;"></div>
