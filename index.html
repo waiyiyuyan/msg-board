@@ -49,28 +49,28 @@
       <div id="replyTip" style="color:#999;font-size:13px;display:none;"></div>
       <textarea name="content"></textarea>
       
-      <div style="display:flex; align-items:center; width:100%; gap:10px;">
-       <!-- 左侧：上传提示/进度条/移除按钮（自动靠左） -->
-      <span id="mediaBox" style="white-space: nowrap; display: inline-block; min-width: 180px;">
-        <!-- 状态提示区：加载动画/成功/错误都放这里 -->
-        <div id="mediaStatus"></div>
-        <!-- 进度条：常驻DOM，永远不被覆盖 -->
-        <div id="uploadProgressWrap" style="display: none; margin: 4px 0;">
-          <div style="width:100%;height:8px;background:#eee;border-radius:4px;overflow:hidden;">
-            <div id="uploadProgressBar" style="width:0%;height:100%;background:#007aff;transition:width 0.1s linear;"></div>
+      <div style="display:flex; align-items:center; width:100%; gap:8px; flex-wrap:nowrap;">
+        <!-- 左侧：上传状态+进度条，缩小最小宽度给按钮腾空间 -->
+        <span id="mediaBox" style="white-space: nowrap; display: inline-block; min-width: 120px; flex:1;">
+          <!-- 状态提示区：加载动画/成功/错误都放这里 -->
+          <div id="mediaStatus"></div>
+          <!-- 进度条：常驻DOM，永远不被覆盖 -->
+          <div id="uploadProgressWrap" style="display: none; margin: 4px 0;">
+            <div style="width:100%;height:8px;background:#eee;border-radius:4px;overflow:hidden;">
+              <div id="uploadProgressBar" style="width:0%;height:100%;background:#007aff;transition:width 0.1s linear;"></div>
+            </div>
+            <div style="font-size:12px;color:#666;margin-top:2px;text-align:left;">
+              <span id="progressText">0%</span>
+            </div>
           </div>
-          <div style="font-size:12px;color:#666;margin-top:2px;text-align:left;">
-            <span id="progressText">0%</span>
-          </div>
-        </div>
-      </span>
+        </span>
     
         <!-- 关键：中间的占位元素，自动填满剩余空间，把右边按钮推到最右侧 -->
         <div style="flex: 1;"></div>
     
         <!-- 右侧：按钮组（自动靠右） -->
         <div style="display:flex; align-items:center; gap:10px;">
-            <button type="button" class="btn" id="uploadBtn">上传图片/视频</button>
+            <button type="button" class="btn" id="uploadBtn">传图/视频</button>
             <button class="btn" type="submit">发布</button>
         </div>
     
