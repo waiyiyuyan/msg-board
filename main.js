@@ -54,7 +54,6 @@ async function uploadFile(file) {
   const progressText = document.getElementById('progressText');
 
   // 显示加载动画 + 进度条
-  if (statusEl) statusEl.innerHTML = `<div class="spin-loader"></div>`;
   if (progressWrap && progressBar && progressText) {
     progressWrap.style.display = 'block';
     progressBar.style.width = '0%';
