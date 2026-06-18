@@ -1,0 +1,15 @@
+# 适配必应Bingbot、谷歌爬虫，全站允许抓取
+User-agent: *
+Allow: /
+
+# 控制爬虫抓取间隔，防止频繁请求
+Crawl-delay: 2
+
+# 屏蔽无收录价值的弹窗哈希路由
+Disallow: /#pop
+Disallow: /#notify
+Disallow: /#preview
+Disallow: /#notice
+
+# 站点地图地址
+Sitemap: https://mb.lovefree.de5.net/sitemap.xml
