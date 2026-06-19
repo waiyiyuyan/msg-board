@@ -6,13 +6,13 @@ body{
     margin:0 auto;
     padding-bottom: 80px;
 }
-/* 主帖子：移除卡片，仅底部一条分割线，极致紧凑 */
+/* 主帖子：移除卡片，仅底部一条分割线 */
 .post-card{
-    background: transparent; /* 移除卡片白色背景 */
+    background: transparent;
     border-radius: 0;
-    padding:16px 0; /* 上下内边距和你原来卡片一致，不缩小 */
+    padding:16px 0;
     margin-bottom:0;
-    border-bottom:1px solid #e5e5ea; /* 仅底部一条分割线 */
+    border-bottom:1px solid #e5e5ea;
 }
 .post-info{
     display:flex;
@@ -53,10 +53,15 @@ body{
     font-size:13px;
 }
 .del-btn{background:#ff3b30;}
-/* 隐藏帖子内多余分割线，只用底部外部分隔 */
-.divider{display:none;}
+/* 修复：不隐藏分割线，透明占位维持原有高度，解决点击穿透 */
+.divider{
+    height:16px;
+    background:transparent;
+    border:none;
+    margin:0;
+}
 
-/* 回复区：紧凑细分隔，和主帖风格统一 */
+/* 回复区 */
 .reply-wrap{
     padding-top:6px;
     padding-bottom:50px;
@@ -349,7 +354,12 @@ textarea{
   color: #f53f3f;
   font-size: 13px;
 }
-.empty-reply { color: #888; font-style: italic; }
+/* 修复：0条回复文字禁止点击，不会误展开 */
+.empty-reply {
+  color: #888;
+  font-style: italic;
+  pointer-events: none;
+}
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
