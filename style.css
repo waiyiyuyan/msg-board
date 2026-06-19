@@ -528,3 +528,19 @@ textarea{
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   }
 }
+
+/* 回复楼层计数器，显示在时间左侧 */
+.post-card {
+  counter-reset: floorNum;
+}
+.reply-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.reply-time::before {
+  counter-increment: floorNum;
+  content: counter(floorNum) "F";
+  font-size: 10px;
+  color: var(--text-second);
+}
