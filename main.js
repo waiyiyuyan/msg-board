@@ -361,24 +361,26 @@ function buildPostHtml(post, isModal = false) {
 function renderMedia(mediaUrl) {
   if (!mediaUrl) return "";
   const lowerUrl = mediaUrl.toLowerCase();
-  // 通用代理地址（图片视频共用同一个）
   const PROXY_PREFIX = "https://imgvideop.lovefree.de5.net/?url=";
   const proxySrc = PROXY_PREFIX + encodeURIComponent(mediaUrl);
 
-  // 图片
   const imgExts = [".png", ".jpg", ".jpeg", ".gif", ".webp"];
   if (imgExts.some(ext => lowerUrl.endsWith(ext))) {
-    return `<img class="msg-media-img" src="${proxySrc}" alt="">`;
+    return `
+    <div class="msg-media-wrap">
+      <img class="msg-media-img" src="${proxySrc}" alt="">
+    </div>`;
   }
 
-  // 视频：修复竖屏裁剪问题，完整显示不裁切
   if (lowerUrl.endsWith(".mp4") || lowerUrl.endsWith(".webm")) {
-    return `<video class="msg-media-img" controls playsinline style="max-width:100%; max-height:70vh; object-fit:contain; background:#000; border-radius:6px;">
-      <source src="${proxySrc}" type="video/mp4">
-      您的浏览器不支持视频播放
-    </video>`;
+    return `
+    <div class="msg-media-wrap">
+      <video class="msg-media-video" controls playsinline preload="metadata">
+        <source src="${proxySrc}" type="video/mp4">
+        浏览器不支持该视频
+      </video>
+    </div>`;
   }
-
   return "";
 }
 
@@ -960,8 +962,8 @@ notifyMask.addEventListener('click', function (e) {
 });
 
 function bindMediaEvents(container) {
-  // 图片：绑定点击放大事件
-  container.querySelectorAll('img.msg-media-img:not([data-event-bound])').forEach(img => {
+  // 图片点击放大
+  container.querySelectorAll('.msg-media-img:not([data-event-bound])').forEach(img => {
     img.dataset.eventBound = "true";
     img.style.cursor = "zoom-in";
     img.onclick = function () {
@@ -969,21 +971,22 @@ function bindMediaEvents(container) {
       imgPreviewMask.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     };
-    img.onerror = function () { this.style.display = 'none'; };
+    img.onerror = function () {
+      this.closest(".msg-media-wrap").style.display = 'none';
+    };
   });
 
-  // 视频：绑定播放互斥逻辑 + 加载失败隐藏
-  container.querySelectorAll('video.msg-media-img:not([data-event-bound])').forEach(video => {
+  // 视频互斥暂停
+  container.querySelectorAll('video.msg-media-video:not([data-event-bound])').forEach(video => {
     video.dataset.eventBound = "true";
-    video.onerror = function () { this.style.display = 'none'; };
+    video.onerror = function () {
+      this.closest(".msg-media-wrap").style.display = 'none';
+    };
 
-    // 核心：播放时自动暂停其他所有视频
     video.addEventListener('play', function () {
-      const allVideos = document.querySelectorAll('video.msg-media-img');
+      const allVideos = document.querySelectorAll('video.msg-media-video');
       allVideos.forEach(v => {
-        if (v !== video) {
-          v.pause();
-        }
+        if (v !== video) v.pause();
       });
     });
   });
