@@ -33,10 +33,10 @@ html {
   --green: #34c759;
 
   /* 全局统一字号变量，只改这里就能全站同步缩放 */
-  --fs-xs: 14px;  // 时间、楼层、小字提示
---fs-sm: 14px;  // 回复昵称、折叠按钮、加载提示
---fs-md: 14px;  // 按钮、回复正文、通知文字
---fs-lg: 14px;  // 帖子标题/内容、输入框、弹窗昵称
+  --fs-xs: 14px;  /* 时间、楼层、小字提示 */
+  --fs-sm: 14px;  /* 回复昵称、折叠按钮、加载提示 */
+  --fs-md: 14px;  /* 按钮、回复正文、通知文字 */
+  --fs-lg: 14px;  /* 帖子标题/内容、输入框、弹窗昵称 */
 }
 
 /* 全局字号工具类，所有文字继承这套标准 */
@@ -86,6 +86,7 @@ body{
     padding:16px 0;
     margin-bottom:0;
     border-bottom:1px solid var(--border-line);
+    counter-reset: floorNum;
 }
 .post-info{
     display:flex;
@@ -404,17 +405,39 @@ textarea{
 .post-content a:hover, .reply-text a:hover {
   color: var(--blue-dark);
 }
-.msg-media-img {
+
+/* ===== X平台风格媒体容器+图片/视频 完整版 ===== */
+.msg-media-wrap {
   width: 100%;
-  height: 120px;
-  border-radius: 6px;
+  max-width: 580px;
+  margin: 8px auto;
+  border-radius: 12px;
+  overflow: hidden;
   border: 1px solid var(--border-line);
-  margin: 6px 0;
-  object-fit: cover;
-  object-position: center;
-  loading: lazy;
-  display: block;
+  background: #000;
 }
+@media (prefers-color-scheme: dark) {
+  .msg-media-wrap {
+    background: #0a0a0a;
+  }
+}
+.msg-media-img,
+.msg-media-video {
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
+  display: block;
+  loading: lazy;
+  background: #000;
+}
+@media (prefers-color-scheme: dark) {
+  .msg-media-img,
+  .msg-media-video {
+    background: #0a0a0a;
+  }
+}
+
 .img-preview-mask {
   position: fixed;
   inset: 0;
@@ -540,8 +563,4 @@ textarea{
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   }
-}
-/* 楼层计数器初始化 */
-.post-card {
-  counter-reset: floorNum;
 }
