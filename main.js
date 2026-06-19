@@ -316,7 +316,7 @@ function buildPostHtml(post, isModal = false) {
                onerror="this.style.display='none'">
           <div class="reply-name">${headText}</div>
         </div>
-        <div class="reply-time">${r.create_time}</div>
+        <div class="reply-time">${r.create_time.slice(0,16)}</div>
       </div>
         <div class="reply-text">${showContent}</div>
         ${renderMedia(r.media_urls || "")}
@@ -337,7 +337,7 @@ function buildPostHtml(post, isModal = false) {
              onerror="this.style.display='none'">
         <span class="post-author">${post.name}</span>
       </div>
-      <span class="post-time">${post.create_time}</span>
+      <span class="post-time">${post.create_time.slice(0,16)}</span>
     </div>
     <div class="post-content">${parseLink(post.content)}</div>
     ${renderMedia(post.media_urls || "")}
@@ -423,7 +423,7 @@ function renderNotify() {
     html += `<div class="notify-item" onclick="jumpPost(${item.id},${item.target_msg_id},${item.reply_id})">
       <div>
         <div class="notify-txt" ${textStyle}>${dot}${item.reply_name} 回复了你：${item.reply_preview}</div>
-        <div class="notify-time">${item.create_time}</div>
+        <div class="notify-time">${item.create_time.slice(0,16)}</div>
       </div>
     </div>`;
   });
