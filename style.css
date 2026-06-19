@@ -248,6 +248,7 @@ textarea{
   border-radius:8px;
   display:grid;
   place-items:center;
+  font-size: 12px;
 }
 
 /* 通知弹窗 */
