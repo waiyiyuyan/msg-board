@@ -1,4 +1,8 @@
 /* ========== 明暗主题变量 放在最顶部 ========== */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 :root {
   /* 基础配色 */
   --bg-light: #f2f2f7;
@@ -528,19 +532,13 @@ textarea{
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   }
 }
-
-/* 回复楼层计数器，显示在时间左侧 */
+/* 回复楼层 不改动时间原有样式，不会压缩全局字体 */
 .post-card {
   counter-reset: floorNum;
 }
-.reply-time {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.reply-time::before {
+.reply-name::after {
   counter-increment: floorNum;
-  content: counter(floorNum) "F";
-  font-size: 10px;
+  content: " · " counter(floorNum) "楼";
+  font-size: 11px;
   color: var(--text-second);
 }
