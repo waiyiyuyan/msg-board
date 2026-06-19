@@ -343,8 +343,8 @@ function buildPostHtml(post, isModal = false) {
     ${renderMedia(post.media_urls || "")}
     <!-- 合并后的操作行：回复按钮 + 展开折叠按钮 同行显示 -->
     <div class="post-action-row">
-      <div class="toggle-wrapper" data-pid="${post.id}" style="${post.replys.length === 0 ? 'cursor:default;' : 'cursor:pointer;'}">
-        <button class="fold-btn" data-fold-pid="${post.id}" style="${post.replys.length === 0 ? 'color:#999;cursor:default;' : ''}">
+      <div class="toggle-wrapper ${post.replys.length === 0 ? 'toggle-wrapper-empty' : ''}" data-pid="${post.id}" style="${post.replys.length === 0 ? 'cursor:default;' : 'cursor:pointer;'}">
+        <button class="fold-btn" data-fold-pid="${post.id}" style="${post.replys.length === 0 ? 'color:#999;cursor:default;pointer-events:none;' : ''}">
           ${post.replys.length}条回复 ${post.replys.length > 0 ? (foldReplyIds.includes(post.id) ? '▼' : '▶') : ''}
         </button>
       </div>
