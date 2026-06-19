@@ -1,84 +1,135 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;}
-/* 新增底部留白，防止内容被悬浮按钮遮挡 */
-body{background:#f2f2f7;padding:14px;max-width:700px;margin:0 auto;padding-bottom: 80px;}
-.post-card{background:#fff;border-radius:8px;padding:16px;margin-bottom:16px;}
-.post-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.post-author{font-size:15px;color:#007aff;font-weight:500;}
-.post-time{font-size:12px;color:#86868b;}
-.post-content{
-  font-size:15px;
-  color:#333;
-  line-height:1.5;
-  margin-bottom:8px;
-  white-space: pre-line;
-  overflow-wrap: break-word;
-  word-break: break-all;
+body{
+    background:#f2f2f7;
+    padding:6px;
+    max-width:700px;
+    margin:0 auto;
+    padding-bottom: 80px;
 }
-.post-btn-group{display:flex;justify-content:flex-end;gap:8px;}
-.btn{background:#007aff;color:#fff;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;}
+/* 主帖子：移除卡片，仅底部一条分割线，极致紧凑 */
+.post-card{
+    background: transparent; /* 移除卡片白色背景 */
+    border-radius: 0;
+    padding:16px 0; /* 上下内边距和你原来卡片一致，不缩小 */
+    margin-bottom:0;
+    border-bottom:1px solid #e5e5ea; /* 仅底部一条分割线 */
+}
+.post-info{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:3px;
+}
+.post-author{
+    font-size:14px;
+    color:#007aff;
+    font-weight:500;
+}
+.post-time{
+    font-size:11px;
+    color:#86868b;
+}
+.post-content{
+    font-size:14px;
+    color:#222;
+    line-height:1.4;
+    margin-bottom:4px;
+    white-space: pre-line;
+    overflow-wrap: break-word;
+    word-break: break-all;
+}
+.post-btn-group{
+    display:flex;
+    justify-content:flex-end;
+    gap:6px;
+}
+.btn{
+    background:#007aff;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:4px 10px;
+    cursor:pointer;
+    font-size:13px;
+}
 .del-btn{background:#ff3b30;}
-.divider{height:1px;background:#e5e5ea;margin:16px 0;}
-.reply-wrap{padding-top:12px;padding-bottom:85px;}
-/* 弹窗内回复区域：保留少量底部边距，不拥挤 */
+/* 隐藏帖子内多余分割线，只用底部外部分隔 */
+.divider{display:none;}
+
+/* 回复区：紧凑细分隔，和主帖风格统一 */
+.reply-wrap{
+    padding-top:6px;
+    padding-bottom:50px;
+}
 .notice-full-modal .reply-wrap {
-  padding-top: 8px;   /* 微调顶部间距 */
+  padding-top: 8px;
   padding-bottom: 0;
 }
-.reply-item{padding:8px 0;border-bottom:1px solid #eee;display:flex;flex-direction:column;}
-.reply-item:last-child{border-bottom:none;}
-.reply-head{display:flex;justify-content:space-between;align-items:center;}
-.reply-name{font-size:13px;color:#007aff;}
-.reply-text{
-  font-size:14px;
-  color:#333;
-  margin:3px 0;
-  white-space: pre-line;
-  overflow-wrap: break-word;
-  word-break: break-all;
+.reply-item{
+    padding:4px 0;
+    border-bottom:1px solid #eee;
+    display:flex;
+    flex-direction:column;
 }
-.reply-time{font-size:11px;color:#999;}
+.reply-item:last-child{border-bottom:none;}
+.reply-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.reply-name{
+    font-size:12px;
+    color:#007aff;
+}
+.reply-text{
+    font-size:13px;
+    color:#222;
+    margin:2px 0;
+    white-space: pre-line;
+    overflow-wrap: break-word;
+    word-break: break-all;
+}
+.reply-time{
+    font-size:10px;
+    color:#999;
+}
 .reply-small-btn{
-    font-size:14px;
+    font-size:13px;
     padding:2px 4px;
     background:transparent;
     border:0;
     color:#007aff;
-    margin-top:4px;
+    margin-top:3px;
     cursor:pointer;
 }
 .reply-small-btn:hover{color:#0051b8;}
-/* 移除按钮：沿用回复按钮布局，文字红色 */
-.reply-small-btn.del-btn {
-    color: #ff3b30;
-}
-.reply-small-btn.del-btn:hover {
-    color: #d92e24;
-}
-input{width:100%;font-size:15px;outline-color:#007aff;}
+.reply-small-btn.del-btn {color:#ff3b30;}
+.reply-small-btn.del-btn:hover {color:#d92e24;}
+
+input{width:100%;font-size:14px;outline-color:#007aff;}
 textarea{
   width:100%;
   border:none;
-  
-  padding:8px 0;
-  font-size:15px;
+  padding:6px 0;
+  font-size:14px;
   outline:none;
   resize:none;
-  min-height:32px;
+  min-height:30px;
 }
 .btn:disabled{opacity:0.6;cursor:not-allowed;}
 
 /* 右下角悬浮发帖按钮 */
 .float-add-btn{
   position:fixed;
-  right:18px;
-  bottom:22px;
-  width:52px;
-  height:52px;
+  right:14px;
+  bottom:18px;
+  width:48px;
+  height:48px;
   border-radius:50%;
   border:none;
   background:#007aff;
   color:#fff;
-  font-size:26px;
+  font-size:24px;
   z-index:101;
   cursor:pointer;
   display:flex;
@@ -88,14 +139,14 @@ textarea{
 /* 消息铃铛样式 */
 .bell-btn{
   position:fixed;
-  bottom:22px;
-  right:76px;
-  width:52px;
-  height:52px;
+  bottom:18px;
+  right:70px;
+  width:48px;
+  height:48px;
   border-radius:50%;
   border:none;
   background:#007aff;
-  font-size:20px;
+  font-size:18px;
   color:#fff;
   z-index:101;
   cursor:pointer;
@@ -103,7 +154,6 @@ textarea{
   align-items: center;
   justify-content: center;
 }
-/* 新增：悬浮按钮点击按压效果 */
 .float-add-btn:active, .bell-btn:active {
   opacity: 0.8;
   transform: scale(0.95);
@@ -114,13 +164,14 @@ textarea{
   right:-4px;
   background:#f53f3f;
   color:#fff;
-  font-size:11px;
-  min-width:18px;
-  height:18px;
-  border-radius:9px;
+  font-size:10px;
+  min-width:16px;
+  height:16px;
+  border-radius:8px;
   display:grid;
   place-items:center;
 }
+
 /* 通知弹窗 */
 .notify-mask{
   display:none;
@@ -130,52 +181,39 @@ textarea{
   z-index:100;
   align-items:center;
   justify-content:center;
-  
 }
 .notify-box{
   width:min(90%,460px);
   max-height:70vh;
   background:#fff;
   border-radius:8px;
-  padding:16px;
+  padding:14px;
   pointer-events:auto;
   display:flex;
   flex-direction:column;
 }
-
-#notifyListContent {
-  flex: 1;
-  overflow-y: auto;
-}
-
+#notifyListContent {flex:1;overflow-y:auto;}
 .notify-item{
-  padding:12px 0;
+  padding:10px 0;
   border-bottom:1px solid #eee;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  cursor: pointer; /* 鼠标悬浮变为手型，提示可点击 */
+  cursor: pointer;
 }
-/* 可选：hover 背景高亮，增强点击反馈（按需保留） */
-.notify-item:hover {
-  background-color: #f8f8f8;
-}
-/* 通知顶部按钮栏布局 */
+.notify-item:hover {background-color:#f8f8f8;}
 .notify-btn-bar {
   display: flex;
   gap: 10px;
   margin-bottom: 8px;
 }
-.notify-btn-bar .btn {
-  flex: 1; /* 两个按钮平分宽度 */
-}
+.notify-btn-bar .btn {flex:1;}
 .notify-item:last-child{border-bottom:none;}
-.notify-txt{font-size:14px;color:#333;line-height:1.4;}
-.notify-time{font-size:11px;color:#999;margin-top:4px;}
-
+.notify-txt{font-size:13px;color:#333;line-height:1.4;}
+.notify-time{font-size:10px;color:#999;margin-top:3px;}
 .empty-tip{text-align:center;padding:30px 0;color:#999;}
 
-/* 弹窗遮罩+发帖弹窗 */
+/* 发帖弹窗 */
 .mask{
   display:none;
   position:fixed;
@@ -184,109 +222,86 @@ textarea{
   z-index:10000;
   align-items:center;
   justify-content:center;
-  padding:16px;
+  padding:12px;
 }
 .pop-post{
   width:min(520px,100%);
   background:#fff;
   border-radius:8px;
-  padding:20px;
+  padding:14px;
 }
-/* ========== 弹窗顶部 头像+昵称 样式 ========== */
-/* 头像+昵称 整行容器：横向居中排列 */
 .popup-avatar-row {
   display: flex;
-  align-items: flex-end;  /* 关键：元素底部对齐 */
-  gap: 10px;               /* 头像和昵称之间的间距 */
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid #e5e5ea; /* 分割线，和全站分割线样式统一 */
+  align-items: flex-end;
+  gap: 10px;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #e5e5ea;
 }
-
-/* 弹窗头像：圆形、固定尺寸 */
 .popup-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 0;        /* 正方形头像（关键修改） */
+  width: 34px;
+  height: 34px;
+  border-radius: 0;
   object-fit: cover;
   display: block;
   border: 1px solid #e5e5ea;
-  background-color: #f2f2f7; /* 头像加载中兜底底色 */
+  background-color: #f2f2f7;
 }
-/* 弹窗昵称文字：长文本自动省略，防止布局挤压 */
 .popup-nick {
-  font-size: 15px;
+  font-size: 14px;
   color: #007aff;
   font-weight: 500;
-  /* 长昵称防溢出：超出部分显示省略号 */
   max-width: 280px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* ========== 帖子头部 头像+昵称 样式 ========== */
-/* 帖子头像：正方形，和弹窗头像规格统一 */
 .post-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 0;          /* 正方形 */
+  width: 34px;
+  height: 34px;
+  border-radius: 0;
   object-fit: cover;
   display: block;
   border: 1px solid #e5e5ea;
-  background-color: #f2f2f7;  /* 加载兜底底色 */
+  background-color: #f2f2f7;
 }
-
-/* 帖子头部头像昵称容器：内部已行内样式控制对齐，此处仅预留扩展 */
-.post-avatar-row {
-  line-height: 1;
-}
-/* ========== 回复条目 头像+昵称 样式 ========== */
-/* 回复头像：正方形，尺寸略小于帖子头像，视觉层级区分，风格统一 */
+.post-avatar-row {line-height: 1;}
 .reply-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 0;          /* 正方形头像 */
+  width: 34px;
+  height: 34px;
+  border-radius: 0;
   object-fit: cover;
   display: block;
   border: 1px solid #e5e5ea;
-  background-color: #f2f2f7;  /* 头像加载兜底底色 */
+  background-color: #f2f2f7;
 }
-
-/* 回复头像+昵称容器：预留扩展样式 */
-.reply-avatar-row {
-  line-height: 1;
-}
+.reply-avatar-row {line-height: 1;}
 .pop-post form{
   display:flex;
   flex-direction:column;
-  gap:16px;
+  gap:10px;
 }
-.pop-post .btn{
-  align-self:flex-end;
-}
+.pop-post .btn{align-self:flex-end;}
 .fold-btn{
   color:#007aff;
   background:transparent;
   border:none;
-  font-size:13px;
+  font-size:12px;
   cursor:pointer;
   padding:2px 0;
 }
-/* 折叠按钮外层整行点击容器 */
 .toggle-wrapper {
   display: block;
-  padding: 8px 0; /* 上下内边距，加大手机触摸热区 */
+  padding: 6px 0;
 }
 @keyframes flash-highlight {
   0% { background-color: #e3f2fd; }
-  50% { background-color: #ffffff; }
+  50% { background-color: transparent; }
   100% { background-color: #e3f2fd; }
 }
 .flash {
   animation: flash-highlight 0.6s ease-in-out 2;
 }
-/* 超链接样式 */
 .post-content a, .reply-text a {
   color: #007aff;
   text-decoration: underline;
@@ -294,19 +309,17 @@ textarea{
 .post-content a:hover, .reply-text a:hover {
   color: #0051b8;
 }
-
 .msg-media-img {
-  width: 100%;          /* 宽度自适应父容器（帖子卡片），和文字同宽 */
-  height: 180px;         /* 固定高度，可自行修改数值 */
-  border-radius: 8px;
+  width: 100%;
+  height: 120px;
+  border-radius: 6px;
   border: 1px solid #7c7c7c;
-  margin: 8px 0;
-  object-fit: cover;     /* 等比例铺满容器，超出部分裁剪 */
-  object-position: center; /* 图片居中 */
+  margin: 6px 0;
+  object-fit: cover;
+  object-position: center;
   loading: lazy;
-  display: block;        /* 消除图片默认行内留白间隙 */
+  display: block;
 }
-/* 图片放大预览弹窗 + 新增淡入动画 */
 .img-preview-mask {
   position: fixed;
   inset: 0;
@@ -315,7 +328,7 @@ textarea{
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
   transition: opacity 0.2s ease;
 }
 .img-preview-mask img {
@@ -324,36 +337,30 @@ textarea{
   object-fit: contain;
   border-radius: 4px;
 }
-
-/* 上传提示区域：文字+按钮居中对齐 */
 #mediaBox {
   display: inline-flex;
-  align-items: center; /* 文字和按钮垂直居中 */
-  gap: 8px; /* 文字与按钮之间固定间距 */
-  max-width: 260px;   /* 限制容器最大宽度，根据页面微调 */
-  flex-wrap: wrap;    /* 内容超长自动换行（核心） */
-  line-height: 1.5;
+  align-items: center;
+  gap: 6px;
+  max-width: 260px;
+  flex-wrap: wrap;
+  line-height: 1.4;
 }
 #mediaBox .err-text {
-  color: #f53f3f; /* 报错文字红色 */
-  font-size: 14px;
+  color: #f53f3f;
+  font-size: 13px;
 }
 .empty-reply { color: #888; font-style: italic; }
-/* ========== 上传加载动画 全局样式 ========== */
-/* 1. 经典旋转加载圈 */
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 .spin-loader {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border: 2px solid #e5e5ea;
-  border-top: 2px solid #007aff; /* 主题蓝 */
+  border-top: 2px solid #007aff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
-
-/* 2. 三点跳动加载 */
 @keyframes bounce-dot {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
@@ -368,8 +375,6 @@ textarea{
 }
 .dot-loader span:nth-child(2) { animation-delay: 0.2s; }
 .dot-loader span:nth-child(3) { animation-delay: 0.4s; }
-
-/* 3. 脉冲圆点（极简呼吸动画） */
 @keyframes pulse-dot {
   0%, 100% { transform: scale(1); opacity: 0.7; }
   50% { transform: scale(1.2); opacity: 1; }
@@ -381,16 +386,8 @@ textarea{
   background: #007aff;
   animation: pulse-dot 1.2s ease-in-out infinite;
 }
-
-/* 4. 上传进度条样式（进阶方案用） */
-.progress-wrap {
-  width: 220px;
-}
-.progress-text {
-  font-size: 13px;
-  color: #333;
-  margin-bottom: 4px;
-}
+.progress-wrap {width: 220px;}
+.progress-text {font-size: 12px;color: #333;margin-bottom: 3px;}
 .progress-bar-bg {
   height: 6px;
   background: #e5e5ea;
@@ -404,17 +401,13 @@ textarea{
   border-radius: 3px;
   transition: width 0.1s linear;
 }
-/* 帖子底部操作栏：回复按钮 + 展开按钮 左右同行 */
 .post-action-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 10px 0;
+  margin: 8px 0;
   width: 100%;
 }
-
-/* ===================== 通知详情全屏弹窗 样式 ===================== */
-/* 外层容器：保留原生全屏、默认隐藏，无任何改动，绝对安全 */
 .notice-full-modal {
   display: none;
   position: fixed;
@@ -426,38 +419,26 @@ textarea{
   z-index: 200;
   box-sizing: border-box;
 }
-
-/* 内部内容容器：基础样式 */
 .modal-content {
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  padding: 1rem 1rem 2rem 1rem; /* 上、右、下、左：底部加大到 2rem */
+  padding: 1rem 0.8rem 2rem 0.8rem;
   box-sizing: border-box;
 }
-
-/* ========== 手机端（宽度 < 768px）：完全保留原版全屏效果 ========== */
 @media (max-width: 767px) {
   .modal-content {
     width: 100%;
     height: 100%;
   }
 }
-
-/* ========== 电脑端（宽度 ≥ 768px）：卡片双居中（核心修复） ========== */
 @media (min-width: 768px) {
   .modal-content {
-    /* 宽度和主页主体对齐 */
     max-width: 700px;
     width: 100%;
-    /* 限制最大高度，避免撑满屏幕 */
     max-height: 85vh;
     height: auto;
-
-    /* 核心：水平 + 垂直 双居中（传统布局最稳写法） */
     margin: auto;
-
-    /* 美化样式，可随意删除 */
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   }
