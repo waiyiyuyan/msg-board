@@ -1,4 +1,8 @@
 /* ========== 明暗主题变量 放在最顶部 ========== */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 :root {
   /* 基础配色 */
   --bg-light: #f2f2f7;
@@ -27,7 +31,20 @@
   --red: #ff3b30;
   --red-dark: #d92e24;
   --green: #34c759;
+
+  /* 全局统一字号变量，只改这里就能全站同步缩放 */
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-md: 15px;
+  --fs-lg: 16px;
 }
+
+/* 全局字号工具类，所有文字继承这套标准 */
+.fs-xs { font-size: var(--fs-xs); }
+.fs-sm { font-size: var(--fs-sm); }
+.fs-md { font-size: var(--fs-md); }
+.fs-lg { font-size: var(--fs-lg); }
+
 /* 浅色系统默认 */
 @media (prefers-color-scheme: light) {
   :root {
@@ -77,16 +94,13 @@ body{
     margin-bottom:3px;
 }
 .post-author{
-    font-size:14px;
     color:var(--blue);
     font-weight:500;
 }
 .post-time{
-    font-size:11px;
     color:var(--text-second);
 }
 .post-content{
-    font-size:14px;
     color:var(--text-main);
     line-height:1.4;
     margin-bottom:4px;
@@ -106,7 +120,6 @@ body{
     border-radius:6px;
     padding:4px 10px;
     cursor:pointer;
-    font-size:13px;
 }
 .del-btn{background:var(--red);}
 /* 透明占位，还原原版上下16px外边距，隔开折叠按钮与回复区域 */
@@ -139,11 +152,9 @@ body{
     align-items:center;
 }
 .reply-name{
-    font-size:12px;
     color:var(--blue);
 }
 .reply-text{
-    font-size:13px;
     color:var(--text-main);
     margin:2px 0;
     white-space: pre-line;
@@ -151,11 +162,17 @@ body{
     word-break: break-all;
 }
 .reply-time{
-    font-size:10px;
     color:var(--text-second);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.reply-time::before {
+  counter-increment: floorNum;
+  content: counter(floorNum) "楼";
+  color: var(--text-second);
 }
 .reply-small-btn{
-    font-size:13px;
     padding:2px 4px;
     background:transparent;
     border:0;
@@ -167,12 +184,11 @@ body{
 .reply-small-btn.del-btn {color:var(--red);}
 .reply-small-btn.del-btn:hover {color:var(--red-dark);}
 
-input{width:100%;font-size:14px;outline-color:var(--blue);color:var(--pop-text);background:transparent;}
+input{width:100%;outline-color:var(--blue);color:var(--pop-text);background:transparent;}
 textarea{
   width:100%;
   border:none;
   padding:6px 0;
-  font-size:14px;
   outline:none;
   resize:none;
   min-height:30px;
@@ -227,7 +243,6 @@ textarea{
   right:-4px;
   background:var(--red);
   color:#fff;
-  font-size:10px;
   min-width:16px;
   height:16px;
   border-radius:8px;
@@ -277,8 +292,8 @@ textarea{
 }
 .notify-btn-bar .btn {flex:1;}
 .notify-item:last-child{border-bottom:none;}
-.notify-txt{font-size:13px;color:var(--text-main);line-height:1.4;}
-.notify-time{font-size:10px;color:var(--text-second);margin-top:3px;}
+.notify-txt{color:var(--text-main);line-height:1.4;}
+.notify-time{color:var(--text-second);margin-top:3px;}
 .empty-tip{text-align:center;padding:30px 0;color:var(--text-second);}
 
 /* 发帖弹窗 */
@@ -316,7 +331,6 @@ textarea{
   background-color: var(--bg);
 }
 .popup-nick {
-  font-size: 14px;
   color: var(--blue);
   font-weight: 500;
   max-width: 280px;
@@ -354,7 +368,6 @@ textarea{
   color:var(--blue);
   background:transparent;
   border:none;
-  font-size:12px;
   cursor:pointer;
   padding:2px 0;
 }
@@ -428,7 +441,6 @@ textarea{
 }
 #mediaBox .err-text {
   color: var(--red);
-  font-size: 13px;
 }
 .empty-reply {
   color: var(--text-second);
@@ -472,7 +484,7 @@ textarea{
   animation: pulse-dot 1.2s ease-in-out infinite;
 }
 .progress-wrap {width: 220px;}
-.progress-text {font-size: 12px;color:var(--text-second);margin-bottom: 3px;}
+.progress-text {color:var(--text-second);margin-bottom: 3px;}
 .progress-bar-bg {
   height: 6px;
   background: var(--border-line);
@@ -528,20 +540,7 @@ textarea{
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   }
 }
-/* 回复楼层 不改动时间原有样式，不会压缩全局字体 */
+/* 楼层计数器初始化 */
 .post-card {
   counter-reset: floorNum;
-}
-.reply-time {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  /* 强制恢复你原来的字号，不受flex影响 */
-  font-size: 10px;
-}
-.reply-time::before {
-  counter-increment: floorNum;
-  content: counter(floorNum) "楼";
-  font-size: 10px;
-  color: var(--text-second);
 }
