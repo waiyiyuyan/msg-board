@@ -1,8 +1,4 @@
 /* ========== 明暗主题变量 放在最顶部 ========== */
-html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-}
 :root {
   /* 基础配色 */
   --bg-light: #f2f2f7;
@@ -536,9 +532,16 @@ textarea{
 .post-card {
   counter-reset: floorNum;
 }
-.reply-name::after {
+.reply-time {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  /* 强制恢复你原来的字号，不受flex影响 */
+  font-size: 10px;
+}
+.reply-time::before {
   counter-increment: floorNum;
-  content: " · " counter(floorNum) "楼";
-  font-size: 11px;
+  content: counter(floorNum) "楼";
+  font-size: 10px;
   color: var(--text-second);
 }
