@@ -962,21 +962,20 @@ notifyMask.addEventListener('click', function (e) {
 });
 
 function bindMediaEvents(container) {
-  // 图片点击放大
+  // 图片：点击新标签页打开原图，不再弹出遮罩预览
   container.querySelectorAll('.msg-media-img:not([data-event-bound])').forEach(img => {
     img.dataset.eventBound = "true";
-    img.style.cursor = "zoom-in";
+    img.style.cursor = "pointer";
     img.onclick = function () {
-      previewImg.src = this.src;
-      imgPreviewMask.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+      // 新窗口打开原图
+      window.open(this.src, "_blank");
     };
     img.onerror = function () {
       this.closest(".msg-media-wrap").style.display = 'none';
     };
   });
 
-  // 视频互斥暂停
+  // 视频：播放互斥逻辑不变，加载失败隐藏容器
   container.querySelectorAll('video.msg-media-video:not([data-event-bound])').forEach(video => {
     video.dataset.eventBound = "true";
     video.onerror = function () {
