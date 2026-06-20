@@ -108,6 +108,7 @@ body{
     white-space: pre-line;
     overflow-wrap: break-word;
     word-break: break-all;
+    font-size: var(--fs-lg); /* 新增这一行 */
 }
 .post-btn-group{
     display:flex;
