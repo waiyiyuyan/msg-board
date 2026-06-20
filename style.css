@@ -240,8 +240,8 @@ textarea{
 }
 .badge{
   position:absolute;
-  top:-4px;
-  right:-4px;
+  top:-6px;
+  right:-6px;
   background:var(--red);
   color:#fff;
   min-width:16px;
@@ -249,7 +249,10 @@ textarea{
   border-radius:8px;
   display:grid;
   place-items:center;
-  font-size: 12px;
+  font-size: 11px;
+  line-height:1;
+  padding:0 2px;
+  overflow: hidden;
 }
 
 /* 通知弹窗 */
@@ -408,14 +411,13 @@ textarea{
 
 /* 复刻X平台原生自适应媒体，无多余黑边，左对齐 */
 .msg-media-wrap {
-  /* 取消固定max-width，宽度由内部图片/视频自动撑开 */
   width: fit-content;
-  max-width: min(100%, 420px); /* 最大不超过420，防止过大 */
-  margin: 8px 0; /* 左对齐 */
+  max-width: min(100%, 520px);
+  margin: 8px 0;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--border-line);
-  background: var(--bg); /* 留白和页面同色，看不见黑边 */
+  background: var(--bg);
 }
 @media (prefers-color-scheme: dark) {
   .msg-media-wrap {
@@ -426,8 +428,8 @@ textarea{
 .msg-media-video {
   width: auto;
   height: auto;
-  max-width: 420px;
-  max-height: 55vh;
+  max-width: 520px;
+  max-height: 65vh;
   object-fit: contain;
   display: block;
   loading: lazy;
