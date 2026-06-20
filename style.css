@@ -409,7 +409,7 @@ textarea{
 /* ===== X平台风格媒体容器+图片/视频 完整版 ===== */
 .msg-media-wrap {
   width: 100%;
-  max-width: 390px; /* 从580缩小到420，尺寸更小 */
+  max-width: 380px; /* 从580缩小到380，尺寸更小 */
   margin: 8px 0; /* 取消auto居中，改为左对齐 */
   border-radius: 12px;
   overflow: hidden;
@@ -425,7 +425,7 @@ textarea{
 .msg-media-video {
   width: 100%;
   height: auto;
-  max-height: 60vh; /* 同步降低最大高度，整体更小 */
+  max-height: 56vh; /* 同步降低最大高度，整体更小 */
   object-fit: contain;
   display: block;
   loading: lazy;
