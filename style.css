@@ -71,21 +71,10 @@ html {
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;}
 body{
     background:var(--bg);
-    padding:0 16px 80px;
+    padding: 6px 16px 80px;
     max-width:700px;
     margin:0 auto;
-    padding-top:6px;
 }
-
-/* 公共文本通用换行样式（消除3处重复代码） */
-.text-wrap {
-  white-space: pre-line;
-  overflow-wrap: break-word;
-  word-break: break-all;
-  color: var(--text-main);
-  line-height: 1.4;
-}
-
 /* ========== 帖子模块 ========== */
 .post-card{
     background: transparent;
@@ -109,9 +98,14 @@ body{
     font-size: var(--fs-xs);
 }
 .post-content{
-    @extend .text-wrap;
     margin-bottom:4px;
     font-size: var(--fs-lg);
+    /* 手动补全换行渲染规则 */
+    color: var(--text-main);
+    line-height: 1.4;
+    white-space: pre-line;
+    overflow-wrap: break-word;
+    word-break: break-all;
 }
 .post-action-row {
   display: flex;
@@ -156,9 +150,14 @@ body{
     font-size: var(--fs-sm);
 }
 .reply-text{
-    @extend .text-wrap;
     margin:2px 0;
     font-size: var(--fs-md);
+    /* 手动补全换行渲染规则 */
+    color: var(--text-main);
+    line-height: 1.4;
+    white-space: pre-line;
+    overflow-wrap: break-word;
+    word-break: break-all;
 }
 .reply-time{
     color:var(--text-second);
@@ -220,6 +219,7 @@ textarea{
   min-height:30px;
   color:var(--pop-text);
   background:transparent;
+  font-size: var(--fs-lg); /* 新增 */
 }
 
 /* ========== 悬浮按钮 ========== */
