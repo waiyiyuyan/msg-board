@@ -33,10 +33,10 @@ html {
   --green: #34c759;
 
   /* 全局统一字号变量，只改这里就能全站同步缩放 */
-  --fs-xs: 14px;  /* 时间、楼层、小字提示 */
-  --fs-sm: 14px;  /* 回复昵称、折叠按钮、加载提示 */
-  --fs-md: 14px;  /* 按钮、回复正文、通知文字 */
-  --fs-lg: 14px;  /* 帖子标题/内容、输入框、弹窗昵称 */
+  --fs-xs: 14px;  /* 时间、楼层 → reply-time / post-time */
+  --fs-sm: 14px;  /* 昵称、折叠按钮 → reply-name / post-author */
+  --fs-md: 14px;  /* 回复正文、通知文字 → reply-text / notify-txt */
+  --fs-lg: 14px;  /* 帖子正文 → post-content */
 }
 
 /* 全局字号工具类，所有文字继承这套标准 */
@@ -97,6 +97,7 @@ body{
 .post-author{
     color:var(--blue);
     font-weight:500;
+    font-size: var(--fs-sm);
 }
 .post-time{
     color:var(--text-second);
@@ -155,6 +156,7 @@ body{
 }
 .reply-name{
     color:var(--blue);
+    font-size: var(--fs-sm);
 }
 .reply-text{
     color:var(--text-main);
@@ -162,12 +164,14 @@ body{
     white-space: pre-line;
     overflow-wrap: break-word;
     word-break: break-all;
+    font-size: var(--fs-md);
 }
 .reply-time{
     color:var(--text-second);
     display: flex;
     align-items: center;
     gap: 5px;
+    font-size: var(--fs-xs);
 }
 .reply-time::before {
   counter-increment: floorNum;
