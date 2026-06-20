@@ -117,10 +117,16 @@ function renderMedia(mediaUrl) {
   const lowerUrl = mediaUrl.toLowerCase();
   const proxySrc = PROXY_PREFIX + encodeURIComponent(mediaUrl);
   if (IMG_EXTS.some(ext => lowerUrl.endsWith(ext))) {
-    return `<div class="msg-media-wrap"><img class="msg-media-img" src="${proxySrc}" alt=""></div>`;
+    return `<div class="msg-media-wrap">
+      <img class="msg-media-img" style="width:100%;" src="${proxySrc}" alt="">
+    </div>`;
   }
   if (lowerUrl.endsWith(".mp4") || lowerUrl.endsWith(".webm")) {
-    return `<div class="msg-media-wrap"><video class="msg-media-video" controls playsinline webkit-playsinline preload="metadata"><source src="${proxySrc}" type="video/mp4">浏览器不支持该视频</video></div>`;
+    return `<div class="msg-media-wrap">
+      <video class="msg-media-video" style="width:100%;" controls playsinline webkit-playsinline preload="metadata">
+        <source src="${proxySrc}" type="video/mp4">浏览器不支持该视频
+      </video>
+    </div>`;
   }
   return "";
 }
@@ -399,10 +405,8 @@ listBox.addEventListener("click", e => {
 // ===================== 通知模块 =====================
 function renderNotify() {
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
-  setTimeout(() => {
-    unReadBadge.style.display = unReadCount > 0 ? 'grid' : 'none';
-    unReadBadge.innerText = unReadCount > 99 ? '99+' : unReadCount;
-  }, 20);
+  unReadBadge.style.display = unReadCount > 0 ? 'grid' : 'none';
+  unReadBadge.innerText = unReadCount > 99 ? '99+' : unReadCount;
   if (readAllBtn && clearNotifyBtn) {
     readAllBtn.disabled = notifyList.length === 0 || unReadCount === 0;
     clearNotifyBtn.disabled = notifyList.length === 0;
