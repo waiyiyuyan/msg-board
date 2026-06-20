@@ -413,7 +413,7 @@ textarea{
 /* 复刻X平台原生自适应媒体，无多余黑边，左对齐 */
 .msg-media-wrap {
   width: fit-content;
-  max-width: min(100%, 520px);
+  max-width: min(100%, 420px);
   margin: 8px 0;
   border-radius: 12px;
   overflow: hidden;
@@ -429,7 +429,7 @@ textarea{
 .msg-media-video {
   width: auto;
   height: auto;
-  max-width: 520px;
+  max-width: 420px;
   max-height: 65vh;
   object-fit: contain;
   display: block;
