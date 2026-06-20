@@ -297,8 +297,8 @@ textarea{
 }
 .notify-btn-bar .btn {flex:1;}
 .notify-item:last-child{border-bottom:none;}
-.notify-txt{color:var(--text-main);line-height:1.4;}
-.notify-time{color:var(--text-second);margin-top:3px;}
+.notify-txt{color:var(--text-main);line-height:1.4;font-size: var(--fs-md);}
+.notify-time{color:var(--text-second);margin-top:3px;font-size: var(--fs-md);}
 .empty-tip{text-align:center;padding:30px 0;color:var(--text-second);}
 
 /* 发帖弹窗 */
