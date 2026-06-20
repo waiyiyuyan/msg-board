@@ -91,13 +91,6 @@ function autoResize(el) {
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
-/** 遍历绑定一次事件，防止重复绑定 */
-function bindOnce(sel, event, cb) {
-  document.querySelectorAll(`${sel}:not([data-event-bound])`).forEach(el => {
-    el.dataset.eventBound = "true";
-    el[`on${event}`] = cb;
-  });
-}
 /** 获取回复头部文案（消除3处重复代码） */
 function getReplyHeadText(r, myNick) {
   const rawContent = parseLink(r.r_content);
@@ -118,7 +111,7 @@ function getReplyHeadText(r, myNick) {
   return { headText, showContent };
 }
 
-// ===================== 媒体渲染 & 媒体事件 =====================
+// ===================== 媒体渲染 & 媒体事件（改用委托，修复图片视频绑定失效） =====================
 function renderMedia(mediaUrl) {
   if (!mediaUrl) return "";
   const lowerUrl = mediaUrl.toLowerCase();
@@ -131,17 +124,25 @@ function renderMedia(mediaUrl) {
   }
   return "";
 }
-function bindMediaEvents(container) {
-  bindOnce(".msg-media-img", "click", function () { window.open(this.src, "_blank"); });
-  bindOnce(".msg-media-img", "error", function () { this.closest(".msg-media-wrap").style.display = 'none'; });
-  bindOnce("video.msg-media-video", "error", function () { this.closest(".msg-media-wrap").style.display = 'none'; });
-  container.querySelectorAll('video.msg-media-video:not([data-video-bound])').forEach(v => {
-    v.dataset.videoBound = "true";
-    v.addEventListener('play', () => {
-      document.querySelectorAll('video.msg-media-video').forEach(vid => vid !== v && vid.pause());
-    });
+// 全局统一媒体事件委托，不用循环绑定，动态DOM自动生效
+listBox.addEventListener("click", function(e) {
+  const img = e.target.closest(".msg-media-img");
+  if(img) window.open(img.src, "_blank");
+});
+listBox.addEventListener("error", function(e) {
+  const target = e.target;
+  if(target.matches(".msg-media-img, .msg-media-video")) {
+    target.closest(".msg-media-wrap").style.display = "none";
+  }
+}, true);
+// 视频互斥播放委托
+listBox.addEventListener("play", function(e) {
+  const vid = e.target.closest(".msg-media-video");
+  if(!vid) return;
+  document.querySelectorAll(".msg-media-video").forEach(v => {
+    if(v !== vid) v.pause();
   });
-}
+}, true);
 
 // ===================== 上传模块 =====================
 function clearMedia() {
@@ -311,8 +312,6 @@ function renderPosts(data) {
     if (wrap) wrap.style.display = "block";
     if (btn) btn.innerText = `${wrap.querySelectorAll(".reply-item").length}条回复 ▼`;
   });
-  bindOnce(".fold-btn", "click", e => toggleReplyFold(e.target.dataset.foldPid));
-  bindMediaEvents(listBox);
   console.log(`[前端] 帖子渲染完成，共 ${data.length} 条，最新ID：${data[0]?.id}`);
 }
 
@@ -370,8 +369,6 @@ async function loadMorePosts() {
       hasMore = data.hasMore;
       const newHtml = data.list.map(post => buildPostHtml(post)).join("");
       listBox.insertAdjacentHTML("beforeend", newHtml);
-      bindOnce(".fold-btn", "click", e => toggleReplyFold(e.target.dataset.foldPid));
-      bindMediaEvents(listBox);
       console.log("[分页] 追加加载完成，新增", data.list.length, "条");
     } else hasMore = false;
   } catch (e) {
@@ -385,7 +382,16 @@ async function loadMorePosts() {
 document.addEventListener("DOMContentLoaded", () => {
   if (loadTip) loadTip.addEventListener("click", () => hasMore ? loadMorePosts() : scrollToTop());
 });
+// 全局委托折叠按钮点击（修复评论无法展开）
 listBox.addEventListener("click", e => {
+  // 点击折叠按钮
+  const foldBtn = e.target.closest(".fold-btn");
+  if(foldBtn) {
+    e.stopPropagation();
+    toggleReplyFold(foldBtn.dataset.foldPid);
+    return;
+  }
+  // 点击空白折叠容器
   const wrapper = e.target.closest(".toggle-wrapper");
   if (wrapper) toggleReplyFold(wrapper.dataset.pid);
 });
@@ -671,8 +677,6 @@ function initWebSocket() {
           break;
         case "NEW_POST":
           listBox.insertAdjacentHTML("afterbegin", buildPostHtml(data.item));
-          bindOnce(".fold-btn", "click", e => toggleReplyFold(e.target.dataset.foldPid));
-          bindMediaEvents(listBox);
           lastData.unshift(data.item);
           break;
         case "NEW_REPLY": {
@@ -705,7 +709,6 @@ function initWebSocket() {
           toggleWrapper.style.cursor = "";
           const totalReply = allReplies.length;
           foldBtn.innerText = totalReply + '条回复 ' + (foldReplyIds.includes(Number(targetPid)) ? '▼' : '▶');
-          bindMediaEvents(replyWrap);
           const cachePost = lastData.find(p => Number(p.id) === Number(targetPid));
           if (cachePost && cachePost.replys) cachePost.replys.push(replyItem);
           if (isNoticeModalOpen && Number(currentModalPostId) === Number(targetPid)) {
