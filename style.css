@@ -134,7 +134,7 @@ body{
 /* 回复区 */
 .reply-wrap{
     padding-top:6px;
-    padding-bottom:50px;
+    padding-bottom: 0;
 }
 .notice-full-modal .reply-wrap {
   padding-top: 8px;
