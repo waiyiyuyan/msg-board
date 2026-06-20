@@ -406,15 +406,16 @@ textarea{
   color: var(--blue-dark);
 }
 
-/* ===== X平台风格媒体容器+图片/视频 完整版 ===== */
+/* 复刻X平台原生自适应媒体，无多余黑边，左对齐 */
 .msg-media-wrap {
-  width: 100%;
-  max-width: 380px; /* 从580缩小到380，尺寸更小 */
-  margin: 8px 0; /* 取消auto居中，改为左对齐 */
+  /* 取消固定max-width，宽度由内部图片/视频自动撑开 */
+  width: fit-content;
+  max-width: min(100%, 420px); /* 最大不超过420，防止过大 */
+  margin: 8px 0; /* 左对齐 */
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--border-line);
-  background: #000;
+  background: var(--bg); /* 留白和页面同色，看不见黑边 */
 }
 @media (prefers-color-scheme: dark) {
   .msg-media-wrap {
@@ -423,13 +424,14 @@ textarea{
 }
 .msg-media-img,
 .msg-media-video {
-  width: 100%;
+  width: auto;
   height: auto;
-  max-height: 56vh; /* 同步降低最大高度，整体更小 */
+  max-width: 420px;
+  max-height: 55vh;
   object-fit: contain;
   display: block;
   loading: lazy;
-  background: #000;
+  background: var(--bg);
 }
 @media (prefers-color-scheme: dark) {
   .msg-media-img,
