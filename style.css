@@ -430,7 +430,7 @@ textarea{
   width: auto;
   height: auto;
   max-width: 420px;
-  max-height: 65vh;
+  max-height: 55vh;
   object-fit: contain;
   display: block;
   loading: lazy;
