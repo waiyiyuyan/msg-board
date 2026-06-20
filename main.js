@@ -991,15 +991,6 @@ function bindMediaEvents(container) {
   });
 }
 
-// 图片预览关闭
-imgPreviewMask.addEventListener('click', function (e) {
-  if (e.target !== previewImg) {
-    imgPreviewMask.style.display = 'none';
-    previewImg.src = "";
-    document.body.style.overflow = '';
-  }
-});
-
 // ===================== 核心：WebSocket 初始化 + 心跳 + 重连 + 兜底 =====================
 let ws = null;
 let heartbeatTimer = null;
