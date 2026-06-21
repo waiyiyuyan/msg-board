@@ -80,7 +80,7 @@ function getAvatarUrl(nick) {
 /** 生成访客昵称 */
 async function fetchRandomNick() {
   const randomStr = Math.random().toString(36).slice(2, 7);
-  return "访客_" + randomStr;
+  return randomStr;
 }
 /** 自动缩放输入框 */
 function autoResize(el) {
