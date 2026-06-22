@@ -74,8 +74,35 @@ function parseLink(text) {
   return escapeTxt.replace(/(https?:\/\/[^\s<>"]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 }
 /** 头像生成 */
+/** 头像生成 - 本地画布文字头像，无外部图片依赖，永不失效 */
 function getAvatarUrl(nick) {
-  return nick ? `https://picsum.photos/seed/${encodeURIComponent(nick)}/200/200` : "";
+  if (!nick) return "";
+  const cacheId = `avatar_${encodeURIComponent(nick)}`;
+  let canvas = document.getElementById(cacheId);
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+    canvas.id = cacheId;
+    canvas.width = 200;
+    canvas.height = 200;
+    const ctx = canvas.getContext("2d");
+    // 根据昵称哈希算出固定背景色
+    let hash = 0;
+    [...nick].forEach(c => hash = c.charCodeAt(0) + ((hash << 5) - hash));
+    const r = Math.abs(hash) % 200;
+    const g = Math.abs(hash >> 8) % 200;
+    const b = Math.abs(hash >> 16) % 200;
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.fillRect(0,0,200,200);
+    // 绘制昵称首字母白色大字
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 90px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(nick[0].toUpperCase(), 100, 100);
+    document.body.appendChild(canvas);
+    canvas.style.display = "none";
+  }
+  return canvas.toDataURL("image/png");
 }
 /** 生成访客昵称 */
 async function fetchRandomNick() {
