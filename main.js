@@ -104,7 +104,7 @@ function getAvatarUrl(nick) {
     ctx.textBaseline = "middle";
     const char = nick[0].toUpperCase();
     // 精确居中坐标 100,100
-    ctx.fillText(char, 100, 100);
+    ctx.fillText(char, 100, 104);
 
     document.body.appendChild(canvas);
     canvas.style.display = "none";
