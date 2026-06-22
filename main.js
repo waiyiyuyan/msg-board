@@ -73,8 +73,7 @@ function parseLink(text) {
   const escapeTxt = text.replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;" })[m]);
   return escapeTxt.replace(/(https?:\/\/[^\s<>"]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 }
-/** 头像生成 */
-/** 头像生成 - 本地画布文字头像，无外部图片依赖，永不失效 */
+/** 头像生成 - 本地画布文字头像，修复文字居中，固定昵称配色 */
 function getAvatarUrl(nick) {
   if (!nick) return "";
   const cacheId = `avatar_${encodeURIComponent(nick)}`;
@@ -85,20 +84,28 @@ function getAvatarUrl(nick) {
     canvas.width = 200;
     canvas.height = 200;
     const ctx = canvas.getContext("2d");
-    // 根据昵称哈希算出固定背景色
+
+    // 哈希计算固定背景色
     let hash = 0;
-    [...nick].forEach(c => hash = c.charCodeAt(0) + ((hash << 5) - hash));
-    const r = Math.abs(hash) % 200;
-    const g = Math.abs(hash >> 8) % 200;
-    const b = Math.abs(hash >> 16) % 200;
-    ctx.fillStyle = `rgb(${r},${g},${b})`;
-    ctx.fillRect(0,0,200,200);
-    // 绘制昵称首字母白色大字
-    ctx.fillStyle = "#fff";
-    ctx.font = "bold 90px sans-serif";
+    for (let i = 0; i < nick.length; i++) {
+      hash = nick.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const r = Math.abs(hash) % 180;
+    const g = Math.abs((hash >> 8)) % 180;
+    const b = Math.abs((hash >> 16)) % 180;
+    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+    ctx.fillRect(0, 0, 200, 200);
+
+    // 文字居中修复
+    ctx.fillStyle = "#ffffff";
+    // 加粗字体，微调字号防止溢出
+    ctx.font = "bold 86px -apple-system, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(nick[0].toUpperCase(), 100, 100);
+    const char = nick[0].toUpperCase();
+    // 精确居中坐标 100,100
+    ctx.fillText(char, 100, 100);
+
     document.body.appendChild(canvas);
     canvas.style.display = "none";
   }
