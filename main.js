@@ -73,43 +73,26 @@ function parseLink(text) {
   const escapeTxt = text.replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;" })[m]);
   return escapeTxt.replace(/(https?:\/\/[^\s<>"]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 }
-/** 头像生成 - 本地画布文字头像，修复文字居中，固定昵称配色 */
+/** SVG 矢量文字头像，替代Canvas，无隐藏DOM */
 function getAvatarUrl(nick) {
   if (!nick) return "";
-  const cacheId = `avatar_${encodeURIComponent(nick)}`;
-  let canvas = document.getElementById(cacheId);
-  if (!canvas) {
-    canvas = document.createElement("canvas");
-    canvas.id = cacheId;
-    canvas.width = 200;
-    canvas.height = 200;
-    const ctx = canvas.getContext("2d");
-
-    // 哈希计算固定背景色
-    let hash = 0;
-    for (let i = 0; i < nick.length; i++) {
-      hash = nick.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const r = Math.abs(hash) % 180;
-    const g = Math.abs((hash >> 8)) % 180;
-    const b = Math.abs((hash >> 16)) % 180;
-    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-    ctx.fillRect(0, 0, 200, 200);
-
-    // 文字居中修复
-    ctx.fillStyle = "#ffffff";
-    // 加粗字体，微调字号防止溢出
-    ctx.font = "bold 86px -apple-system, sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    const char = nick[0].toUpperCase();
-    // 精确居中坐标 100,100
-    ctx.fillText(char, 100, 104);
-
-    document.body.appendChild(canvas);
-    canvas.style.display = "none";
+  // 哈希计算固定背景色
+  let hash = 0;
+  for (let i = 0; i < nick.length; i++) {
+    hash = nick.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return canvas.toDataURL("image/png");
+  const r = Math.abs(hash) % 180;
+  const g = Math.abs((hash >> 8)) % 180;
+  const b = Math.abs((hash >> 16)) % 180;
+  const char = nick[0].toUpperCase();
+
+  // 基础正方形SVG头像
+  const svg = `<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <rect width="200" height="200" fill="rgb(${r},${g},${b})"/>
+    <text x="100" y="104" font-size="86" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system,sans-serif">${char}</text>
+  </svg>`;
+  // 转base64图片地址，兼容img src
+  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
 }
 /** 生成访客昵称 */
 async function fetchRandomNick() {
