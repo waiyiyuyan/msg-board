@@ -461,7 +461,7 @@ async function clearAllNotify() {
   }
 }
 bellBtn.onclick = () => {
-  // 打开通知前，强制关闭发帖弹窗
+  // 先关闭发帖弹窗
   if (popOpen) {
     maskDom.style.display = 'none';
     popForm.reset();
@@ -469,8 +469,10 @@ bellBtn.onclick = () => {
     popOpen = false;
   }
   if (notifyMask.style.display === 'flex') {
+    // 已打开 → 关闭通知
     notifyMask.style.display = 'none';
   } else {
+    // 打开通知：渲染列表 + 显示遮罩
     renderNotify();
     notifyMask.style.display = 'flex';
   }
