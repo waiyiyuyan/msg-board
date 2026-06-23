@@ -460,24 +460,17 @@ async function clearAllNotify() {
     clearNotifyBtn.disabled = false;
   }
 }
+
 bellBtn.onclick = () => {
-  // 先关闭发帖弹窗
-  if (popOpen) {
-    maskDom.style.display = 'none';
-    popForm.reset();
-    clearMedia();
-    popOpen = false;
-  }
-  if (notifyMask.style.display === 'flex') {
-    // 已打开 → 关闭通知
-    notifyMask.style.display = 'none';
-  } else {
-    // 打开通知：渲染列表 + 显示遮罩
+  if (notifyMask.style.display === 'flex') notifyMask.style.display = 'none';
+  else {
+    if (popOpen) { maskDom.style.display = 'none'; popForm.reset(); popOpen = false; }
     renderNotify();
     notifyMask.style.display = 'flex';
   }
 };
 notifyMask.addEventListener('click', e => { if (e.target === notifyMask) notifyMask.style.display = 'none'; });
+
 
 // ===================== 通知全屏弹窗 =====================
 function renderNoticeModalContent(postId, replyId, needFlash = true) {
