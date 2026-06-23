@@ -73,26 +73,11 @@ function parseLink(text) {
   const escapeTxt = text.replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;" })[m]);
   return escapeTxt.replace(/(https?:\/\/[^\s<>"]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 }
-/** SVG 矢量文字头像，替代Canvas，无隐藏DOM */
+// 生成头像
 function getAvatarUrl(nick) {
   if (!nick) return "";
-  // 哈希计算固定背景色
-  let hash = 0;
-  for (let i = 0; i < nick.length; i++) {
-    hash = nick.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const r = Math.abs(hash) % 180;
-  const g = Math.abs((hash >> 8)) % 180;
-  const b = Math.abs((hash >> 16)) % 180;
-  const char = nick[0].toUpperCase();
-
-  // 基础正方形SVG头像
-  const svg = `<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-    <rect width="200" height="200" fill="rgb(${r},${g},${b})"/>
-    <text x="100" y="110" font-size="86" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system,sans-serif">${char}</text>
-  </svg>`;
-  // 转base64图片地址，兼容img src
-  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+  // seed 传昵称，固定对应卡通头像
+  return `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(nick)}`;
 }
 /** 生成访客昵称 */
 async function fetchRandomNick() {
