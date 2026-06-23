@@ -180,8 +180,14 @@ body{
     cursor:pointer;
 }
 .reply-small-btn:hover{color:var(--blue-dark);}
-.reply-small-btn.del-btn {color:var(--red);}
-.reply-small-btn.del-btn:hover {color:var(--red-dark);}
+.reply-small-btn.del-btn {
+    color:var(--red);
+    background: transparent;
+}
+.reply-small-btn.del-btn:hover {
+    color:var(--red-dark);
+    background: transparent;
+}
 
 /* ========== 统一头像（合并3套完全重复头像代码） ========== */
 .post-avatar, .reply-avatar, .popup-avatar {
