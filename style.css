@@ -68,7 +68,7 @@ html {
 }
 
 /* 全局重置 */
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Microsoft YaHei",Segoe UI,sans-serif;}
 body{
     background:var(--bg);
     padding: 6px 16px 80px;
