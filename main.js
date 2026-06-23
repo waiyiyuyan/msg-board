@@ -461,9 +461,16 @@ async function clearAllNotify() {
   }
 }
 bellBtn.onclick = () => {
-  if (notifyMask.style.display === 'flex') notifyMask.style.display = 'none';
-  else {
-    if (popOpen) { maskDom.style.display = 'none'; popForm.reset(); popOpen = false; }
+  // 打开通知前，强制关闭发帖弹窗
+  if (popOpen) {
+    maskDom.style.display = 'none';
+    popForm.reset();
+    clearMedia();
+    popOpen = false;
+  }
+  if (notifyMask.style.display === 'flex') {
+    notifyMask.style.display = 'none';
+  } else {
     renderNotify();
     notifyMask.style.display = 'flex';
   }
