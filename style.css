@@ -75,15 +75,15 @@ body{
     max-width:700px;
     margin:0 auto;
 }
-/* ========== 帖子模块 ========== */
+/* ========== 帖子模块 改为直角细线无阴影 ========== */
 .post-card{
     background: var(--pop-bg);
-    border-radius: 12px;
+    border: 1px solid var(--text-second);
+    border-radius: 0;
     padding: 16px 14px;
     margin-bottom: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    box-shadow: none;
     counter-reset: floorNum;
-    border: none;
 }
 .post-info{
     display:flex;
@@ -195,7 +195,7 @@ body{
     background: transparent;
 }
 
-/* ========== 统一头像（合并3套完全重复头像代码） ========== */
+/* ========== 统一头像 ========== */
 .post-avatar, .reply-avatar, .popup-avatar {
   width: 34px;
   height: 34px;
@@ -207,17 +207,29 @@ body{
 }
 .post-avatar-row, .reply-avatar-row {line-height: 1;}
 
-/* ========== 按钮通用 ========== */
+/* ========== 按钮通用 全局改为细线透明直角 ========== */
 .btn{
-    background:var(--blue);
-    color:#fff;
-    border:none;
-    border-radius:6px;
+    background:transparent;
+    border:1px solid var(--text-second);
+    color:var(--text-main);
+    border-radius:0;
     padding:4px 10px;
     cursor:pointer;
     font-size: var(--fs-md);
+    transition: color 0.15s, border-color 0.15s;
 }
-.del-btn{background:var(--red);}
+.btn.del-btn{
+  border-color:var(--red);
+  color:var(--red);
+}
+.btn:hover{
+    border-color:var(--blue);
+    color:var(--blue);
+}
+.btn.del-btn:hover{
+  border-color:var(--red-dark);
+  color:var(--red-dark);
+}
 .btn:disabled{opacity:0.6;cursor:not-allowed;}
 
 /* ========== 输入框 ========== */
@@ -231,18 +243,18 @@ textarea{
   min-height:30px;
   color:var(--pop-text);
   background:transparent;
-  font-size: var(--fs-lg); /* 新增 */
+  font-size: var(--fs-lg);
 }
 
-/* ========== 悬浮按钮 ========== */
+/* ========== 悬浮按钮 同步改为直角细线，取消圆形填充 ========== */
 .float-add-btn, .bell-btn{
   position:fixed;
   width:48px;
   height:48px;
-  border-radius:50%;
-  border:none;
-  background:var(--blue);
-  color:#fff;
+  border-radius:0;
+  border:1px solid var(--text-second);
+  background:transparent;
+  color:var(--text-main);
   z-index:101;
   cursor:pointer;
   display:flex;
@@ -252,7 +264,8 @@ textarea{
 .float-add-btn{right:14px;bottom:18px;font-size:24px;}
 .bell-btn{bottom:18px;right:70px;font-size:18px;}
 .float-add-btn:active, .bell-btn:active {
-  opacity: 0.8;
+  border-color:var(--blue);
+  color:var(--blue);
   transform: scale(0.95);
 }
 .badge{
@@ -272,7 +285,7 @@ textarea{
   overflow: hidden;
 }
 
-/* ========== 通知弹窗 ========== */
+/* ========== 通知弹窗 直角细线无阴影 ========== */
 .notify-mask{
   display:none;
   position:fixed;
@@ -286,7 +299,8 @@ textarea{
   width:min(90%,460px);
   max-height:70vh;
   background:var(--pop-bg);
-  border-radius:8px;
+  border:1px solid var(--text-second);
+  border-radius:0;
   padding:14px;
   pointer-events:auto;
   display:flex;
@@ -318,7 +332,7 @@ textarea{
 .notify-time{color:var(--text-second);margin-top:3px;font-size: var(--fs-xs);}
 .empty-tip{text-align:center;padding:30px 0;color:var(--text-second);}
 
-/* ========== 发帖弹窗 ========== */
+/* ========== 发帖弹窗 直角细线 ========== */
 .mask{
   display:none;
   position:fixed;
@@ -332,7 +346,8 @@ textarea{
 .pop-post{
   width:min(520px,100%);
   background:var(--pop-bg);
-  border-radius:8px;
+  border:1px solid var(--text-second);
+  border-radius:0;
   padding:14px;
 }
 .popup-avatar-row {
@@ -428,7 +443,7 @@ textarea{
   width: fit-content;
   max-width: min(100%, 420px);
   margin: 8px 0;
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
   border: 1px solid var(--border-line);
   background: var(--bg);
@@ -514,18 +529,18 @@ textarea{
 .progress-bar-bg {
   height: 6px;
   background: var(--border-line);
-  border-radius: 3px;
+  border-radius: 0;
   overflow: hidden;
 }
 .progress-bar-fill {
   height: 100%;
   width: 0%;
   background: var(--green);
-  border-radius: 3px;
+  border-radius: 0;
   transition: width 0.1s linear;
 }
 
-/* ========== 帖子详情全屏弹窗 ========== */
+/* ========== 帖子详情全屏弹窗 桌面端改为直角细线 ========== */
 .notice-full-modal {
   display: none;
   position: fixed;
@@ -556,7 +571,8 @@ textarea{
     max-height: 85vh;
     height: auto;
     margin: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    border:1px solid var(--text-second);
+    border-radius: 0;
+    box-shadow: none;
   }
 }
