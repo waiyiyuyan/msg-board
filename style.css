@@ -71,16 +71,19 @@ html {
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Microsoft YaHei",Segoe UI,sans-serif;}
 body{
     background:var(--bg);
-    padding: 6px 16px 80px;
+    padding: 16px 12px 80px;
     max-width:700px;
     margin:0 auto;
 }
 /* ========== 帖子模块 ========== */
 .post-card{
-    background: transparent;
-    border-bottom:1px solid var(--border-line);
-    padding:16px 0 8px 0;
+    background: var(--pop-bg);
+    border-radius: 12px;
+    padding: 16px 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     counter-reset: floorNum;
+    border: none;
 }
 .post-info{
     display:flex;
@@ -111,7 +114,7 @@ body{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 8px 0;
+  margin: 10px 0 4px 0;
   width: 100%;
 }
 .post-btn-group{
@@ -120,26 +123,29 @@ body{
     gap:6px;
 }
 .divider{
-    height:1px;
-    background:transparent;
-    margin:16px 0;
-    border:none;
+    display: none;
 }
 
 /* ========== 回复区 ========== */
 .reply-wrap{
-    padding-top:6px;
+    padding-top: 10px;
+    margin-top: 8px;
+    border-top: 1px solid var(--reply-border);
 }
 .notice-full-modal .reply-wrap {
-  padding-top: 8px;
+  padding-top: 10px;
+  margin-top: 8px;
 }
 .reply-item{
-    padding:4px 0;
-    border-bottom:1px solid var(--reply-border);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--reply-border);
     display:flex;
     flex-direction:column;
 }
-.reply-item:last-child{border-bottom:none;}
+.reply-item:last-child{
+  border-bottom:none;
+  padding-bottom: 0;
+}
 .reply-head{
     display:flex;
     justify-content:space-between;
