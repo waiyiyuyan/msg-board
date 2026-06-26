@@ -114,7 +114,7 @@ body{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 10px 0 4px 0;
+  margin: 10px 0 0 0;
   width: 100%;
 }
 .post-btn-group{
@@ -184,6 +184,7 @@ body{
     color:var(--blue);
     margin-top:3px;
     cursor:pointer;
+    font-size: var(--fs-xs); /* 和折叠按钮字号完全统一 */
 }
 .reply-small-btn:hover{color:var(--blue-dark);}
 .reply-small-btn.del-btn {
@@ -383,8 +384,8 @@ textarea{
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 2px 14px 2px 0; /* 右侧留空间给箭头，左侧无内边距 */
-  font-size: var(--fs-sm);
+  padding: 2px 14px; /* 上下左右统一小内边距 */
+  font-size: var(--fs-xs);
   transition: color 0.2s ease;
 }
 /* 箭头定位到右边 */
