@@ -184,7 +184,6 @@ body{
     color:var(--blue);
     margin-top:3px;
     cursor:pointer;
-    font-size: var(--fs-xs); /* 和折叠按钮字号完全统一 */
 }
 .reply-small-btn:hover{color:var(--blue-dark);}
 .reply-small-btn.del-btn {
@@ -384,8 +383,8 @@ textarea{
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 2px 14px; /* 上下左右统一小内边距 */
-  font-size: var(--fs-xs);
+  padding: 2px 14px 2px 0;
+  font-size: var(--fs-xs); /* 统一缩小为xs，和回复按钮一致 */
   transition: color 0.2s ease;
 }
 /* 箭头定位到右边 */
