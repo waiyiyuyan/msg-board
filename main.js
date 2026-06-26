@@ -248,11 +248,11 @@ function toggleReplyFold(pid) {
   if (foldReplyIds.includes(pidNum)) {
     foldReplyIds = foldReplyIds.filter(x => x !== pidNum);
     wrap.style.display = 'none';
-    btn.innerText = total + '条回复 ▶';
+    btn.innerText = total + '条回复 +';
   } else {
     foldReplyIds.push(pidNum);
     wrap.style.display = 'block';
-    btn.innerText = total + '条回复 ▼';
+    btn.innerText = total + '条回复 -';
   }
 }
 function closeReply(pid) {
