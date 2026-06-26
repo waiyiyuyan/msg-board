@@ -493,7 +493,7 @@ function renderNoticeModalContent(postId, replyId, needFlash = true) {
   const replyWrap = noticeModalContent.querySelector(`.reply-wrap[data-wrap-pid="${postId}"]`);
   const foldBtn = noticeModalContent.querySelector(`.fold-btn[data-fold-pid="${postId}"]`);
   if (replyWrap) replyWrap.style.display = "block";
-  iif (foldBtn) {
+  if (foldBtn) {
     foldBtn.innerText = `${replyWrap.querySelectorAll(".reply-item").length}条回复`;
     foldBtn.setAttribute('aria-expanded', 'true');
   }
