@@ -360,28 +360,55 @@ textarea{
 .pop-post .btn{align-self:flex-end;}
 
 /* ========== 折叠按钮 ========== */
-.fold-btn{
-  color:var(--blue);
-  background:transparent;
-  border:none;
-  cursor:pointer;
-  padding:2px 0;
-  font-size: var(--fs-sm);
-}
 .toggle-wrapper {
   display: block;
   padding: 6px 0;
-  background: rgba(242,242,247,0.01);
+  cursor: pointer;
 }
 .toggle-wrapper-empty {
   pointer-events: none !important;
   cursor: default;
-  color:var(--text-second);
+  color: var(--text-second);
 }
 .toggle-wrapper-empty .fold-btn {
   pointer-events: none !important;
   cursor: default;
-  color:var(--text-second) !important;
+  color: var(--text-second) !important;
+}
+
+/* 折叠按钮：左侧箭头 + 文字 */
+.fold-btn {
+  position: relative;
+  color: var(--blue);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 0 2px 14px;
+  font-size: var(--fs-sm);
+  transition: color 0.2s ease;
+}
+/* CSS 绘制箭头，替代 [+]/[-] 字符 */
+.fold-btn::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-top: 1.5px solid var(--blue);
+  border-right: 1.5px solid var(--blue);
+  transform: translateY(-50%) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+/* 展开状态：箭头朝下旋转 */
+.fold-btn[aria-expanded="true"]::before {
+  transform: translateY(-50%) rotate(135deg);
+}
+.fold-btn:hover {
+  color: var(--blue-dark);
+}
+.fold-btn:hover::before {
+  border-color: var(--blue-dark);
 }
 
 /* ========== 链接样式 ========== */
