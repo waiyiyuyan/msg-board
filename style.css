@@ -376,22 +376,22 @@ textarea{
   color: var(--text-second) !important;
 }
 
-/* 折叠按钮：左侧箭头 + 文字 */
+/* 折叠按钮：箭头放文字右侧 */
 .fold-btn {
   position: relative;
   color: var(--blue);
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 2px 0 2px 14px;
+  padding: 2px 14px 2px 0; /* 右侧留空间给箭头，左侧无内边距 */
   font-size: var(--fs-sm);
   transition: color 0.2s ease;
 }
-/* CSS 绘制箭头，替代 [+]/[-] 字符 */
+/* 箭头定位到右边 */
 .fold-btn::before {
   content: "";
   position: absolute;
-  left: 0;
+  right: 0;
   top: 50%;
   width: 6px;
   height: 6px;
@@ -400,9 +400,13 @@ textarea{
   transform: translateY(-50%) rotate(45deg);
   transition: transform 0.2s ease;
 }
-/* 展开状态：箭头朝下旋转 */
+/* 展开时箭头向下 */
 .fold-btn[aria-expanded="true"]::before {
   transform: translateY(-50%) rotate(135deg);
+}
+/* 回复0条、无aria属性时，隐藏箭头 */
+.fold-btn:not([aria-expanded])::before {
+  display: none;
 }
 .fold-btn:hover {
   color: var(--blue-dark);
