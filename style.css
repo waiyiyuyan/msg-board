@@ -219,16 +219,16 @@ body{
     transition: color 0.15s, border-color 0.15s;
 }
 .btn.del-btn{
-  border-color:var(--red);
-  color:var(--red);
+  border-color:var(--text-second);
+  color:var(--text-main);
 }
 .btn:hover{
-    border-color:var(--blue);
-    color:var(--blue);
+    border-color:var(--text-main);
+    color:var(--text-main);
 }
 .btn.del-btn:hover{
-  border-color:var(--red-dark);
-  color:var(--red-dark);
+  border-color:#444;
+  color:#444;
 }
 .btn:disabled{opacity:0.6;cursor:not-allowed;}
 
