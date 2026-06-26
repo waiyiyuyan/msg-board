@@ -246,26 +246,41 @@ textarea{
   font-size: var(--fs-lg);
 }
 
-/* ========== 悬浮按钮 同步改为直角细线，取消圆形填充 ========== */
+/* ========== 悬浮按钮 同步改为直角细线，固定底色手机清晰可见 ========== */
 .float-add-btn, .bell-btn{
   position:fixed;
   width:48px;
   height:48px;
   border-radius:0;
   border:1px solid var(--text-second);
-  background:transparent;
-  color:var(--text-main);
   z-index:101;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+/* 浅色模式：按钮底色 #f8f9fa */
+@media (prefers-color-scheme: light) {
+  .float-add-btn, .bell-btn {
+    background: var(--bg-light);
+    color:var(--text-main);
+  }
+}
+/* 深色模式：按钮底色 #1c1c1e */
+@media (prefers-color-scheme: dark) {
+  .float-add-btn, .bell-btn {
+    background: var(--bg-dark);
+    color:var(--text-main);
+  }
 }
 .float-add-btn{right:14px;bottom:18px;font-size:24px;}
 .bell-btn{bottom:18px;right:70px;font-size:18px;}
-.float-add-btn:active, .bell-btn:active {
+.float-add-btn:hover, .bell-btn:hover {
   border-color:var(--blue);
   color:var(--blue);
+}
+.float-add-btn:active, .bell-btn:active {
   transform: scale(0.95);
 }
 .badge{
