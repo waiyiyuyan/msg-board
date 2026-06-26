@@ -384,7 +384,6 @@ textarea{
   border: none;
   cursor: pointer;
   padding: 2px 14px 2px 0;
-  font-size: var(--fs-xs); /* 统一缩小为xs，和回复按钮一致 */
   transition: color 0.2s ease;
 }
 /* 箭头定位到右边 */
