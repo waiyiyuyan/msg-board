@@ -248,11 +248,11 @@ function toggleReplyFold(pid) {
   if (foldReplyIds.includes(pidNum)) {
     foldReplyIds = foldReplyIds.filter(x => x !== pidNum);
     wrap.style.display = 'none';
-    btn.innerText = total + '条回复 +';
+    btn.innerText = total + '条回复 [+]';
   } else {
     foldReplyIds.push(pidNum);
     wrap.style.display = 'block';
-    btn.innerText = total + '条回复 -';
+    btn.innerText = total + '条回复 [-]';
   }
 }
 function closeReply(pid) {
@@ -261,7 +261,7 @@ function closeReply(pid) {
   const total = wrap?.querySelectorAll('.reply-item').length || 0;
   foldReplyIds = foldReplyIds.filter(x => x !== pid);
   if (wrap) wrap.style.display = 'none';
-  if (foldBtn) foldBtn.innerText = total + '条回复 ▶';
+  if (foldBtn) foldBtn.innerText = total + '条回复 [-]';
 }
 function buildPostHtml(post, isModal = false) {
   let rHtml = '';
@@ -301,7 +301,7 @@ function buildPostHtml(post, isModal = false) {
     <div class="post-action-row">
       <div class="toggle-wrapper ${post.replys.length === 0 ? 'toggle-wrapper-empty' : ''}" data-pid="${post.id}" style="${post.replys.length === 0 ? 'cursor:default;' : 'cursor:pointer;'}">
         <button class="fold-btn" data-fold-pid="${post.id}" style="${post.replys.length === 0 ? 'color:#999;cursor:default;pointer-events:none;' : ''}">
-          ${post.replys.length}条回复 ${post.replys.length > 0 ? (foldReplyIds.includes(post.id) ? '▼' : '▶') : ''}
+          ${post.replys.length}条回复 ${post.replys.length > 0 ? (foldReplyIds.includes(post.id) ? '[+]' : '[-]') : ''}
         </button>
       </div>
       <div class="post-btn-group"><button class="reply-small-btn" onclick="openReplyPop(${post.id},'${post.name}')">回复</button></div>
@@ -318,7 +318,7 @@ function renderPosts(data) {
     const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
     const btn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
     if (wrap) wrap.style.display = "block";
-    if (btn) btn.innerText = `${wrap.querySelectorAll(".reply-item").length}条回复 ▼`;
+    if (btn) btn.innerText = `${wrap.querySelectorAll(".reply-item").length}条回复 [+]`;
   });
   console.log(`[前端] 帖子渲染完成，共 ${data.length} 条，最新ID：${data[0]?.id}`);
 }
@@ -483,7 +483,7 @@ function renderNoticeModalContent(postId, replyId, needFlash = true) {
   const replyWrap = noticeModalContent.querySelector(`.reply-wrap[data-wrap-pid="${postId}"]`);
   const foldBtn = noticeModalContent.querySelector(`.fold-btn[data-fold-pid="${postId}"]`);
   if (replyWrap) replyWrap.style.display = "block";
-  if (foldBtn) foldBtn.innerText = `${replyWrap.querySelectorAll(".reply-item").length}条回复 ▼`;
+  if (foldBtn) foldBtn.innerText = `${replyWrap.querySelectorAll(".reply-item").length}条回复 [+]`;
   if (needFlash) {
     setTimeout(() => {
       const targetReply = noticeModalContent.querySelector(`.reply-item[data-rid="${replyId}"]`);
@@ -716,7 +716,7 @@ function initWebSocket() {
           foldBtn.style.cursor = "";
           toggleWrapper.style.cursor = "";
           const totalReply = allReplies.length;
-          foldBtn.innerText = totalReply + '条回复 ' + (foldReplyIds.includes(Number(targetPid)) ? '▼' : '▶');
+          foldBtn.innerText = totalReply + '条回复 ' + (foldReplyIds.includes(Number(targetPid)) ? '[+]' : '[-]');
           const cachePost = lastData.find(p => Number(p.id) === Number(targetPid));
           if (cachePost && cachePost.replys) cachePost.replys.push(replyItem);
           if (isNoticeModalOpen && Number(currentModalPostId) === Number(targetPid)) {
