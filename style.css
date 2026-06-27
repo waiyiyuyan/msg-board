@@ -378,44 +378,53 @@ textarea{
   color: var(--text-second) !important;
 }
 
-/* 折叠按钮：箭头放文字右侧 */
+/* 折叠按钮：纯CSS渲染 💬数字 [+]/[-] */
 .fold-btn {
   position: relative;
   color: var(--blue);
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 2px 14px 2px 0;
+  padding: 2px 18px 2px 0;
   transition: color 0.2s ease;
+  font-size: var(--fs-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
-/* 箭头定位到右边 */
+/* 气泡图标 */
 .fold-btn::before {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  border-top: 1.5px solid var(--blue);
-  border-right: 1.5px solid var(--blue);
-  transform: translateY(-50%) rotate(45deg);
-  transition: transform 0.2s ease;
+  content: "💬";
 }
-/* 展开时箭头向下 */
-.fold-btn[aria-expanded="true"]::before {
-  transform: translateY(-50%) rotate(135deg);
+/* 默认基础：只显示数字 */
+.fold-btn::after {
+  content: attr(data-reply-count);
 }
-/* 回复0条、无aria属性时，隐藏箭头 */
-.fold-btn:not([aria-expanded])::before {
-  display: none;
+/* 收起状态：数字 + [+] */
+.fold-btn:not([aria-expanded="true"])::after {
+  content: attr(data-reply-count) " [+]";
 }
+/* 展开状态：数字 + [-] */
+.fold-btn[aria-expanded="true"]::after {
+  content: attr(data-reply-count) " [-]";
+}
+/* 0条回复（无aria属性）：只显示数字，隐藏 + - */
+.fold-btn:not([aria-expanded])::after {
+  content: attr(data-reply-count);
+}
+/* 0条回复整体灰色禁用 */
+.fold-btn:not([aria-expanded]) {
+  color: var(--text-second) !important;
+  cursor: default;
+  pointer-events: none;
+}
+/* hover变色 */
 .fold-btn:hover {
   color: var(--blue-dark);
 }
-.fold-btn:hover::before {
-  border-color: var(--blue-dark);
+.fold-btn:not([aria-expanded]):hover {
+  color: var(--text-second) !important;
 }
-
 /* ========== 链接样式 ========== */
 .post-content a, .reply-text a {
   color: var(--blue);
