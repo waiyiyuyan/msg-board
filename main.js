@@ -244,29 +244,24 @@ function toggleReplyFold(pid) {
   const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
   const btn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
   if (!wrap || !btn) return;
-  const total = wrap.querySelectorAll(".reply-item").length;
   if (foldReplyIds.includes(pidNum)) {
     // 收起
     foldReplyIds = foldReplyIds.filter(x => x !== pidNum);
     wrap.style.display = 'none';
-    btn.innerText = total + '条回复';
     btn.setAttribute('aria-expanded', 'false');
   } else {
     // 展开
     foldReplyIds.push(pidNum);
     wrap.style.display = 'block';
-    btn.innerText = total + '条回复';
     btn.setAttribute('aria-expanded', 'true');
   }
 }
 function closeReply(pid) {
   const wrap = document.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
   const foldBtn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
-  const total = wrap?.querySelectorAll('.reply-item').length || 0;
   foldReplyIds = foldReplyIds.filter(x => x !== pid);
   if (wrap) wrap.style.display = 'none';
   if (foldBtn) {
-    foldBtn.innerText = total + '条回复';
     foldBtn.setAttribute('aria-expanded', 'false');
   }
 }
@@ -329,7 +324,6 @@ function renderPosts(data) {
     const btn = document.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
     if (wrap) wrap.style.display = "block";
     if (btn) {
-      btn.innerText = `${wrap.querySelectorAll(".reply-item").length}条回复`;
       btn.setAttribute('aria-expanded', 'true');
     }
   });
@@ -731,8 +725,6 @@ function initWebSocket() {
           foldBtn.style.color = "";
           foldBtn.style.cursor = "";
           toggleWrapper.style.cursor = "";
-          const totalReply = allReplies.length;
-          foldBtn.innerText = totalReply + '条回复';
           foldBtn.setAttribute('aria-expanded', foldReplyIds.includes(Number(targetPid)) ? 'true' : 'false');
           const cachePost = lastData.find(p => Number(p.id) === Number(targetPid));
           if (cachePost && cachePost.replys) cachePost.replys.push(replyItem);
