@@ -117,7 +117,7 @@ body{
 .post-action-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between; /* 左右两端分开 */
   margin-top: 8px;
 }
 .post-btn-group{
