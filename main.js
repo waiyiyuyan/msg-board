@@ -311,7 +311,7 @@ function buildPostHtml(post, isModal = false) {
           data-fold-pid="${post.id}" 
           data-reply-count="${post.replys.length}"
           ${post.replys.length === 0 ? '' : `aria-expanded="${foldReplyIds.includes(post.id)}"`} 
-          style="${post.replys.length === 0 ? 'color:#999;cursor:default;pointer-events:none;' : ''}">
+          style="${post.replys.length === 0 ? '' : ''}">
         </button>
       </div>
       <div class="post-btn-group"><button class="reply-small-btn" onclick="openReplyPop(${post.id},'${post.name}')">回复</button></div>
