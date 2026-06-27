@@ -307,8 +307,11 @@ function buildPostHtml(post, isModal = false) {
     ${renderMedia(post.media_urls || "")}
     <div class="post-action-row">
       <div class="toggle-wrapper ${post.replys.length === 0 ? 'toggle-wrapper-empty' : ''}" data-pid="${post.id}" style="${post.replys.length === 0 ? 'cursor:default;' : 'cursor:pointer;'}">
-        <button class="fold-btn" data-fold-pid="${post.id}" ${post.replys.length === 0 ? '' : `aria-expanded="${foldReplyIds.includes(post.id)}"`} style="${post.replys.length === 0 ? 'color:#999;cursor:default;pointer-events:none;' : ''}">
-          ${post.replys.length}条回复
+        <button class="fold-btn" 
+          data-fold-pid="${post.id}" 
+          data-reply-count="${post.replys.length}"
+          ${post.replys.length === 0 ? '' : `aria-expanded="${foldReplyIds.includes(post.id)}"`} 
+          style="${post.replys.length === 0 ? 'color:#999;cursor:default;pointer-events:none;' : ''}">
         </button>
       </div>
       <div class="post-btn-group"><button class="reply-small-btn" onclick="openReplyPop(${post.id},'${post.name}')">回复</button></div>
