@@ -76,14 +76,18 @@ body{
     margin:0 auto;
 }
 /* ========== 帖子模块 ========== */
-.post-card{
-    background: var(--pop-bg);
-    border-radius: 12px;
-    padding: 16px 14px;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    counter-reset: floorNum;
-    border: none;
+.post-card {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none;
+  /* iOS原生蓝色分割竖线 */
+  border-left: 4px solid var(--blue);
+  padding: 12px 12px 14px 14px;
+  margin-bottom: 24px;
+}
+.post-card:hover {
+  background: rgba(0, 122, 255, 0.06) !important;
 }
 .post-info{
     display:flex;
@@ -113,9 +117,8 @@ body{
 .post-action-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin: 10px 0 0 0;
-  width: 100%;
+  gap: 10px;
+  margin-top: 8px;
 }
 .post-btn-group{
     display:flex;
@@ -127,24 +130,23 @@ body{
 }
 
 /* ========== 回复区 ========== */
-.reply-wrap{
-    padding-top: 10px;
-    margin-top: 8px;
-    border-top: 1px solid var(--reply-border);
+.reply-wrap {
+  margin-top: 12px;
+  margin-left: 8px;
+  padding-left: 16px;
+  border-left: 1px solid var(--border-line);
 }
 .notice-full-modal .reply-wrap {
   padding-top: 10px;
   margin-top: 8px;
 }
-.reply-item{
-    padding: 8px 0;
-    border-bottom: 1px solid var(--reply-border);
-    display:flex;
-    flex-direction:column;
+.reply-item {
+  margin: 10px 0;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--reply-border);
 }
-.reply-item:last-child{
-  border-bottom:none;
-  padding-bottom: 0;
+.reply-item:last-child {
+  border-bottom: none;
 }
 .reply-head{
     display:flex;
