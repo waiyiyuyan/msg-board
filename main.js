@@ -394,17 +394,22 @@ function renderNotify() {
 
 function renderPageNotify() {
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
-  // 控制按钮禁用
-  pageReadAll.disabled = unReadCount === 0;
-  pageClearAll.disabled = notifyList.length === 0;
+  const opBar = document.getElementById("notifyOpBar");
 
+  // 列表为空 → 隐藏按钮栏
   if (notifyList.length === 0) {
+    opBar.style.display = "none";
     pageNotifyList.innerHTML = "";
     notifyEmptyTip.style.display = "block";
     return;
   }
+
+  // 有通知时显示按钮栏，并控制按钮禁用
+  opBar.style.display = "flex";
+  pageReadAll.disabled = unReadCount === 0;
+  pageClearAll.disabled = false;
+
   notifyEmptyTip.style.display = "none";
-  // 渲染通知条目
   pageNotifyList.innerHTML = notifyList.map(item => {
     const isRead = item.is_read === 1;
     return `<div class="page-notify-item" onclick="jumpPost(${item.id},${item.target_msg_id},${item.reply_id})">
@@ -742,6 +747,7 @@ function renderRouteView() {
   const navBack = document.querySelector(".cli-nav-back");
   const navBtns = document.querySelector(".cli-nav-buttons");
   const notifyPage = document.getElementById("notifyPage");
+  const loadTipDom = document.getElementById("loadTip");
 
   // 通知页面路由 #notify
   if (hashStr === "notify") {
@@ -751,16 +757,19 @@ function renderRouteView() {
     notifyPage.style.display = "block";
     navBack.style.display = "block";
     navBtns.style.display = "none";
-    // 渲染通知列表到通知页面
+    loadTipDom.style.display = "none"; // 隐藏加载更多
+
     renderPageNotify();
   } else if (pidMatch) {
-    // 帖子详情 原有逻辑不变
+    // 帖子详情
     currentViewPid = pidMatch[1];
     listWrap.style.display = "none";
     detailWrap.style.display = "block";
     notifyPage.style.display = "none";
     navBack.style.display = "block";
     navBtns.style.display = "none";
+    loadTipDom.style.display = "none"; // 隐藏加载更多
+
     renderSinglePost(currentViewPid);
   } else {
     // 首页
@@ -770,6 +779,7 @@ function renderRouteView() {
     notifyPage.style.display = "none";
     navBack.style.display = "none";
     navBtns.style.display = "flex";
+    loadTipDom.style.display = "block"; // 首页恢复显示加载更多
   }
 }
 
