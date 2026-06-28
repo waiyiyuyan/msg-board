@@ -580,7 +580,7 @@ textarea{
   display: flex;
   gap: 12px;
   padding: 12px 0;
-  border-top: 1px solid var(--border-line);
+  border-top: none;
   border-bottom: 1px dashed var(--reply-border);
   margin-bottom: 16px;
 }
@@ -608,6 +608,6 @@ textarea{
 .page-notify-time {
   color: var(--text-second);
   font-size: var(--fs-xs);
-  text-align: right;
+  text-align: left;
   margin-top: 4px;
 }
