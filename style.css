@@ -541,7 +541,7 @@ textarea{
 .cli-btn {
   font-family: Consolas, Monaco, monospace;
   background: transparent;
-  border: 1px solid var(--border-line);
+  border: none;
   color: var(--text-main);
   padding: 4px 10px;
   cursor: pointer;
