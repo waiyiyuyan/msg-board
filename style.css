@@ -363,17 +363,9 @@ textarea{
 .fold-btn::after {
   content: attr(data-reply-count);
 }
-/* 0条回复灰色禁用 */
-.fold-btn:not([aria-expanded]) {
-  color: var(--text-second) !important;
-  cursor: default;
-  pointer-events: none;
-}
+
 .fold-btn:hover {
   color: var(--blue-dark);
-}
-.fold-btn:not([aria-expanded]):hover {
-  color: var(--text-second) !important;
 }
 
 /* ========== 链接样式 ========== */
