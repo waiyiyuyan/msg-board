@@ -479,27 +479,23 @@ textarea{
   background-color: var(--bg);
   z-index: 200;
   box-sizing: border-box;
+  /* 关键：滚动移到最外层，整页面可滑动 */
+  overflow-y: auto;
 }
 .modal-content {
   width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  padding: 76px 0.8rem 2rem 0.8rem;
+  /* 和首页body padding完全统一：上下76/80，左右12px */
+  padding: 76px 12px 80px 12px;
   box-sizing: border-box;
+  /* 删除 height:100% 锁死高度代码 */
 }
-@media (max-width: 767px) {
-  .modal-content {
-    width: 100%;
-    height: 100%;
-  }
-}
+
+/* 电脑大屏：宽度和首页body保持一致700px */
 @media (min-width: 768px) {
   .modal-content {
     max-width: 700px;
-    width: 100%;
-    height: auto;
-    min-height: 100vh;
     margin: 0 auto;
+    min-height: 100vh;
     border-radius: 0;
     box-shadow: none;
   }
