@@ -823,18 +823,26 @@ function renderRouteView() {
   const pidMatch = hashStr.match(/^post\/(\d+)$/);
   const listWrap = document.getElementById("listBox");
   const detailWrap = document.getElementById("noticeFullModal");
+  const navBack = document.querySelector(".cli-nav-back");
+  const navBtns = document.querySelector(".cli-nav-buttons");
 
   if (pidMatch) {
     // 帖子详情页
     currentViewPid = pidMatch[1];
     listWrap.style.display = "none";
     detailWrap.style.display = "block";
+    // 切换导航：显示返回，隐藏通知发帖
+    navBack.style.display = "block";
+    navBtns.style.display = "none";
     renderSinglePost(currentViewPid);
   } else {
     // 首页列表
     currentViewPid = null;
     listWrap.style.display = "block";
     detailWrap.style.display = "none";
+    // 切换导航：隐藏返回，显示通知发帖
+    navBack.style.display = "none";
+    navBtns.style.display = "flex";
   }
 }
 
