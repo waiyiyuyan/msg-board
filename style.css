@@ -67,7 +67,7 @@ html {
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Microsoft YaHei",Segoe UI,sans-serif;}
 body{
     background:var(--bg);
-    padding: 70px 12px 80px;
+    padding: 60px 12px 80px;
     max-width:700px;
     margin:0 auto;
     font-family: Consolas, Monaco, "Microsoft YaHei", monospace;
@@ -416,7 +416,7 @@ textarea{
 }
 .modal-content {
   width: 100%;
-  padding: 70px 12px 80px 12px;
+  padding: 60px 12px 80px 12px;
   box-sizing: border-box;
 }
 @media (min-width: 768px) {
@@ -434,7 +434,7 @@ textarea{
   left: 0;
   width: 100%;
   z-index: 999;
-  padding: 14px 12px;
+  padding: 8px 12px;
   border-bottom: 2px solid var(--border-line);
   background: var(--bg);
 }
@@ -464,6 +464,11 @@ textarea{
   padding: 4px 10px;
   cursor: pointer;
   font-size: var(--fs-md);
+  /* 核心居中代码 */
+  display: inline-flex;
+  align-items: center;    /* 垂直居中 */
+  justify-content: center;/* 水平居中 */
+  gap: 4px;              /* 文字和小红点间距，防止贴在一起 */
 }
 .cli-btn:hover {
   background: rgba(0, 122, 255, 0.06);
@@ -471,6 +476,15 @@ textarea{
 }
 #unReadBadge {
   margin-left: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  background: var(--red);
+  color: #fff;
+  border-radius: 99px;
+  font-size: 12px;
 }
 
 /* 独立通知页面 */
