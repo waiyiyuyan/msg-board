@@ -13,7 +13,6 @@ let lastData = [];
 let notifyList = [];
 let popOpen = false;
 let isUploading = false;
-let postDataList = [];
 let lastCursor = "";
 let isLoading = false;
 let hasMore = true;
@@ -22,6 +21,7 @@ let userNick = "";
 let ws = null;
 let heartbeatTimer = null;
 let routeStack = [];
+let currentViewPid = null;
 
 // ===================== DOM 缓存 =====================
 const uploadBtn = document.getElementById("uploadBtn");
@@ -50,51 +50,52 @@ const pageReadAll = document.getElementById("pageReadAll");
 const pageClearAll = document.getElementById("pageClearAll");
 const pageNotifyList = document.getElementById("pageNotifyList");
 const notifyEmptyTip = document.getElementById("notifyEmptyTip");
+
 // ===================== 通用工具函数 =====================
-/** 统一请求封装 */
 async function req(url, opt = {}) {
   const baseOpt = { credentials: "include", ...opt };
   const res = await fetch(url, baseOpt);
   return res;
 }
-/** Cookie 工具 */
+
 function setCookie(name, val, day = 30) {
   const d = new Date();
   d.setTime(d.getTime() + day * 24 * 60 * 60 * 1000);
   document.cookie = `${name}=${encodeURIComponent(val)};expires=${d.toUTCString()};path=/;SameSite=Lax;Secure`;
 }
+
 function getCookie(name) {
   return document.cookie.split('; ').reduce((v, item) => {
     const [k, val] = item.split('=');
     return k === name ? decodeURIComponent(val) : v;
   }, "");
 }
-/** 链接转义 */
+
 function parseLink(text) {
   if (!text) return "";
   const escapeTxt = text.replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;" })[m]);
   return escapeTxt.replace(/(https?:\/\/[^\s<>"]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 }
-// 生成头像
+
 function getAvatarUrl(nick) {
   if (!nick) return "";
   return `https://api.dicebear.com/10.x/avataaars/svg?seed=${encodeURIComponent(nick)}`;
 }
-/** 生成访客昵称 */
+
 async function fetchRandomNick() {
   const randomStr = Math.random().toString(36).slice(2, 7);
   return randomStr;
 }
-/** 自动缩放输入框 */
+
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = el.scrollHeight + 'px';
 }
-/** 滚动到顶部 */
+
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
-/** 获取回复头部文案 */
+
 function getReplyHeadText(r, myNick) {
   const rawContent = parseLink(r.r_content);
   let headText = r.r_name;
@@ -133,18 +134,19 @@ function renderMedia(mediaUrl) {
   }
   return "";
 }
-// 全局统一媒体事件委托
+
 listBox.addEventListener("click", function(e) {
   const img = e.target.closest(".msg-media-img");
   if(img) window.open(img.src, "_blank");
 });
+
 listBox.addEventListener("error", function(e) {
   const target = e.target;
   if(target.matches(".msg-media-img, .msg-media-video")) {
     target.closest(".msg-media-wrap").style.display = "none";
   }
 }, true);
-// 视频互斥播放委托
+
 listBox.addEventListener("play", function(e) {
   const vid = e.target.closest(".msg-media-video");
   if(!vid) return;
@@ -163,12 +165,14 @@ function clearMedia() {
   if (progressWrap) progressWrap.style.display = "none";
   uploadBtn.disabled = false;
 }
+
 function checkFile(file) {
   if (!ALLOW_MIME.includes(file.type)) return { ok: false, msg: "仅支持 JPG/PNG/GIF/WEBP 图片、MP4/WEBM 视频" };
   if (file.size === 0) return { ok: false, msg: "文件无效，请重新选择" };
   if (file.size > 20 * 1024 * 1024) return { ok: false, msg: "文件不能超过20MB，请压缩后重试" };
   return { ok: true };
 }
+
 async function uploadFile(file) {
   clearMedia();
   uploadBtn.disabled = true;
@@ -222,6 +226,7 @@ async function uploadFile(file) {
     if (submitBtn) submitBtn.disabled = false;
   }
 }
+
 if (uploadBtn && fileSelector) {
   uploadBtn.addEventListener("click", () => fileSelector.click());
   fileSelector.addEventListener("change", async e => {
@@ -240,12 +245,11 @@ if (uploadBtn && fileSelector) {
 }
 
 // ===================== 帖子 & 回复渲染 =====================
-function buildPostHtml(post, isModal = false) {
+function buildPostHtml(post) {
   let rHtml = '';
   const myNick = userNick?.trim() || "";
   if (post.replys && post.replys.length > 0) {
-    post.replys.forEach((r, index) => {
-      const extraBtn = "";
+    post.replys.forEach((r) => {
       const { headText, showContent } = getReplyHeadText(r, myNick);
       rHtml += `<div class="reply-item" data-rid="${r.id}" data-pid="${r.msg_id}">
         <div class="reply-head">
@@ -257,7 +261,7 @@ function buildPostHtml(post, isModal = false) {
         <div class="reply-time">${r.create_time.slice(0,16)}</div>
         <div class="reply-text">${showContent}</div>
         ${renderMedia(r.media_urls || "")}
-        <div style="text-align:right;margin-top:4px;">${extraBtn}<button class="reply-small-btn" onclick="openSubReplyPop(${post.id},${r.id},'${r.r_name}')">回复</button></div>
+        <div style="text-align:right;margin-top:4px;"><button class="reply-small-btn" onclick="openSubReplyPop(${post.id},${r.id},'${r.r_name}')">回复</button></div>
       </div>`;
     });
   }
@@ -283,6 +287,7 @@ function buildPostHtml(post, isModal = false) {
     <div class="reply-wrap" data-wrap-pid="${post.id}" style="display:none">${rHtml}</div>
   </div>`;
 }
+
 function renderPosts(data) {
   lastData = data;
   listBox.innerHTML = data.map(post => buildPostHtml(post)).join("");
@@ -306,6 +311,7 @@ function updateLoadTip() {
     loadTip.style.cursor = "pointer";
   }
 }
+
 async function initLoadPosts() {
   if (isLoading) return;
   isLoading = true;
@@ -314,7 +320,6 @@ async function initLoadPosts() {
     const res = await req(`${API_BASE}/initPosts`);
     const data = await res.json();
     if (data.code === 0) {
-      postDataList = data.list;
       lastData = [...data.list];
       lastCursor = data.lastCursor;
       hasMore = data.hasMore;
@@ -329,6 +334,7 @@ async function initLoadPosts() {
     updateLoadTip();
   }
 }
+
 async function loadMorePosts() {
   if (isLoading || !hasMore) return;
   isLoading = true;
@@ -337,7 +343,6 @@ async function loadMorePosts() {
     const res = await req(`${API_BASE}/loadMorePosts?cursor=${lastCursor}`);
     const data = await res.json();
     if (data.code === 0 && data.list.length > 0) {
-      postDataList.push(...data.list);
       lastData.push(...data.list);
       lastCursor = data.lastCursor;
       hasMore = data.hasMore;
@@ -353,10 +358,11 @@ async function loadMorePosts() {
     updateLoadTip();
   }
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   if (loadTip) loadTip.addEventListener("click", () => hasMore ? loadMorePosts() : scrollToTop());
 });
-// 全局委托折叠按钮点击
+
 listBox.addEventListener("click", e => {
   const foldBtn = e.target.closest(".fold-btn");
   if(foldBtn) {
@@ -395,11 +401,8 @@ function renderNotify() {
 
 function renderPageNotify() {
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
-  // 原来错误：const opBar = document.getElementById("notifyOpBar");
-  // 修正为页面上真实ID notifyOpBarPage
   const opBar = document.getElementById("notifyOpBarPage");
 
-  // 列表为空 → 隐藏按钮栏
   if (notifyList.length === 0) {
     opBar.style.display = "none";
     pageNotifyList.innerHTML = "";
@@ -407,7 +410,6 @@ function renderPageNotify() {
     return;
   }
 
-  // 有通知时显示按钮栏，并控制按钮禁用
   opBar.style.display = "flex";
   pageReadAll.disabled = unReadCount === 0;
   pageClearAll.disabled = false;
@@ -421,12 +423,12 @@ function renderPageNotify() {
     </div>`;
   }).join("");
 }
+
 async function jumpPost(nid, pid, rid) {
   const fd = new FormData();
   fd.append('nid', nid);
   await req(`${API_BASE}/setRead?uid=${encodeURIComponent(userNick)}`, { method: "POST", body: fd });
   
-  // 读完通知，本地同步标记已读，刷新角标
   const targetNotify = notifyList.find(n => n.id === nid);
   if (targetNotify) targetNotify.is_read = 1;
   renderNotify();
@@ -443,6 +445,7 @@ async function jumpPost(nid, pid, rid) {
     }
   }, 150);
 }
+
 async function readAllNotify() {
   const uid = encodeURIComponent(userNick);
   readAllBtn.disabled = true;
@@ -458,6 +461,7 @@ async function readAllNotify() {
     readAllBtn.disabled = false;
   }
 }
+
 async function clearAllNotify() {
   if (notifyList.length === 0) return;
   const uid = encodeURIComponent(userNick);
@@ -476,13 +480,12 @@ async function clearAllNotify() {
 }
 
 bellBtn.onclick = () => {
-  // 关闭所有弹窗
   if (notifyMask.style.display === 'flex') notifyMask.style.display = 'none';
   if (popOpen) { maskDom.style.display = 'none'; popForm.reset(); popOpen = false; }
-  // 进入通知页前，把当前首页hash压入栈
   routeStack.push(location.hash);
   location.hash = "notify";
 };
+
 notifyMask.addEventListener('click', e => { if (e.target === notifyMask) notifyMask.style.display = 'none'; });
 
 // ===================== 回复弹窗 =====================
@@ -502,12 +505,12 @@ function fillReplyPopup(pid, rid, targetName) {
   if (popAvatar) popAvatar.src = userAvatar;
   if (popNickText) popNickText.innerText = userNick;
 }
+
 function openReplyPop(pid, targetName) {
-  
   fillReplyPopup(pid, "", targetName);
 }
+
 function openSubReplyPop(pid, rid, targetName) {
-  
   fillReplyPopup(pid, rid, targetName);
 }
 
@@ -533,6 +536,7 @@ document.getElementById('openPopBtn').onclick = () => {
     if (popNickText) popNickText.innerText = userNick;
   }
 };
+
 popForm.onsubmit = async function (e) {
   e.preventDefault();
   if (isUploading) { alert("图片正在上传，请稍后再发布！"); return; }
@@ -557,7 +561,6 @@ popForm.onsubmit = async function (e) {
       clearMedia();
       popOpen = false;
       textareaDom.placeholder = '';
-      // 新增：如果当前在该帖子详情，重新渲染页面立刻显示新回复
       if(currentViewPid && currentViewPid === pid){
         renderSinglePost(pid);
       }
@@ -568,6 +571,7 @@ popForm.onsubmit = async function (e) {
     submitBtn.disabled = false;
   }
 };
+
 maskDom.addEventListener('click', e => {
   if (e.target === maskDom) {
     maskDom.style.display = 'none';
@@ -577,10 +581,6 @@ maskDom.addEventListener('click', e => {
     textareaDom.placeholder = '';
   }
 });
-async function delPost(postId) {
-  if (!confirm("确定要删除该帖子吗？\n帖子、所有回复、相关通知都会一并清空！")) return;
-  try { await req(`${API_BASE}/del?id=${postId}`); } catch (err) { console.error("删帖出错：", err); alert("网络异常"); }
-}
 
 // ===================== WebSocket 心跳 & 连接 =====================
 function startHeartbeat() {
@@ -589,10 +589,12 @@ function startHeartbeat() {
     if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "HEARTBEAT" }));
   }, HEARTBEAT_INTERVAL);
 }
+
 function initWebSocket() {
   if (ws && ws.readyState !== WebSocket.CLOSED) ws.close();
   clearInterval(heartbeatTimer);
   ws = new WebSocket(WS_URL);
+
   ws.onopen = () => {
     console.log("WebSocket 连接成功");
     if (userNick) ws.send(JSON.stringify({ type: "USER_UID", uid: userNick }));
@@ -606,6 +608,7 @@ function initWebSocket() {
       console.log("[前端] 重连兜底拉取通知完成，条数：", notifyData.length);
     }, 300);
   };
+
   ws.onmessage = (e) => {
     try {
       const data = JSON.parse(e.data);
@@ -641,7 +644,6 @@ function initWebSocket() {
           const foldBtn = postCard.querySelector(".fold-btn");
           const toggleWrapper = postCard.querySelector(".toggle-wrapper");
           const { headText, showContent } = getReplyHeadText(replyItem, userNick?.trim() || "");
-          const extraBtn = "";
           const replyHtml = `<div class="reply-item" data-rid="${replyItem.id}" data-pid="${replyItem.msg_id}">
             <div class="reply-head">
               <div class="reply-avatar-row" style="display: flex; align-items: center; gap: 6px;">
@@ -652,26 +654,19 @@ function initWebSocket() {
             <div class="reply-time">${replyItem.create_time}</div>
             <div class="reply-text">${showContent}</div>
             ${renderMedia(replyItem.media_urls || "")}
-            <div style="text-align:right;margin-top:4px;">${extraBtn}<button class="reply-small-btn" onclick="openSubReplyPop(${targetPid},${replyItem.id},'${replyItem.r_name}')">回复</button></div>
+            <div style="text-align:right;margin-top:4px;"><button class="reply-small-btn" onclick="openSubReplyPop(${targetPid},${replyItem.id},'${replyItem.r_name}')">回复</button></div>
           </div>`;
           replyWrap.insertAdjacentHTML("beforeend", replyHtml);
           const allReplies = replyWrap.querySelectorAll(".reply-item");
-          foldBtn.style.color = "";
-          foldBtn.style.cursor = "";
-          toggleWrapper.style.cursor = "";
-        
-          // 【先更新首页回复数字】
           foldBtn.dataset.replyCount = allReplies.length;
           if (allReplies.length > 0) {
             toggleWrapper.classList.remove('toggle-wrapper-empty');
           }
-        
-          // 同步更新详情页评论区
+
           if (currentViewPid && currentViewPid == targetPid) {
             const detailWrap = document.querySelector(`#noticeFullModal .reply-wrap[data-wrap-pid="${targetPid}"]`);
             if(detailWrap){
               const { headText, showContent } = getReplyHeadText(replyItem, userNick?.trim() || "");
-              const extraBtn = "";
               const replyHtml = `<div class="reply-item" data-rid="${replyItem.id}" data-pid="${replyItem.msg_id}">
                 <div class="reply-head">
                   <div class="reply-avatar-row" style="display: flex; align-items: center; gap: 6px;">
@@ -682,15 +677,14 @@ function initWebSocket() {
                 <div class="reply-time">${replyItem.create_time}</div>
                 <div class="reply-text">${showContent}</div>
                 ${renderMedia(replyItem.media_urls || "")}
-                <div style="text-align:right;margin-top:4px;">${extraBtn}<button class="reply-small-btn" onclick="openSubReplyPop(${targetPid},${replyItem.id},'${replyItem.r_name}')">回复</button></div>
+                <div style="text-align:right;margin-top:4px;"><button class="reply-small-btn" onclick="openSubReplyPop(${targetPid},${replyItem.id},'${replyItem.r_name}')">回复</button></div>
               </div>`;
               detailWrap.insertAdjacentHTML("beforeend", replyHtml);
             }
           }
-        
+
           const cachePost = lastData.find(p => Number(p.id) === Number(targetPid));
           if (cachePost && cachePost.replys) cachePost.replys.push(replyItem);
-        
           break;
         }
         case "DELETE_POST":
@@ -702,15 +696,18 @@ function initWebSocket() {
       console.error("WS 消息解析失败", err);
     }
   };
+
   ws.onclose = () => {
     clearInterval(heartbeatTimer);
     console.log("WebSocket 连接断开，3秒后重连");
     setTimeout(initWebSocket, 3000);
   };
+
   ws.onerror = () => {
     clearInterval(heartbeatTimer);
     setTimeout(initWebSocket, 3000);
   };
+
   let initDataFallbackTimer = setTimeout(() => { if (lastData.length === 0) initLoadPosts(); }, 2000);
   const rawOnMsg = ws.onmessage;
   ws.onmessage = function (e) {
@@ -722,40 +719,17 @@ function initWebSocket() {
   };
 }
 
-// ===================== 页面初始化入口 =====================
-// ===================== 页面初始化入口 =====================
-textareaDom.addEventListener('input', () => autoResize(textareaDom));
-window.addEventListener("load", async () => {
-  // 第一步：先初始化用户信息，再连WS，保证WS能正确上报用户ID
-  userNick = getCookie('userNick');
-  if (!userNick) {
-    const newNick = await fetchRandomNick();
-    userNick = newNick;
-    setCookie("userNick", newNick);
-  }
-  popNick.value = userNick;
-  userAvatar = getAvatarUrl(userNick);
-  // 第二步：用户信息就绪后再建立WS连接
-  initLoadPosts();
-  initWebSocket();
-  renderRouteView();
-});
-
 // ========== 路由分页逻辑 ==========
-let currentViewPid = null;
-
 function goPostDetail(pid) {
-  // 把当前页面存入历史栈
   routeStack.push(location.hash);
   location.hash = `post/${pid}`;
 }
+
 function goHome() {
-  // 取出上一层路由
   const lastRoute = routeStack.pop();
   if (lastRoute && lastRoute !== location.hash) {
     location.hash = lastRoute.replace("#", "");
   } else {
-    // 无历史记录，直接回首页
     location.hash = "";
   }
 }
@@ -770,10 +744,6 @@ function renderRouteView() {
   const notifyPage = document.getElementById("notifyPage");
   const loadTipDom = document.getElementById("loadTip");
 
-  // 保存当前完整hash，作为下一页的来源记录
-  const currentHash = location.hash;
-
-  // 通知页面路由 #notify
   if (hashStr === "notify") {
     currentViewPid = null;
     listWrap.style.display = "none";
@@ -784,7 +754,6 @@ function renderRouteView() {
     loadTipDom.style.display = "none";
     renderPageNotify();
   } else if (pidMatch) {
-    // 进入帖子详情，记录上一页hash
     currentViewPid = pidMatch[1];
     listWrap.style.display = "none";
     detailWrap.style.display = "block";
@@ -794,7 +763,6 @@ function renderRouteView() {
     loadTipDom.style.display = "none";
     renderSinglePost(currentViewPid);
   } else {
-    // 首页
     currentViewPid = null;
     listWrap.style.display = "block";
     detailWrap.style.display = "none";
@@ -832,7 +800,7 @@ async function renderSinglePost(pid) {
     }
   }
 
-  let html = buildPostHtml(targetPost, true);
+  let html = buildPostHtml(targetPost);
   noticeModalContent.innerHTML = html;
 
   const replyWrap = noticeModalContent.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
@@ -841,20 +809,19 @@ async function renderSinglePost(pid) {
   if (foldBtn) foldBtn.setAttribute("aria-expanded", "true");
 }
 
-// 通知页按钮绑定
 pageReadAll.onclick = async () => {
   await readAllNotify();
   renderPageNotify();
-  renderNotify(); // 更新顶部小红点
+  renderNotify();
 };
 pageClearAll.onclick = async () => {
   await clearAllNotify();
   renderPageNotify();
-  renderNotify(); // 更新顶部小红点
+  renderNotify();
 };
 
 window.addEventListener("hashchange", renderRouteView);
-// 页面从后台切回前台，自动刷新通知
+
 document.addEventListener("visibilitychange", async () => {
   if (document.visibilityState !== "visible" || !userNick) return;
   try {
@@ -866,4 +833,20 @@ document.addEventListener("visibilitychange", async () => {
   } catch (e) {
     console.error("刷新通知失败", e);
   }
+});
+
+textareaDom.addEventListener('input', () => autoResize(textareaDom));
+
+window.addEventListener("load", async () => {
+  userNick = getCookie('userNick');
+  if (!userNick) {
+    const newNick = await fetchRandomNick();
+    userNick = newNick;
+    setCookie("userNick", newNick);
+  }
+  popNick.value = userNick;
+  userAvatar = getAvatarUrl(userNick);
+  initLoadPosts();
+  initWebSocket();
+  renderRouteView();
 });
