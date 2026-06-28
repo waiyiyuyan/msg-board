@@ -450,32 +450,34 @@ textarea{
   display: flex;
   justify-content: flex-end;
   gap: 4px;
+  align-items: center;
 }
 .cli-nav-buttons button {
   border: none;
   outline: none;
   background: transparent;
 }
+/* 修复按钮文字垂直居中 */
 .cli-btn {
   font-family: Consolas, Monaco, monospace;
   background: transparent;
   border: none;
   color: var(--text-main);
-  padding: 4px 10px;
+  padding: 6px 12px;
   cursor: pointer;
   font-size: var(--fs-md);
-  /* 核心居中代码 */
   display: inline-flex;
-  align-items: center;    /* 垂直居中 */
-  justify-content: center;/* 水平居中 */
-  gap: 4px;              /* 文字和小红点间距，防止贴在一起 */
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  box-sizing: border-box;
 }
 .cli-btn:hover {
   background: rgba(0, 122, 255, 0.06);
   color: var(--blue);
 }
 #unReadBadge {
-  margin-left: 2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -483,8 +485,9 @@ textarea{
   height: 16px;
   background: var(--red);
   color: #fff;
-  border-radius: 99px;
+  border-radius: 999px;
   font-size: 12px;
+  line-height: 1;
 }
 
 /* 独立通知页面 */
@@ -493,15 +496,28 @@ textarea{
   min-height: 100vh;
   display: none;
 }
+/* 旧列表上方按钮栏隐藏，不再使用 */
 .notify-op-bar {
+  display: none !important;
+}
+/* 通知页顶部头部：标题左、按钮右 */
+.notify-page-header {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
   padding: 12px 0;
   border-bottom: 1px dashed var(--reply-border);
   margin-bottom: 16px;
+  gap: 12px;
 }
-.notify-op-bar .btn {
-  flex: 1;
+.notify-page-title {
+  font-size: var(--fs-lg);
+  color: var(--text-main);
+  font-weight: 500;
+}
+.notify-page-btn-group {
+  display: flex;
+  gap: 8px;
 }
 .page-notify-item {
   padding: 10px 0;
