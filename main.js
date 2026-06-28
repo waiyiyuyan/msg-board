@@ -248,8 +248,8 @@ function buildPostHtml(post, isModal = false) {
             <img class="reply-avatar" src="${getAvatarUrl(r.r_name)}" alt="头像" onerror="this.style.display='none'">
             <div class="reply-name">${headText}</div>
           </div>
-          <div class="reply-time">${r.create_time.slice(0,16)}</div>
         </div>
+        <div class="reply-time">${r.create_time.slice(0,16)}</div>
         <div class="reply-text">${showContent}</div>
         ${renderMedia(r.media_urls || "")}
         <div style="text-align:right;margin-top:4px;">${extraBtn}<button class="reply-small-btn" onclick="openSubReplyPop(${post.id},${r.id},'${r.r_name}')">回复</button></div>
@@ -603,8 +603,8 @@ function initWebSocket() {
                 <img class="reply-avatar" src="${getAvatarUrl(replyItem.r_name)}" alt="头像" onerror="this.style.display='none'">
                 <div class="reply-name">${headText}</div>
               </div>
-              <div class="reply-time">${replyItem.create_time}</div>
             </div>
+            <div class="reply-time">${replyItem.create_time}</div>
             <div class="reply-text">${showContent}</div>
             ${renderMedia(replyItem.media_urls || "")}
             <div style="text-align:right;margin-top:4px;">${extraBtn}<button class="reply-small-btn" onclick="openSubReplyPop(${targetPid},${replyItem.id},'${replyItem.r_name}')">回复</button></div>
@@ -633,8 +633,8 @@ function initWebSocket() {
                     <img class="reply-avatar" src="${getAvatarUrl(replyItem.r_name)}" alt="头像" onerror="this.style.display='none'">
                     <div class="reply-name">${headText}</div>
                   </div>
-                  <div class="reply-time">${replyItem.create_time}</div>
                 </div>
+                <div class="reply-time">${replyItem.create_time}</div>
                 <div class="reply-text">${showContent}</div>
                 ${renderMedia(replyItem.media_urls || "")}
                 <div style="text-align:right;margin-top:4px;">${extraBtn}<button class="reply-small-btn" onclick="openSubReplyPop(${targetPid},${replyItem.id},'${replyItem.r_name}')">回复</button></div>
