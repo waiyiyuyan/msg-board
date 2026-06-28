@@ -485,7 +485,7 @@ textarea{
 .modal-content {
   width: 100%;
   /* 和首页body padding完全统一：上下76/80，左右12px */
-  padding: 76px 12px 80px 12px;
+  padding: 70px 12px 80px 12px;
   box-sizing: border-box;
   /* 删除 height:100% 锁死高度代码 */
 }
