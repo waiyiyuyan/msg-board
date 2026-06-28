@@ -425,7 +425,13 @@ async function jumpPost(nid, pid, rid) {
   const fd = new FormData();
   fd.append('nid', nid);
   await req(`${API_BASE}/setRead?uid=${encodeURIComponent(userNick)}`, { method: "POST", body: fd });
-  // 把当前 #notify 压入历史栈
+  
+  // 读完通知，本地同步标记已读，刷新角标
+  const targetNotify = notifyList.find(n => n.id === nid);
+  if (targetNotify) targetNotify.is_read = 1;
+  renderNotify();
+  if (location.hash.slice(1) === "notify") renderPageNotify();
+
   routeStack.push(location.hash);
   location.hash = `post/${pid}`;
   setTimeout(() => {
@@ -444,6 +450,7 @@ async function readAllNotify() {
     await req(`${API_BASE}/readAllNotify?uid=${uid}`, { method: "POST" });
     notifyList.forEach(item => item.is_read = 1);
     renderNotify();
+    if (location.hash.slice(1) === "notify") renderPageNotify();
   } catch (err) {
     console.error("全部已读出错：", err);
     alert("网络异常");
@@ -459,6 +466,7 @@ async function clearAllNotify() {
     await req(`${API_BASE}/clearAllNotify?uid=${uid}`, { method: "POST" });
     notifyList = [];
     renderNotify();
+    if (location.hash.slice(1) === "notify") renderPageNotify();
   } catch (err) {
     console.error("清空通知出错：", err);
     alert("网络异常");
@@ -715,23 +723,21 @@ function initWebSocket() {
 }
 
 // ===================== 页面初始化入口 =====================
+// ===================== 页面初始化入口 =====================
 textareaDom.addEventListener('input', () => autoResize(textareaDom));
 window.addEventListener("load", async () => {
-  initLoadPosts();
-  initWebSocket();
+  // 第一步：先初始化用户信息，再连WS，保证WS能正确上报用户ID
   userNick = getCookie('userNick');
-  if (userNick) {
-    popNick.value = userNick;
-    userAvatar = getAvatarUrl(userNick);
-    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "USER_UID", uid: userNick }));
-  } else {
+  if (!userNick) {
     const newNick = await fetchRandomNick();
     userNick = newNick;
     setCookie("userNick", newNick);
-    userAvatar = getAvatarUrl(newNick);
-    popNick.value = newNick;
-    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "USER_UID", uid: newNick }));
   }
+  popNick.value = userNick;
+  userAvatar = getAvatarUrl(userNick);
+  // 第二步：用户信息就绪后再建立WS连接
+  initLoadPosts();
+  initWebSocket();
   renderRouteView();
 });
 
@@ -848,3 +854,16 @@ pageClearAll.onclick = async () => {
 };
 
 window.addEventListener("hashchange", renderRouteView);
+// 页面从后台切回前台，自动刷新通知
+document.addEventListener("visibilitychange", async () => {
+  if (document.visibilityState !== "visible" || !userNick) return;
+  try {
+    const notifyRes = await req(`${API_BASE}/getNotify?uid=${encodeURIComponent(userNick)}`);
+    const notifyData = await notifyRes.json();
+    notifyList = notifyData;
+    renderNotify();
+    if (location.hash.slice(1) === "notify") renderPageNotify();
+  } catch (e) {
+    console.error("刷新通知失败", e);
+  }
+});
