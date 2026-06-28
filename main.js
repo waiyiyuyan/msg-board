@@ -21,6 +21,7 @@ let userAvatar = "";
 let userNick = "";
 let ws = null;
 let heartbeatTimer = null;
+let prevHash = "";
 
 // ===================== DOM 缓存 =====================
 const uploadBtn = document.getElementById("uploadBtn");
@@ -738,7 +739,11 @@ function goPostDetail(pid) {
   location.hash = `post/${pid}`;
 }
 function goHome() {
-  location.hash = "";
+  if (prevHash === "#notify") {
+    location.hash = "notify";
+  } else {
+    location.hash = "";
+  }
 }
 
 function renderRouteView() {
@@ -751,6 +756,9 @@ function renderRouteView() {
   const notifyPage = document.getElementById("notifyPage");
   const loadTipDom = document.getElementById("loadTip");
 
+  // 保存当前完整hash，作为下一页的来源记录
+  const currentHash = location.hash;
+
   // 通知页面路由 #notify
   if (hashStr === "notify") {
     currentViewPid = null;
@@ -759,19 +767,18 @@ function renderRouteView() {
     notifyPage.style.display = "block";
     navBack.style.display = "block";
     navBtns.style.display = "none";
-    loadTipDom.style.display = "none"; // 隐藏加载更多
-
+    loadTipDom.style.display = "none";
     renderPageNotify();
   } else if (pidMatch) {
-    // 帖子详情
+    // 进入帖子详情，记录上一页hash
+    prevHash = currentHash;
     currentViewPid = pidMatch[1];
     listWrap.style.display = "none";
     detailWrap.style.display = "block";
     notifyPage.style.display = "none";
     navBack.style.display = "block";
     navBtns.style.display = "none";
-    loadTipDom.style.display = "none"; // 隐藏加载更多
-
+    loadTipDom.style.display = "none";
     renderSinglePost(currentViewPid);
   } else {
     // 首页
@@ -781,7 +788,7 @@ function renderRouteView() {
     notifyPage.style.display = "none";
     navBack.style.display = "none";
     navBtns.style.display = "flex";
-    loadTipDom.style.display = "block"; // 首页恢复显示加载更多
+    loadTipDom.style.display = "block";
   }
 }
 
