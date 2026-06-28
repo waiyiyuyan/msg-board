@@ -235,25 +235,6 @@ textarea{
   font-size: var(--fs-lg); /* 新增 */
 }
 
-/* ========== 悬浮按钮 ========== */
-
-.badge{
-  position:absolute;
-  top:-6px;
-  right:-6px;
-  background:var(--red);
-  color:#fff;
-  min-width:16px;
-  height:16px;
-  border-radius:8px;
-  display:grid;
-  place-items:center;
-  font-size: 11px;
-  line-height:1;
-  padding:0 2px;
-  overflow: hidden;
-}
-
 /* ========== 通知弹窗 ========== */
 .notify-mask{
   display:none;
@@ -578,11 +559,9 @@ textarea{
   border-color: var(--blue);
   color: var(--blue);
 }
-.cli-btn .badge {
-  transform: translate(2px, -6px);
-  min-width: 16px;
-  height: 16px;
-  font-size: 11px;
+/* 未读数字和文字稍微隔开一点 */
+#unReadBadge {
+  margin-left: 2px;
 }
 
 /* 隐藏右下角原来悬浮圆形按钮 */
