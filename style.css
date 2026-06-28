@@ -125,9 +125,7 @@ body{
     justify-content:flex-end;
     gap:6px;
 }
-.divider{
-    display: none;
-}
+
 
 /* ========== 回复区 ========== */
 .reply-wrap {
@@ -237,26 +235,7 @@ textarea{
 }
 
 /* ========== 悬浮按钮 ========== */
-.float-add-btn, .bell-btn{
-  position:fixed;
-  width:48px;
-  height:48px;
-  border-radius:50%;
-  border:none;
-  background:var(--blue);
-  color:#fff;
-  z-index:101;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.float-add-btn{right:14px;bottom:18px;font-size:24px;}
-.bell-btn{bottom:18px;right:70px;font-size:18px;}
-.float-add-btn:active, .bell-btn:active {
-  opacity: 0.8;
-  transform: scale(0.95);
-}
+
 .badge{
   position:absolute;
   top:-6px;
@@ -558,4 +537,44 @@ textarea{
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   }
+}
+
+/* ========== CLI 顶部导航栏 新样式 ========== */
+.cli-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 14px 12px;
+  border-bottom: 2px solid var(--border-line);
+  margin: 0 -12px 20px -12px;
+}
+.cli-nav-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.cli-btn {
+  font-family: Consolas, Monaco, monospace;
+  background: transparent;
+  border: 1px solid var(--border-line);
+  color: var(--text-main);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: var(--fs-md);
+}
+.cli-btn:hover {
+  background: rgba(0, 122, 255, 0.06);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.cli-btn .badge {
+  transform: translate(2px, -6px);
+  min-width: 16px;
+  height: 16px;
+  font-size: 11px;
+}
+
+/* 隐藏右下角原来悬浮圆形按钮 */
+.float-add-btn, .bell-btn {
+  display: none !important;
 }
