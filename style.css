@@ -74,6 +74,7 @@ body{
     padding: 16px 12px 80px;
     max-width:700px;
     margin:0 auto;
+    font-family: Consolas, Monaco, "Microsoft YaHei", monospace;
 }
 /* ========== 帖子模块 ========== */
 .post-card {
@@ -539,23 +540,33 @@ textarea{
   }
 }
 
-/* ========== CLI 顶部导航栏 新样式 ========== */
+/* ========== CLI 顶部导航栏 固定顶部新版 ========== */
 .cli-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   padding: 14px 12px;
   border-bottom: 2px solid var(--border-line);
-  margin: 0 -12px 20px -12px;
+  background: var(--bg);
 }
 .cli-nav-buttons {
   display: flex;
   gap: 10px;
   align-items: center;
+  max-width: 700px;
+  margin: 0 auto;
+  width: 100%;
+  justify-content: flex-end;
 }
 .cli-btn {
   font-family: Consolas, Monaco, monospace;
   background: transparent;
+  /* 保留边框，符合CLI线条风格 */
   border: 1px solid var(--border-line);
   color: var(--text-main);
   padding: 4px 10px;
