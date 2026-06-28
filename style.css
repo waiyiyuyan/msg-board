@@ -569,3 +569,45 @@ textarea{
 .float-add-btn, .bell-btn {
   display: none !important;
 }
+
+/* ========== 通知独立路由页面 #notify ========== */
+.notify-page {
+  background: var(--bg);
+  min-height: 100vh;
+  display: none;
+}
+.notify-op-bar {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-line);
+  border-bottom: 1px dashed var(--reply-border);
+  margin-bottom: 16px;
+}
+.notify-op-bar .btn {
+  flex: 1;
+}
+/* 单条通知条目 */
+.page-notify-item {
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--reply-border);
+  cursor: pointer;
+}
+.page-notify-item:last-child {
+  border-bottom: none;
+}
+.page-notify-text {
+  color: var(--text-main);
+  line-height: 1.4;
+  font-size: var(--fs-md);
+}
+.page-notify-text.unread::before {
+  content: "● ";
+  color: var(--text-second);
+}
+.page-notify-time {
+  color: var(--text-second);
+  font-size: var(--fs-xs);
+  text-align: right;
+  margin-top: 4px;
+}
