@@ -524,12 +524,19 @@ textarea{
   width: 100%;
 }
 .cli-nav-back {
-  display: none;
+  border: none;
+  outline: none;
+  background: transparent;
 }
 .cli-nav-buttons {
   display: flex;
+  justify-content: flex-end;
   gap: 10px;
-  align-items: center;
+}
+.cli-nav-buttons button {
+  border: none;
+  outline: none;
+  background: transparent;
 }
 .cli-btn {
   font-family: Consolas, Monaco, monospace;
