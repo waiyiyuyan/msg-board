@@ -46,7 +46,7 @@
     <!-- 首页：通知+发帖 -->
     <div class="cli-nav-buttons">
       <button id="bellBtn" class="cli-btn">
-        通知 [ <span id="unReadBadge" style="display:none"></span> ]
+        通知 <span id="unReadBadge" style="display:none"></span>
       </button>
       <button id="openPopBtn" class="cli-btn">发帖</button> 
     </div>
@@ -118,6 +118,21 @@
   <div class="modal-content" id="noticeModalContent">
   </div>
 </div>
+  <!-- 粘贴你这段通知路由页面容器在这里 -->
+<div class="notify-page" id="notifyPage" style="display: none; padding-top:70px;">
+  <div class="page-inner" style="max-width:700px;margin:0 auto;padding:0 12px;">
+    <!-- 操作按钮栏 -->
+    <div class="notify-op-bar">
+      <button class="btn" id="pageReadAll">全部已读</button>
+      <button class="btn del-btn" id="pageClearAll">清空通知</button>
+    </div>
+    <!-- 通知列表渲染容器 -->
+    <div id="pageNotifyList"></div>
+    <!-- 空状态提示 -->
+    <div class="empty-tip" id="notifyEmptyTip" style="display:none;">暂无消息通知</div>
+  </div>
+</div>
+  
 <script src="main.js" defer></script>
 </body>
 </html>
