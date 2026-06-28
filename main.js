@@ -394,7 +394,9 @@ function renderNotify() {
 
 function renderPageNotify() {
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
-  const opBar = document.getElementById("notifyOpBar");
+  // 原来错误：const opBar = document.getElementById("notifyOpBar");
+  // 修正为页面上真实ID notifyOpBarPage
+  const opBar = document.getElementById("notifyOpBarPage");
 
   // 列表为空 → 隐藏按钮栏
   if (notifyList.length === 0) {
