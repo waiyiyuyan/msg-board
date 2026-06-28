@@ -2,7 +2,6 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="msvalidate.01" content="556A61E15E450D3C39258BE0D09D60D1" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2f2f7">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c1c1e">
@@ -13,17 +12,17 @@
 <meta name="robots" content="index,follow">
 <!-- 标准唯一链接 -->
 <link rel="canonical" href="https://mb.lovefree.de5.net">
-<!-- Open Graph 社交卡片（微信/QQ/必应通用） -->
+<!-- Open Graph 社交卡片 -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="留言板 - 在线匿名留言交流社区">
 <meta property="og:description" content="轻量在线匿名留言板，支持发帖、图片视频上传、回复互动、消息通知，永久免费在线留言归档，电脑手机自适应访问。">
 <meta property="og:url" content="https://mb.lovefree.de5.net">
 <meta property="og:site_name" content="匿名留言板">
-<!-- X/Twitter 社交卡片（无封面图，移除图片标签） -->
+<!-- X/Twitter 社交卡片 -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="留言板 - 在线匿名留言交流社区">
 <meta name="twitter:description" content="轻量在线匿名留言板，支持发帖、图片视频上传、回复互动、消息通知，永久免费在线留言归档，电脑手机自适应访问。">
-<!-- 结构化数据 Schema 利于必应展示富摘要 -->
+<!-- 结构化数据 Schema -->
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
@@ -33,34 +32,28 @@
   "description":"轻量在线匿名留言板，支持发帖、图片视频上传、回复互动、消息通知，永久免费在线留言归档，电脑手机自适应访问。"
 }
 </script>
-<!-- 引入外部CSS样式文件 -->
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<!-- 页面顶部区域 -->
-  <header class="cli-header">
-    <!-- 详情页：返回按钮 -->
-    <div class="cli-nav-back" style="display:none;">
-        <button class="cli-btn" onclick="goHome()">返回</button>
-    </div>
-    <!-- 首页：通知+发帖 -->
-    <div class="cli-nav-buttons">
-      <button id="bellBtn" class="cli-btn">
-        通知 <span id="unReadBadge" style="display:none"></span>
-      </button>
-      <button id="openPopBtn" class="cli-btn">发帖</button> 
-    </div>
+<header class="cli-header">
+  <div class="cli-nav-back" style="display:none;">
+      <button class="cli-btn" onclick="goHome()">返回</button>
+  </div>
+  <div class="cli-nav-buttons">
+    <button id="bellBtn" class="cli-btn">
+      通知 <span id="unReadBadge" style="display:none"></span>
+    </button>
+    <button id="openPopBtn" class="cli-btn">发帖</button> 
+  </div>
  </header>
-<!-- 网站核心内容，爬虫优先抓取 -->
+
 <main>
   <div id="listBox"></div>
-  <!-- 分页加载提示 -->
   <div id="loadTip" class="fs-sm" style="text-align:center;padding:18px 0;color:var(--text-second);cursor:default;">
     加载中...
   </div>
 </main>
 
-<!-- 所有弹窗、遮罩放到main外面，爬虫知道这不是正文 -->
 <!-- 通知弹窗遮罩 -->
 <div class="notify-mask" id="notifyMask">
   <div class="notify-box" id="notifyWrap">
@@ -71,6 +64,7 @@
     <div id="notifyListContent"></div>
   </div>
 </div>
+
 <!-- 发帖弹窗 -->
 <div class="mask" id="popMask">
   <div class="pop-post">
@@ -105,7 +99,6 @@
     </div>
         
       <input type="file" id="fileSelector" style="display:none;" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm">
-      <input type="hidden" name="title" value="">
       <input type="hidden" name="name" id="popNick">
       <input type="hidden" id="hidPid" name="pid" value="">
       <input type="hidden" id="hidRid" name="targetRid" value="">
@@ -118,17 +111,15 @@
   <div class="modal-content" id="noticeModalContent">
   </div>
 </div>
-  <!-- 粘贴你这段通知路由页面容器在这里 -->
+
+<!-- 通知独立页面 -->
 <div class="notify-page" id="notifyPage" style="display: none;">
   <div class="page-inner" style="max-width:700px;margin:0 auto;padding:0 12px;">
-    <!-- 操作按钮栏 -->
     <div class="notify-op-bar" id="notifyOpBarPage">
       <button class="btn" id="pageReadAll">全部已读</button>
       <button class="btn del-btn" id="pageClearAll">清空通知</button>
     </div>
-    <!-- 通知列表渲染容器 -->
     <div id="pageNotifyList"></div>
-    <!-- 空状态提示 -->
     <div class="empty-tip" id="notifyEmptyTip" style="display:none;">暂无消息通知</div>
   </div>
 </div>
