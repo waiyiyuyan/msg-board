@@ -45,6 +45,10 @@ const noticeFullModal = document.getElementById('noticeFullModal');
 const noticeModalContent = document.getElementById('noticeModalContent');
 const loadTip = document.getElementById("loadTip");
 
+const pageReadAll = document.getElementById("pageReadAll");
+const pageClearAll = document.getElementById("pageClearAll");
+const pageNotifyList = document.getElementById("pageNotifyList");
+const notifyEmptyTip = document.getElementById("notifyEmptyTip");
 // ===================== 通用工具函数 =====================
 /** 统一请求封装 */
 async function req(url, opt = {}) {
@@ -387,11 +391,32 @@ function renderNotify() {
         </div>`;
       }).join("");
 }
+
+function renderPageNotify() {
+  const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
+  // 控制按钮禁用
+  pageReadAll.disabled = unReadCount === 0;
+  pageClearAll.disabled = notifyList.length === 0;
+
+  if (notifyList.length === 0) {
+    pageNotifyList.innerHTML = "";
+    notifyEmptyTip.style.display = "block";
+    return;
+  }
+  notifyEmptyTip.style.display = "none";
+  // 渲染通知条目
+  pageNotifyList.innerHTML = notifyList.map(item => {
+    const isRead = item.is_read === 1;
+    return `<div class="page-notify-item" onclick="jumpPost(${item.id},${item.target_msg_id},${item.reply_id})">
+      <div class="page-notify-text ${isRead ? '' : 'unread'}">${item.reply_name} 回复了你：${item.reply_preview}</div>
+      <div class="page-notify-time">${item.create_time.slice(0,16)}</div>
+    </div>`;
+  }).join("");
+}
 async function jumpPost(nid, pid, rid) {
   const fd = new FormData();
   fd.append('nid', nid);
   await req(`${API_BASE}/setRead?uid=${encodeURIComponent(userNick)}`, { method: "POST", body: fd });
-  notifyMask.style.display = 'none';
   location.hash = `post/${pid}`;
   setTimeout(() => {
     const targetReply = document.querySelector(`.reply-item[data-rid="${rid}"]`);
@@ -433,12 +458,11 @@ async function clearAllNotify() {
 }
 
 bellBtn.onclick = () => {
+  // 关闭所有弹窗
   if (notifyMask.style.display === 'flex') notifyMask.style.display = 'none';
-  else {
-    if (popOpen) { maskDom.style.display = 'none'; popForm.reset(); popOpen = false; }
-    renderNotify();
-    notifyMask.style.display = 'flex';
-  }
+  if (popOpen) { maskDom.style.display = 'none'; popForm.reset(); popOpen = false; }
+  // 跳转到通知路由页
+  location.hash = "notify";
 };
 notifyMask.addEventListener('click', e => { if (e.target === notifyMask) notifyMask.style.display = 'none'; });
 
@@ -460,11 +484,11 @@ function fillReplyPopup(pid, rid, targetName) {
   if (popNickText) popNickText.innerText = userNick;
 }
 function openReplyPop(pid, targetName) {
-  if (notifyMask.style.display === 'flex') notifyMask.style.display = 'none';
+  
   fillReplyPopup(pid, "", targetName);
 }
 function openSubReplyPop(pid, rid, targetName) {
-  if (notifyMask.style.display === 'flex') notifyMask.style.display = 'none';
+  
   fillReplyPopup(pid, rid, targetName);
 }
 
@@ -475,7 +499,6 @@ document.getElementById('openPopBtn').onclick = () => {
     popForm.reset();
     popOpen = false;
   } else {
-    if (notifyMask.style.display === 'flex') notifyMask.style.display = 'none';
     hidPid.value = '';
     hidRid.value = '';
     targetUserDom.value = '';
@@ -579,6 +602,9 @@ function initWebSocket() {
         case "NOTIFY_DATA":
           notifyList = data.notify || [];
           renderNotify();
+          if (location.hash.slice(1) === "notify") {
+            renderPageNotify();
+          }
           break;
         case "SYS_LOG":
           console[data.level === "error" ? "error" : "log"]("[后端日志]", data.content);
@@ -715,18 +741,33 @@ function renderRouteView() {
   const detailWrap = document.getElementById("noticeFullModal");
   const navBack = document.querySelector(".cli-nav-back");
   const navBtns = document.querySelector(".cli-nav-buttons");
+  const notifyPage = document.getElementById("notifyPage");
 
-  if (pidMatch) {
+  // 通知页面路由 #notify
+  if (hashStr === "notify") {
+    currentViewPid = null;
+    listWrap.style.display = "none";
+    detailWrap.style.display = "none";
+    notifyPage.style.display = "block";
+    navBack.style.display = "block";
+    navBtns.style.display = "none";
+    // 渲染通知列表到通知页面
+    renderPageNotify();
+  } else if (pidMatch) {
+    // 帖子详情 原有逻辑不变
     currentViewPid = pidMatch[1];
     listWrap.style.display = "none";
     detailWrap.style.display = "block";
+    notifyPage.style.display = "none";
     navBack.style.display = "block";
     navBtns.style.display = "none";
     renderSinglePost(currentViewPid);
   } else {
+    // 首页
     currentViewPid = null;
     listWrap.style.display = "block";
     detailWrap.style.display = "none";
+    notifyPage.style.display = "none";
     navBack.style.display = "none";
     navBtns.style.display = "flex";
   }
@@ -767,5 +808,17 @@ async function renderSinglePost(pid) {
   const foldBtn = noticeModalContent.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
   if (foldBtn) foldBtn.setAttribute("aria-expanded", "true");
 }
+
+// 通知页按钮绑定
+pageReadAll.onclick = async () => {
+  await readAllNotify();
+  renderPageNotify();
+  renderNotify(); // 更新顶部小红点
+};
+pageClearAll.onclick = async () => {
+  await clearAllNotify();
+  renderPageNotify();
+  renderNotify(); // 更新顶部小红点
+};
 
 window.addEventListener("hashchange", renderRouteView);
