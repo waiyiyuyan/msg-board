@@ -403,12 +403,16 @@ listBox.addEventListener("click", e => {
   const foldBtn = e.target.closest(".fold-btn");
   if(foldBtn) {
     e.stopPropagation();
-    toggleReplyFold(foldBtn.dataset.foldPid);
+    const pid = foldBtn.dataset.foldPid;
+    goPostDetail(pid);
     return;
   }
   // 点击空白折叠容器
   const wrapper = e.target.closest(".toggle-wrapper");
-  if (wrapper) toggleReplyFold(wrapper.dataset.pid);
+  if (wrapper) {
+    const pid = wrapper.dataset.pid;
+    goPostDetail(pid);
+  }
 });
 
 // ===================== 通知模块 =====================
@@ -436,7 +440,17 @@ async function jumpPost(nid, pid, rid) {
   fd.append('nid', nid);
   await req(`${API_BASE}/setRead?uid=${encodeURIComponent(userNick)}`, { method: "POST", body: fd });
   notifyMask.style.display = 'none';
-  openNoticeModal(pid, rid);
+  // 改用路由跳转
+  location.hash = `post/${pid}`;
+  // 延迟滚动到目标回复
+  setTimeout(() => {
+    const targetReply = document.querySelector(`.reply-item[data-rid="${rid}"]`);
+    if (targetReply) {
+      targetReply.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetReply.classList.add('flash');
+      targetReply.addEventListener('animationend', () => targetReply.classList.remove('flash'), { once: true });
+    }
+  }, 150);
 }
 async function readAllNotify() {
   const uid = encodeURIComponent(userNick);
@@ -787,4 +801,84 @@ window.addEventListener("load", async () => {
     popNick.value = newNick;
     if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "USER_UID", uid: newNick }));
   }
+  // 在这一行下面新增调用路由渲染
+  renderRouteView();
 });
+
+// ========== 路由分页逻辑 ==========
+let currentViewPid = null;
+
+// 切换到帖子详情路由
+function goPostDetail(pid) {
+  location.hash = `post/${pid}`;
+}
+// 切回首页列表
+function goHome() {
+  location.hash = "";
+}
+
+// 根据hash渲染对应视图
+function renderRouteView() {
+  const hashStr = location.hash.slice(1);
+  const pidMatch = hashStr.match(/^post\/(\d+)$/);
+  const listWrap = document.getElementById("listBox");
+  const detailWrap = document.getElementById("noticeFullModal");
+
+  if (pidMatch) {
+    // 帖子详情页
+    currentViewPid = pidMatch[1];
+    listWrap.style.display = "none";
+    detailWrap.style.display = "block";
+    renderSinglePost(currentViewPid);
+  } else {
+    // 首页列表
+    currentViewPid = null;
+    listWrap.style.display = "block";
+    detailWrap.style.display = "none";
+  }
+}
+
+// 渲染单篇帖子详情（自动展开全部回复）
+async function renderSinglePost(pid) {
+  let targetPost = lastData.find(item => Number(item.id) === Number(pid));
+  // 本地缓存无该帖子，请求后端详情
+  if (!targetPost) {
+    try {
+      const res = await req(`${API_BASE}/getPostDetail?id=${pid}`);
+      const resData = await res.json();
+      if (resData.code === 0 && resData.data) {
+        targetPost = resData.data;
+        lastData.push(targetPost);
+      } else {
+        noticeModalContent.innerHTML = `
+        <div style="text-align:center;padding:50px 20px;color:var(--text-second);">
+          <p>帖子不存在或已删除</p>
+          <button class="btn" onclick="goHome()">返回列表</button>
+        </div>`;
+        return;
+      }
+    } catch (err) {
+      noticeModalContent.innerHTML = `
+        <div style="text-align:center;padding:50px 20px;color:var(--text-second);">
+          <p>帖子加载失败</p>
+          <button class="btn" onclick="goHome()">返回列表</button>
+        </div>`;
+      return;
+    }
+  }
+
+  // 生成帖子html，第二个参数isModal=true（强制展开回复）
+  let html = buildPostHtml(targetPost, true);
+  // 头部插入返回首页按钮
+  const backBtnHtml = `<button class="cli-btn" onclick="goHome()" style="margin-bottom:16px;">[ ← 返回列表 ]</button>`;
+  noticeModalContent.innerHTML = backBtnHtml + html;
+
+  // 强制展开当前帖子所有回复区域
+  const replyWrap = noticeModalContent.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
+  if (replyWrap) replyWrap.style.display = "block";
+  const foldBtn = noticeModalContent.querySelector(`.fold-btn[data-fold-pid="${pid}"]`);
+  if (foldBtn) foldBtn.setAttribute("aria-expanded", "true");
+}
+
+// 监听hash变化（浏览器前进/后退、手动改地址）
+window.addEventListener("hashchange", renderRouteView);
