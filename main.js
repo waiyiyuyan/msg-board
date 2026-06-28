@@ -878,8 +878,7 @@ async function renderSinglePost(pid) {
   // 生成帖子html，第二个参数isModal=true（强制展开回复）
   let html = buildPostHtml(targetPost, true);
   // 头部插入返回首页按钮
-  const backBtnHtml = `<button class="cli-btn" onclick="goHome()" style="margin-bottom:16px;">[ ← 返回列表 ]</button>`;
-  noticeModalContent.innerHTML = backBtnHtml + html;
+  noticeModalContent.innerHTML = html;
 
   // 强制展开当前帖子所有回复区域
   const replyWrap = noticeModalContent.querySelector(`.reply-wrap[data-wrap-pid="${pid}"]`);
