@@ -414,7 +414,7 @@ listBox.addEventListener("click", e => {
 // ===================== 通知模块 =====================
 function renderNotify() {
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
-  unReadBadge.style.display = unReadCount > 0 ? 'grid' : 'none';
+  unReadBadge.style.display = unReadCount > 0 ? 'inline' : 'none';
   unReadBadge.innerText = unReadCount > 99 ? '99+' : unReadCount;
   if (readAllBtn && clearNotifyBtn) {
     readAllBtn.disabled = notifyList.length === 0 || unReadCount === 0;
@@ -731,6 +731,13 @@ function initWebSocket() {
           if (isNoticeModalOpen && Number(currentModalPostId) === Number(targetPid)) {
             renderNoticeModalContent(currentModalPostId, currentModalReplyId, false);
           }
+        
+          // ========== 新增：实时更新回复条数 ==========
+          foldBtn.dataset.replyCount = allReplies.length;
+          if (allReplies.length > 0) {
+            toggleWrapper.classList.remove('toggle-wrapper-empty');
+          }
+        
           break;
         }
         case "DELETE_POST":
