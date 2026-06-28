@@ -515,6 +515,10 @@ popForm.onsubmit = async function (e) {
       clearMedia();
       popOpen = false;
       textareaDom.placeholder = '';
+      // 新增：如果当前在该帖子详情，重新渲染页面立刻显示新回复
+      if(currentViewPid && currentViewPid === pid){
+        renderSinglePost(pid);
+      }
     }
   } catch (err) {
     alert("提交失败，请稍后重试");
@@ -610,13 +614,38 @@ function initWebSocket() {
           foldBtn.style.color = "";
           foldBtn.style.cursor = "";
           toggleWrapper.style.cursor = "";
-          const cachePost = lastData.find(p => Number(p.id) === Number(targetPid));
-          if (cachePost && cachePost.replys) cachePost.replys.push(replyItem);
-
+        
+          // 【先更新首页回复数字】
           foldBtn.dataset.replyCount = allReplies.length;
           if (allReplies.length > 0) {
             toggleWrapper.classList.remove('toggle-wrapper-empty');
           }
+        
+          // 同步更新详情页评论区
+          if (currentViewPid && currentViewPid == targetPid) {
+            const detailWrap = document.querySelector(`#noticeFullModal .reply-wrap[data-wrap-pid="${targetPid}"]`);
+            if(detailWrap){
+              const { headText, showContent } = getReplyHeadText(replyItem, userNick?.trim() || "");
+              const extraBtn = "";
+              const replyHtml = `<div class="reply-item" data-rid="${replyItem.id}" data-pid="${replyItem.msg_id}">
+                <div class="reply-head">
+                  <div class="reply-avatar-row" style="display: flex; align-items: center; gap: 6px;">
+                    <img class="reply-avatar" src="${getAvatarUrl(replyItem.r_name)}" alt="头像" onerror="this.style.display='none'">
+                    <div class="reply-name">${headText}</div>
+                  </div>
+                  <div class="reply-time">${replyItem.create_time}</div>
+                </div>
+                <div class="reply-text">${showContent}</div>
+                ${renderMedia(replyItem.media_urls || "")}
+                <div style="text-align:right;margin-top:4px;">${extraBtn}<button class="reply-small-btn" onclick="openSubReplyPop(${targetPid},${replyItem.id},'${replyItem.r_name}')">回复</button></div>
+              </div>`;
+              detailWrap.insertAdjacentHTML("beforeend", replyHtml);
+            }
+          }
+        
+          const cachePost = lastData.find(p => Number(p.id) === Number(targetPid));
+          if (cachePost && cachePost.replys) cachePost.replys.push(replyItem);
+        
           break;
         }
         case "DELETE_POST":
