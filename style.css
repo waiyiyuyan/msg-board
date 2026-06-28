@@ -1,10 +1,9 @@
-/* ========== 明暗主题变量 放在最顶部 ========== */
+/* ========== 明暗主题变量 ========== */
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 :root {
-  /* 基础配色 */
   --bg-light: #f8f9fa;
   --bg-dark: #1c1c1e;
   --text-main-light: #222222;
@@ -26,20 +25,18 @@ html {
   --red-dark: #d92e24;
   --green: #34c759;
 
-  /* 全局统一字号变量，只改这里全站同步缩放 */
-  --fs-xs: 15px;  /* 时间、楼层、小字提示 */
-  --fs-sm: 15px;  /* 回复昵称、折叠按钮、加载提示 */
-  --fs-md: 15px;  /* 按钮、回复正文、通知文字 */
-  --fs-lg: 15px;  /* 帖子内容、输入框、弹窗昵称 */
+  --fs-xs: 15px;
+  --fs-sm: 15px;
+  --fs-md: 15px;
+  --fs-lg: 15px;
 }
 
-/* 全局字号工具类 */
 .fs-xs { font-size: var(--fs-xs); }
 .fs-sm { font-size: var(--fs-sm); }
 .fs-md { font-size: var(--fs-md); }
 .fs-lg { font-size: var(--fs-lg); }
 
-/* 主题切换 */
+/* 亮色/暗色主题 */
 @media (prefers-color-scheme: light) {
   :root {
     --bg: var(--bg-light);
@@ -61,7 +58,6 @@ html {
     --pop-bg: var(--pop-bg-dark);
     --pop-text: var(--pop-text-dark);
   }
-  /* 统一深色媒体背景，不用重复写 */
   .msg-media-wrap, .msg-media-img, .msg-media-video {
     background: #0a0a0a;
   }
@@ -76,13 +72,12 @@ body{
     margin:0 auto;
     font-family: Consolas, Monaco, "Microsoft YaHei", monospace;
 }
-/* ========== 帖子模块 ========== */
+
+/* 帖子卡片 */
 .post-card {
   background: transparent !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  border: none;
-  /* iOS原生蓝色分割竖线 */
   border-left: 4px solid var(--blue);
   padding: 12px 12px 14px 14px;
   margin-bottom: 24px;
@@ -109,7 +104,6 @@ body{
 .post-content{
     margin-bottom:4px;
     font-size: var(--fs-lg);
-    /* 手动补全换行渲染规则 */
     color: var(--text-main);
     line-height: 1.4;
     white-space: pre-line;
@@ -119,7 +113,7 @@ body{
 .post-action-row {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 左右两端分开 */
+  justify-content: space-between;
   margin-top: 8px;
 }
 .post-btn-group{
@@ -127,9 +121,10 @@ body{
     justify-content:flex-end;
     gap:6px;
 }
-/* ========== 回复区 ========== */
+
+/* 回复区域 */
 .reply-wrap {
-  counter-reset: floorNum; /* 新增，每个帖子评论区从头计数 */
+  counter-reset: floorNum;
   margin-top: 12px;
   margin-left: 8px;
   padding-left: 16px;
@@ -154,7 +149,6 @@ body{
     justify-content: space-between;
     gap: 3px;
 }
-/* 楼层标签：右侧显示楼层 */
 .reply-head::after {
   counter-increment: floorNum;
   content: counter(floorNum) "楼";
@@ -173,7 +167,6 @@ body{
 .reply-text{
     margin:2px 0;
     font-size: var(--fs-md);
-    /* 手动补全换行渲染规则 */
     color: var(--text-main);
     line-height: 1.4;
     white-space: pre-line;
@@ -188,11 +181,6 @@ body{
     font-size: var(--fs-xs);
     margin-top: 2px;
 }
-/* 删除时间上原来的楼层伪元素 */
-.reply-time::before {
-  content: none;
-  counter-increment: none;
-}
 .reply-small-btn{
     padding:2px 4px;
     background:transparent;
@@ -204,14 +192,12 @@ body{
 .reply-small-btn:hover{color:var(--blue-dark);}
 .reply-small-btn.del-btn {
     color:var(--red);
-    background: transparent;
 }
 .reply-small-btn.del-btn:hover {
     color:var(--red-dark);
-    background: transparent;
 }
 
-/* ========== 统一头像（合并3套完全重复头像代码） ========== */
+/* 统一头像 */
 .post-avatar, .reply-avatar, .popup-avatar {
   width: 34px;
   height: 34px;
@@ -223,7 +209,7 @@ body{
 }
 .post-avatar-row, .reply-avatar-row {line-height: 1;}
 
-/* ========== 按钮通用 ========== */
+/* 通用按钮 */
 .btn{
     background:var(--blue);
     color:#fff;
@@ -236,7 +222,7 @@ body{
 .del-btn{background:var(--red);}
 .btn:disabled{opacity:0.6;cursor:not-allowed;}
 
-/* ========== 输入框 ========== */
+/* 输入框 */
 input{width:100%;outline-color:var(--blue);color:var(--pop-text);background:transparent;}
 textarea{
   width:100%;
@@ -247,10 +233,10 @@ textarea{
   min-height:30px;
   color:var(--pop-text);
   background:transparent;
-  font-size: var(--fs-lg); /* 新增 */
+  font-size: var(--fs-lg);
 }
 
-/* ========== 通知弹窗 ========== */
+/* 弹窗通知 */
 .notify-mask{
   display:none;
   position:fixed;
@@ -290,13 +276,12 @@ textarea{
   gap: 10px;
   margin-bottom: 8px;
 }
-.notify-btn-bar .btn {flex:1;}
 .notify-item:last-child{border-bottom:none;}
 .notify-txt{color:var(--text-main);line-height:1.4;font-size: var(--fs-md);}
 .notify-time{color:var(--text-second);margin-top:3px;font-size: var(--fs-xs);}
 .empty-tip{text-align:center;padding:30px 0;color:var(--text-second);}
 
-/* ========== 发帖弹窗 ========== */
+/* 发帖弹窗遮罩 */
 .mask{
   display:none;
   position:fixed;
@@ -335,16 +320,13 @@ textarea{
   flex-direction:column;
   gap:10px;
 }
-.pop-post .btn{align-self:flex-end;}
 
-/* ========== 折叠按钮 ========== */
+/* 评论折叠按钮 */
 .toggle-wrapper {
   display: block;
   padding: 6px 0;
   cursor: pointer;
 }
-
-/* 折叠按钮：仅显示 💬数字，无加减符号 */
 .fold-btn {
   position: relative;
   color: var(--blue);
@@ -358,20 +340,17 @@ textarea{
   align-items: center;
   gap: 3px;
 }
-/* 气泡 */
 .fold-btn::before {
   content: "💬";
 }
-/* 只显示数字，不追加任何 +/- */
 .fold-btn::after {
   content: attr(data-reply-count);
 }
-
 .fold-btn:hover {
   color: var(--blue-dark);
 }
 
-/* ========== 链接样式 ========== */
+/* 超链接 */
 .post-content a, .reply-text a {
   color: var(--blue);
   text-decoration: underline;
@@ -380,7 +359,7 @@ textarea{
   color: var(--blue-dark);
 }
 
-/* ========== 媒体图片视频 ========== */
+/* 媒体图片视频 */
 .msg-media-wrap {
   width: fit-content;
   max-width: min(100%, 420px);
@@ -401,7 +380,7 @@ textarea{
   background: var(--bg);
 }
 
-/* ========== 上传媒体提示 ========== */
+/* 上传媒体提示区域 */
 #mediaBox {
   display: inline-flex;
   align-items: center;
@@ -413,49 +392,8 @@ textarea{
 #mediaBox .err-text {
   color: var(--red);
 }
-.empty-reply {
-  color: var(--text-second);
-  font-style: italic;
-  pointer-events: none;
-}
 
-/* ========== 加载动画 ========== */
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-.spin-loader {
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--border-line);
-  border-top: 2px solid var(--blue);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes bounce-dot {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-.dot-loader span {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--text-second);
-  animation: bounce-dot 1s ease-in-out infinite;
-}
-.dot-loader span:nth-child(2) { animation-delay: 0.2s; }
-.dot-loader span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes pulse-dot {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.2); opacity: 1; }
-}
-.pulse-loader {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--blue);
-  animation: pulse-dot 1.2s ease-in-out infinite;
-}
+/* 高亮动画（跳转回复闪烁） */
 @keyframes flash-highlight {
   0% { background-color: rgba(0,122,255,0.15); }
   50% { background-color: transparent; }
@@ -465,24 +403,7 @@ textarea{
   animation: flash-highlight 0.6s ease-in-out 2;
 }
 
-/* ========== 上传进度条 ========== */
-.progress-wrap {width: 220px;}
-.progress-text {color:var(--text-second);margin-bottom: 3px;}
-.progress-bar-bg {
-  height: 6px;
-  background: var(--border-line);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.progress-bar-fill {
-  height: 100%;
-  width: 0%;
-  background: var(--green);
-  border-radius: 3px;
-  transition: width 0.1s linear;
-}
-
-/* ========== 帖子详情全屏弹窗 ========== */
+/* 帖子全屏详情弹窗 */
 .notice-full-modal {
   display: none;
   position: fixed;
@@ -491,29 +412,22 @@ textarea{
   height: 100vh;
   background-color: var(--bg);
   z-index: 200;
-  box-sizing: border-box;
-  /* 关键：滚动移到最外层，整页面可滑动 */
   overflow-y: auto;
 }
 .modal-content {
   width: 100%;
-  /* 和首页body padding完全统一：上下76/80，左右12px */
   padding: 70px 12px 80px 12px;
   box-sizing: border-box;
-  /* 删除 height:100% 锁死高度代码 */
 }
-
-/* 电脑大屏：宽度和首页body保持一致700px */
 @media (min-width: 768px) {
   .modal-content {
     max-width: 700px;
     margin: 0 auto;
     min-height: 100vh;
-    border-radius: 0;
-    box-shadow: none;
   }
 }
-/* ========== CLI 顶部导航栏 固定顶部新版 ========== */
+
+/* 顶部导航栏 */
 .cli-header {
   position: fixed;
   top: 0;
@@ -531,11 +445,6 @@ textarea{
   align-items: center;
   justify-content: space-between;
   width: 100%;
-}
-.cli-nav-back {
-  border: none;
-  outline: none;
-  background: transparent;
 }
 .cli-nav-buttons {
   display: flex;
@@ -558,19 +467,13 @@ textarea{
 }
 .cli-btn:hover {
   background: rgba(0, 122, 255, 0.06);
-  border-color: var(--blue);
   color: var(--blue);
 }
 #unReadBadge {
   margin-left: 2px;
 }
 
-/* 隐藏右下角原来悬浮圆形按钮 */
-.float-add-btn, .bell-btn {
-  display: none !important;
-}
-
-/* ========== 通知独立路由页面 #notify ========== */
+/* 独立通知页面 */
 .notify-page {
   background: var(--bg);
   min-height: 100vh;
@@ -580,14 +483,12 @@ textarea{
   display: flex;
   gap: 12px;
   padding: 12px 0;
-  border-top: none;
   border-bottom: 1px dashed var(--reply-border);
   margin-bottom: 16px;
 }
 .notify-op-bar .btn {
   flex: 1;
 }
-/* 单条通知条目 */
 .page-notify-item {
   padding: 10px 0;
   border-bottom: 1px dashed var(--reply-border);
