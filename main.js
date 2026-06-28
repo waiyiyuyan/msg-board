@@ -21,7 +21,7 @@ let userAvatar = "";
 let userNick = "";
 let ws = null;
 let heartbeatTimer = null;
-let prevHash = "";
+let routeStack = [];
 
 // ===================== DOM 缓存 =====================
 const uploadBtn = document.getElementById("uploadBtn");
@@ -425,8 +425,8 @@ async function jumpPost(nid, pid, rid) {
   const fd = new FormData();
   fd.append('nid', nid);
   await req(`${API_BASE}/setRead?uid=${encodeURIComponent(userNick)}`, { method: "POST", body: fd });
-  // 手动记录来源页面，解决hashchange延迟问题
-  prevHash = location.hash;
+  // 把当前 #notify 压入历史栈
+  routeStack.push(location.hash);
   location.hash = `post/${pid}`;
   setTimeout(() => {
     const targetReply = document.querySelector(`.reply-item[data-rid="${rid}"]`);
@@ -471,7 +471,8 @@ bellBtn.onclick = () => {
   // 关闭所有弹窗
   if (notifyMask.style.display === 'flex') notifyMask.style.display = 'none';
   if (popOpen) { maskDom.style.display = 'none'; popForm.reset(); popOpen = false; }
-  // 跳转到通知路由页
+  // 进入通知页前，把当前首页hash压入栈
+  routeStack.push(location.hash);
   location.hash = "notify";
 };
 notifyMask.addEventListener('click', e => { if (e.target === notifyMask) notifyMask.style.display = 'none'; });
@@ -738,14 +739,17 @@ window.addEventListener("load", async () => {
 let currentViewPid = null;
 
 function goPostDetail(pid) {
-  // 记录当前是首页hash #
-  prevHash = location.hash;
+  // 把当前页面存入历史栈
+  routeStack.push(location.hash);
   location.hash = `post/${pid}`;
 }
 function goHome() {
-  if (prevHash === "#notify") {
-    location.hash = "notify";
+  // 取出上一层路由
+  const lastRoute = routeStack.pop();
+  if (lastRoute && lastRoute !== location.hash) {
+    location.hash = lastRoute.replace("#", "");
   } else {
+    // 无历史记录，直接回首页
     location.hash = "";
   }
 }
