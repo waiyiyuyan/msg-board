@@ -425,6 +425,8 @@ async function jumpPost(nid, pid, rid) {
   const fd = new FormData();
   fd.append('nid', nid);
   await req(`${API_BASE}/setRead?uid=${encodeURIComponent(userNick)}`, { method: "POST", body: fd });
+  // 手动记录来源页面，解决hashchange延迟问题
+  prevHash = location.hash;
   location.hash = `post/${pid}`;
   setTimeout(() => {
     const targetReply = document.querySelector(`.reply-item[data-rid="${rid}"]`);
@@ -736,6 +738,8 @@ window.addEventListener("load", async () => {
 let currentViewPid = null;
 
 function goPostDetail(pid) {
+  // 记录当前是首页hash #
+  prevHash = location.hash;
   location.hash = `post/${pid}`;
 }
 function goHome() {
@@ -771,7 +775,6 @@ function renderRouteView() {
     renderPageNotify();
   } else if (pidMatch) {
     // 进入帖子详情，记录上一页hash
-    prevHash = currentHash;
     currentViewPid = pidMatch[1];
     listWrap.style.display = "none";
     detailWrap.style.display = "block";
