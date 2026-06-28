@@ -540,7 +540,7 @@ textarea{
 .cli-nav-buttons {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 4px;
 }
 .cli-nav-buttons button {
   border: none;
