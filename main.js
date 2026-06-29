@@ -747,8 +747,8 @@ function renderRouteView() {
   const notifyPage = document.getElementById("notifyPage");
   const loadTipDom = document.getElementById("loadTip");
 
-  // 默认：首页/帖子详情 显示通知、发帖，隐藏清空/全部已读
-  navMainBtns.style.display = "flex";
+  // 每次切换页面先全部隐藏两组按钮
+  navMainBtns.style.display = "none";
   navNotifyBtns.style.display = "none";
 
   if (hashStr === "notify") {
@@ -758,27 +758,27 @@ function renderRouteView() {
     notifyPage.style.display = "block";
     navBack.style.display = "block";
     loadTipDom.style.display = "none";
-    // 通知页：切换导航右侧按钮
-    navMainBtns.style.display = "none";
-    renderPageNotify(); // 内部自动判断通知数量控制 navNotifyBtns 显隐
+    navNotifyBtns.style.display = "flex";
+    renderPageNotify();
   } else if (pidMatch) {
+    // 帖子详情：只显示返回，右侧两组按钮全部隐藏
     currentViewPid = pidMatch[1];
     listWrap.style.display = "none";
     detailWrap.style.display = "block";
     notifyPage.style.display = "none";
     navBack.style.display = "block";
     loadTipDom.style.display = "none";
-    renderSinglePost(currentViewPid);
   } else {
+    // 首页：只显示通知、发帖按钮，右对齐
     currentViewPid = null;
     listWrap.style.display = "block";
     detailWrap.style.display = "none";
     notifyPage.style.display = "none";
     navBack.style.display = "none";
     loadTipDom.style.display = "block";
+    navMainBtns.style.display = "flex";
   }
 }
-
 async function renderSinglePost(pid) {
   let targetPost = lastData.find(item => Number(item.id) === Number(pid));
   if (!targetPost) {
