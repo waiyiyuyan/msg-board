@@ -432,10 +432,6 @@ function renderNotifyList() {
   if (notifyList.length === 0) {
     mainView.innerHTML = `
       <div class="empty-tip">暂无消息通知</div>
-      <div class="notify-op-row">
-        <button class="text-btn" disabled>全部已读</button>
-        <button class="text-btn" disabled>清空所有通知</button>
-      </div>
     `;
     return;
   }
