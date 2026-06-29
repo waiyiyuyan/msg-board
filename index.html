@@ -22,7 +22,10 @@
   <div class="top-bar-inner">
     <span class="back-link" id="backLink"></span>
     <span class="view-title" id="viewTitle">帖子列表</span>
-    <span class="notify-link" id="notifyLink">通知(0)</span>
+    <div class="nav-right-group">
+      <span class="notify-link" id="notifyLink">通知(0)</span>
+      <span class="post-btn-top" id="topPostBtn">发帖</span>
+    </div>
   </div>
 </header>
 
@@ -33,7 +36,7 @@
 </main>
 
 <!-- 底部常驻输入区：统一承载发帖/回复/上传，替代所有弹窗 -->
-<footer class="bottom-input">
+<footer class="bottom-input" id="editorWrap" style="display: none;">
   <form id="publishForm">
     <!-- 媒体预览与状态 -->
     <div class="media-preview-box" id="mediaPreviewBox"></div>
