@@ -137,10 +137,11 @@ function closeEditor() {
 // 点击页面空白关闭编辑器
 function handleClickOutsideEditor(e) {
   if (!showEditor) return;
-  // 点击顶部发帖按钮、编辑器内部 不关闭
+  // 点击顶部发帖按钮、编辑器内部、回复按钮 不关闭
   const clickOnTopPostBtn = topPostBtn.contains(e.target);
   const clickInsideEditor = editorWrap.contains(e.target);
-  if (!clickOnTopPostBtn && !clickInsideEditor) {
+  const clickReplyBtn = e.target.matches(".reply-small-btn");
+  if (!clickOnTopPostBtn && !clickInsideEditor && !clickReplyBtn) {
     closeEditor();
   }
 }
