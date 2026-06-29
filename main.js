@@ -123,7 +123,6 @@ function openEditor(mode, pid = null, rid = null, targetName = "") {
   editorWrap.classList.add("show");
   document.querySelector(".main-container").classList.add("editor-open");
   setInputMode(mode, pid, rid, targetName);
-  contentInput.focus();
 }
 
 // 关闭编辑器，清空输入与媒体
