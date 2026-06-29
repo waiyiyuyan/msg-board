@@ -134,6 +134,22 @@ function closeEditor() {
   clearMedia();
   contentInput.value = "";
 }
+// 点击页面空白关闭编辑器
+function handleClickOutsideEditor(e) {
+  if (!showEditor) return;
+  // 点击顶部发帖按钮、编辑器内部 不关闭
+  const clickOnTopPostBtn = topPostBtn.contains(e.target);
+  const clickInsideEditor = editorWrap.contains(e.target);
+  if (!clickOnTopPostBtn && !clickInsideEditor) {
+    closeEditor();
+  }
+}
+// ESC键关闭编辑器
+function handleEscClose(e) {
+  if (e.key === "Escape" && showEditor) {
+    closeEditor();
+  }
+}
 // ===================== 媒体渲染 & 媒体事件 =====================
 function renderMedia(mediaUrl) {
   if (!mediaUrl) return "";
@@ -805,7 +821,6 @@ function renderRouteView() {
 
 // 顶部返回按钮
 backLink.addEventListener("click", goBack);
-
 // ===================== 全局事件 =====================
 window.addEventListener("hashchange", renderRouteView);
 
@@ -840,6 +855,19 @@ window.addEventListener("load", async () => {
   // 顶部发帖按钮点击唤起编辑器（禁止通知页打开）
   topPostBtn.addEventListener("click", () => {
     if (currentView === "notify") return;
-    openEditor("newPost");
+    // 已打开则关闭，未打开则新建帖子
+    if (showEditor) {
+      closeEditor();
+    } else {
+      openEditor("newPost");
+    }
   });
+  // ========== 下面两行新增监听全部放这里 ==========
+  // 全局监听空白点击关闭编辑器
+  document.addEventListener("click", handleClickOutsideEditor);
+  // ESC快捷键关闭
+  document.addEventListener("keydown", handleEscClose);
+
+  // 编辑器内部点击不触发外部关闭（你要找的这一行）
+  editorWrap.addEventListener("click", e => e.stopPropagation());
 });
