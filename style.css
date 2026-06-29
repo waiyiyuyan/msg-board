@@ -427,14 +427,14 @@ textarea{
   }
 }
 
-/* 顶部导航栏 */
+/* 顶部导航栏【高度大幅收窄】 */
 .cli-header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 999;
-  padding: 8px 12px;
+  padding: 4px 12px; /* 原8px → 4px，导航变薄 */
   border-bottom: 2px solid var(--border-line);
   background: var(--bg);
 }
@@ -452,25 +452,31 @@ textarea{
   gap: 4px;
   align-items: center;
 }
+/* 导航两组按钮容器 */
+.nav-main-buttons, .nav-notify-buttons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
 .cli-nav-buttons button {
   border: none;
   outline: none;
   background: transparent;
 }
-/* 修复按钮文字垂直居中 */
+/* 导航按钮紧凑化，垂直居中修复 */
 .cli-btn {
   font-family: Consolas, Monaco, monospace;
   background: transparent;
   border: none;
   color: var(--text-main);
-  padding: 6px 12px;
+  padding: 4px 10px; /* 上下内边距缩小 */
   cursor: pointer;
   font-size: var(--fs-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 36px;
+  min-height: 32px; /* 按钮最小高度降低 */
   box-sizing: border-box;
 }
 .cli-btn:hover {
@@ -496,28 +502,9 @@ textarea{
   min-height: 100vh;
   display: none;
 }
-/* 旧列表上方按钮栏隐藏，不再使用 */
-.notify-op-bar {
+/* 废弃旧通知页头部/按钮栏，全部隐藏 */
+.notify-op-bar, .notify-page-header, .notify-page-title, .notify-page-btn-group {
   display: none !important;
-}
-/* 通知页顶部头部：标题左、按钮右 */
-.notify-page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px dashed var(--reply-border);
-  margin-bottom: 16px;
-  gap: 12px;
-}
-.notify-page-title {
-  font-size: var(--fs-lg);
-  color: var(--text-main);
-  font-weight: 500;
-}
-.notify-page-btn-group {
-  display: flex;
-  gap: 8px;
 }
 .page-notify-item {
   padding: 10px 0;
