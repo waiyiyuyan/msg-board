@@ -427,14 +427,14 @@ textarea{
   }
 }
 
-/* 顶部导航栏【高度大幅收窄】 */
+/* 顶部导航栏【高度收窄】 */
 .cli-header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 999;
-  padding: 4px 12px; /* 原8px → 4px，导航变薄 */
+  padding: 6px 12px; /* 上下高度缩小，变窄 */
   border-bottom: 2px solid var(--border-line);
   background: var(--bg);
 }
@@ -469,14 +469,14 @@ textarea{
   background: transparent;
   border: none;
   color: var(--text-main);
-  padding: 4px 10px; /* 上下内边距缩小 */
+  padding: 4px 10px; /* 按钮上下内边距缩小 */
   cursor: pointer;
   font-size: var(--fs-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 32px; /* 按钮最小高度降低 */
+  min-height: 32px; /* 按钮最小高度降低，整体更紧凑 */
   box-sizing: border-box;
 }
 .cli-btn:hover {
