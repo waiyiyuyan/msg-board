@@ -536,7 +536,7 @@ textarea{
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;  /* 不再分散对齐，改为从左开始排列 */
   gap: 8px;
 }
 .cli-nav-buttons {
@@ -549,4 +549,8 @@ textarea{
 }
 .cli-btn {
   white-space: nowrap;
+}
+.cli-nav-back {
+  flex-shrink: 0;
+  margin-right: 16px; /* 加个固定间距，防止贴太紧 */
 }
