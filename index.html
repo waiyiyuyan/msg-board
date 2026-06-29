@@ -17,102 +17,53 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="cli-header">
-  <div class="cli-header-wrap">
-    <div class="cli-nav-back" style="display:none;">
-        <button class="cli-btn" onclick="goHome()">返回</button>
-    </div>
-    <div class="cli-nav-buttons">
-      <!-- 首页/帖子详情显示按钮 -->
-      <div class="nav-main-buttons">
-        <button id="bellBtn" class="cli-btn">
-          通知<span id="unReadBadge" style="display:none"></span>
-        </button>
-        <button id="openPopBtn" class="cli-btn">发帖</button> 
-      </div>
-      <!-- 仅通知页面显示操作按钮，在导航条右侧 -->
-      <div class="nav-notify-buttons" style="display: none;">
-        <button class="cli-btn" id="pageReadAll">全部已读</button>
-        <button class="cli-btn" id="pageClearAll">清空通知</button>
-      </div>
-    </div>
+<!-- 顶部唯一状态栏：全程共用，无多套导航按钮 -->
+<header class="top-bar">
+  <div class="top-bar-inner">
+    <span class="back-link" id="backLink"></span>
+    <span class="view-title" id="viewTitle">帖子列表</span>
+    <span class="notify-link" id="notifyLink">通知(0)</span>
   </div>
- </header>
+</header>
 
-<main>
-  <div id="listBox"></div>
-  <div id="loadTip" class="fs-sm" style="text-align:center;padding:18px 0;color:var(--text-second);cursor:default;">
-    加载中...
-  </div>
+<!-- 中间唯一内容容器：列表/详情/通知 全部渲染在这里 -->
+<main class="main-container">
+  <div id="mainView"></div>
+  <div id="loadTip" class="fs-sm load-tip">加载中...</div>
 </main>
 
-<!-- 弹窗通知（弹窗内按钮保留不变） -->
-<div class="notify-mask" id="notifyMask">
-  <div class="notify-box" id="notifyWrap">
-    <div class="notify-btn-bar" id="notifyOpBar">
-      <button class="btn fs-md" id="readAllBtn" onclick="readAllNotify()">全部已读</button>
-      <button class="btn del-btn fs-md" id="clearNotifyBtn" onclick="clearAllNotify()">清空通知</button>
-    </div>
-    <div id="notifyListContent"></div>
-  </div>
-</div>
-
-<!-- 发帖弹窗 -->
-<div class="mask" id="popMask">
-  <div class="pop-post">
-    <form id="popForm">
-      <div class="popup-avatar-row">
-        <img class="popup-avatar" id="popupUserAvatar" alt="用户头像">
-        <span class="popup-nick fs-lg" id="popupUserNick"></span>
+<!-- 底部常驻输入区：统一承载发帖/回复/上传，替代所有弹窗 -->
+<footer class="bottom-input">
+  <form id="publishForm">
+    <!-- 媒体预览与状态 -->
+    <div class="media-preview-box" id="mediaPreviewBox"></div>
+    <div id="mediaStatus"></div>
+    <div id="uploadProgressWrap" style="display: none;">
+      <div class="progress-bar-bg">
+        <div id="uploadProgressBar" class="progress-bar-fill"></div>
       </div>
-
-      <div id="replyTip" class="fs-sm" style="color:var(--text-second);display:none;"></div>
-      <textarea name="content" class="fs-lg"></textarea>
-      
-      <div style="display:flex; align-items:center; width:100%; gap:8px; flex-wrap:nowrap;">
-        <span id="mediaBox" style="white-space: nowrap; display: inline-block; min-width: 120px; flex:1;">
-          <div id="mediaStatus"></div>
-          <div id="uploadProgressWrap" style="display: none; margin: 4px 0;">
-            <div style="width:100%;height:8px;background:var(--border-line);border-radius:4px;overflow:hidden;">
-              <div id="uploadProgressBar" style="width:0%;height:100%;background:var(--blue);transition:width 0.1s linear;"></div>
-            </div>
-            <div class="fs-xs" style="color:var(--text-second);margin-top:2px;text-align:left;">
-              <span id="progressText">0%</span>
-            </div>
-          </div>
-        </span>
-    
-        <div style="display:flex; align-items:center; gap:6px; flex-shrink:0; white-space:nowrap; margin-left: auto;">
-            <button type="button" class="btn fs-md" id="uploadBtn" style="padding:6px 10px;">上传媒体</button>
-            <button class="btn fs-md" type="submit" style="padding:6px 10px;">发布</button>
-        </div>
-      
-        <input type="hidden" name="media" id="mediaInput" value="">
+      <div class="fs-xs progress-text"><span id="progressText">0%</span></div>
     </div>
-        
-      <input type="file" id="fileSelector" style="display:none;" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm">
-      <input type="hidden" name="name" id="popNick">
-      <input type="hidden" id="hidPid" name="pid" value="">
-      <input type="hidden" id="hidRid" name="targetRid" value="">
-      <input type="hidden" name="targetUser" id="targetUser" value="">
-    </form>
-  </div>
-</div>
 
-<div class="notice-full-modal" id="noticeFullModal">
-  <div class="modal-content" id="noticeModalContent">
-  </div>
-</div>
+    <!-- 输入框 -->
+    <textarea name="content" id="contentInput" placeholder="输入内容发布新帖子..."></textarea>
 
-<!-- 通知独立页面：内部保留暂无消息提示 -->
-<div class="notify-page" id="notifyPage" style="display: none;">
-  <div class="page-inner" style="max-width:700px;margin:0 auto;padding:0 12px;">
-    <div id="pageNotifyList"></div>
-    <!-- 暂无消息提示标签完整保留 -->
-    <div class="empty-tip" id="notifyEmptyTip" style="display:none;">暂无消息通知</div>
-  </div>
-</div>
-  
+    <!-- 操作栏 -->
+    <div class="input-action-row">
+      <button type="button" id="uploadBtn" class="text-btn">上传媒体</button>
+      <button type="submit" class="primary-btn">发送</button>
+    </div>
+
+    <!-- 隐藏字段 -->
+    <input type="file" id="fileSelector" style="display:none;" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm">
+    <input type="hidden" name="media" id="mediaInput" value="">
+    <input type="hidden" name="name" id="hidNick">
+    <input type="hidden" id="hidPid" name="pid" value="">
+    <input type="hidden" id="hidRid" name="targetRid" value="">
+    <input type="hidden" name="targetUser" id="targetUser" value="">
+  </form>
+</footer>
+
 <script src="main.js" defer></script>
 </body>
 </html>
