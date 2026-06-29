@@ -768,6 +768,7 @@ function renderRouteView() {
     notifyPage.style.display = "none";
     navBack.style.display = "block";
     loadTipDom.style.display = "none";
+    renderSinglePost(currentViewPid); 
   } else {
     // 首页：只显示通知、发帖按钮，右对齐
     currentViewPid = null;
