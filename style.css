@@ -86,22 +86,29 @@ html, body {
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  position: relative;
 }
 .back-link {
   color: var(--blue);
   cursor: pointer;
   flex-shrink: 0;
+  z-index: 1;
 }
 .view-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   color: var(--text-main);
   flex-shrink: 0;
+  pointer-events: none;
 }
 .notify-link {
   margin-left: auto;
   color: var(--blue);
   cursor: pointer;
   flex-shrink: 0;
+  z-index: 1;
 }
 
 /* 中间内容区 */
