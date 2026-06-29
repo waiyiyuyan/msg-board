@@ -401,20 +401,22 @@ function renderNotify() {
 
 function renderPageNotify() {
   const unReadCount = notifyList.filter(item => Number(item.is_read) !== 1).length;
-  const opBar = document.getElementById("notifyOpBarPage");
+  const navNotifyBtns = document.querySelector(".nav-notify-buttons");
 
+  // 无通知：显示提示，隐藏导航操作按钮
   if (notifyList.length === 0) {
-    opBar.style.display = "none";
+    navNotifyBtns.style.display = "none";
     pageNotifyList.innerHTML = "";
     notifyEmptyTip.style.display = "block";
     return;
   }
 
-  opBar.style.display = "flex";
+  // 有通知：显示导航操作按钮，隐藏空提示
+  navNotifyBtns.style.display = "flex";
+  notifyEmptyTip.style.display = "none";
   pageReadAll.disabled = unReadCount === 0;
   pageClearAll.disabled = false;
 
-  notifyEmptyTip.style.display = "none";
   pageNotifyList.innerHTML = notifyList.map(item => {
     const isRead = item.is_read === 1;
     return `<div class="page-notify-item" onclick="jumpPost(${item.id},${item.target_msg_id},${item.reply_id})">
@@ -740,9 +742,14 @@ function renderRouteView() {
   const listWrap = document.getElementById("listBox");
   const detailWrap = document.getElementById("noticeFullModal");
   const navBack = document.querySelector(".cli-nav-back");
-  const navBtns = document.querySelector(".cli-nav-buttons");
+  const navMainBtns = document.querySelector(".nav-main-buttons");
+  const navNotifyBtns = document.querySelector(".nav-notify-buttons");
   const notifyPage = document.getElementById("notifyPage");
   const loadTipDom = document.getElementById("loadTip");
+
+  // 默认：首页/帖子详情 显示通知、发帖，隐藏清空/全部已读
+  navMainBtns.style.display = "flex";
+  navNotifyBtns.style.display = "none";
 
   if (hashStr === "notify") {
     currentViewPid = null;
@@ -750,16 +757,16 @@ function renderRouteView() {
     detailWrap.style.display = "none";
     notifyPage.style.display = "block";
     navBack.style.display = "block";
-    navBtns.style.display = "none";
     loadTipDom.style.display = "none";
-    renderPageNotify();
+    // 通知页：切换导航右侧按钮
+    navMainBtns.style.display = "none";
+    renderPageNotify(); // 内部自动判断通知数量控制 navNotifyBtns 显隐
   } else if (pidMatch) {
     currentViewPid = pidMatch[1];
     listWrap.style.display = "none";
     detailWrap.style.display = "block";
     notifyPage.style.display = "none";
     navBack.style.display = "block";
-    navBtns.style.display = "none";
     loadTipDom.style.display = "none";
     renderSinglePost(currentViewPid);
   } else {
@@ -768,7 +775,6 @@ function renderRouteView() {
     detailWrap.style.display = "none";
     notifyPage.style.display = "none";
     navBack.style.display = "none";
-    navBtns.style.display = "flex";
     loadTipDom.style.display = "block";
   }
 }
