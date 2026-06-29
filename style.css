@@ -103,19 +103,38 @@ html, body {
   flex-shrink: 0;
   pointer-events: none;
 }
+/* 右侧按钮组：通知 + 发帖并排 */
+.nav-right-group {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  z-index: 1;
+}
 .notify-link {
-  margin-left: auto;
   color: var(--blue);
   cursor: pointer;
   flex-shrink: 0;
-  z-index: 1;
+}
+.post-btn-top {
+  color: var(--blue);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+/* 通知页面隐藏顶部发帖按钮 */
+.top-bar-inner.notify-page .post-btn-top {
+  display: none;
 }
 
 /* 中间内容区 */
 .main-container {
   max-width: 700px;
   margin: 0 auto;
-  padding: 60px 12px 180px;
+  padding: 60px 12px 20px;
+  transition: padding-bottom 0.24s ease;
+}
+/* 编辑器弹出时，增加底部留白防止遮挡内容 */
+.main-container.editor-open {
+  padding-bottom: 180px;
 }
 .load-tip {
   text-align: center;
@@ -124,7 +143,7 @@ html, body {
   cursor: default;
 }
 
-/* 底部常驻输入区 */
+/* 底部常驻输入区：默认隐藏在屏幕外，带动画 */
 .bottom-input {
   position: fixed;
   bottom: 0;
@@ -134,6 +153,12 @@ html, body {
   border-top: 2px solid var(--border-line);
   padding: 10px 12px;
   z-index: 999;
+  transform: translateY(100%);
+  transition: transform 0.24s ease;
+}
+/* 弹出状态 */
+.bottom-input.show {
+  transform: translateY(0);
 }
 .bottom-input form {
   max-width: 700px;
