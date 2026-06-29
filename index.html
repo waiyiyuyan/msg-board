@@ -9,7 +9,6 @@
 <meta name="description" content="轻量匿名留言板，支持发帖、图文视频上传、回复互动，永久免费，电脑手机自适应访问。">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://mb.lovefree.de5.net">
-<!-- 社交分享极简标签 -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="留言板 - 在线匿名留言交流社区">
 <meta property="og:url" content="https://mb.lovefree.de5.net">
@@ -18,22 +17,20 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<!-- 顶部全局导航栏 cli-header（通知页时右侧新增操作按钮） -->
 <header class="cli-header">
   <div class="cli-nav-back" style="display:none;">
       <button class="cli-btn" onclick="goHome()">返回</button>
   </div>
-  <!-- 导航右侧容器：默认显示通知/发帖；进入通知页显示全部已读、清空 -->
   <div class="cli-nav-buttons">
-    <!-- 首页正常按钮 -->
+    <!-- 首页/帖子详情显示按钮 -->
     <div class="nav-main-buttons">
       <button id="bellBtn" class="cli-btn">
         通知<span id="unReadBadge" style="display:none"></span>
       </button>
       <button id="openPopBtn" class="cli-btn">发帖</button> 
     </div>
-    <!-- 仅通知页面显示的操作按钮，默认隐藏 -->
-    <div class="nav-notify-buttons" style="display: none; gap:4px;">
+    <!-- 仅通知页面显示操作按钮，在导航条右侧 -->
+    <div class="nav-notify-buttons" style="display: none;">
       <button class="cli-btn" id="pageReadAll">全部已读</button>
       <button class="cli-btn" id="pageClearAll">清空通知</button>
     </div>
@@ -47,7 +44,7 @@
   </div>
 </main>
 
-<!-- 通知弹窗遮罩 -->
+<!-- 弹窗通知（弹窗内按钮保留不变） -->
 <div class="notify-mask" id="notifyMask">
   <div class="notify-box" id="notifyWrap">
     <div class="notify-btn-bar" id="notifyOpBar">
@@ -105,10 +102,9 @@
   </div>
 </div>
 
-<!-- 通知独立页面：移除页面内旧按钮容器 -->
+<!-- 通知独立页面：内部移除所有操作按钮，干净列表 -->
 <div class="notify-page" id="notifyPage" style="display: none;">
   <div class="page-inner" style="max-width:700px;margin:0 auto;padding:0 12px;">
-    <!-- 删掉原来页面内的notify-op-bar，按钮全部移到顶部导航 -->
     <div id="pageNotifyList"></div>
     <div class="empty-tip" id="notifyEmptyTip" style="display:none;">暂无消息通知</div>
   </div>
