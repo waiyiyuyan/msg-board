@@ -25,6 +25,7 @@ let currentView = "list"; // list / detail / notify
 let prevView = "list";    // 记录上一级视图，用于返回
 let currentViewPid = null;
 let replyTarget = null;
+let showEditor = false; // 控制底部编辑器滑入/滑出
 
 // ===================== DOM 缓存 =====================
 const mainView = document.getElementById("mainView");
@@ -48,6 +49,9 @@ const hidPid = document.getElementById("hidPid");
 const hidRid = document.getElementById("hidRid");
 const hidNick = document.getElementById("hidNick");
 const targetUserDom = document.getElementById("targetUser");
+
+const topPostBtn = document.getElementById("topPostBtn");
+const editorWrap = document.getElementById("editorWrap");
 
 // ===================== 通用工具函数 =====================
 async function req(url, opt = {}) {
@@ -113,6 +117,23 @@ function getReplyHeadText(r, myNick) {
   return { headText, showContent };
 }
 
+// 打开底部编辑器，设置编辑模式
+function openEditor(mode, pid = null, rid = null, targetName = "") {
+  showEditor = true;
+  editorWrap.classList.add("show");
+  document.querySelector(".main-container").classList.add("editor-open");
+  setInputMode(mode, pid, rid, targetName);
+  contentInput.focus();
+}
+
+// 关闭编辑器，清空输入与媒体
+function closeEditor() {
+  showEditor = false;
+  editorWrap.classList.remove("show");
+  document.querySelector(".main-container").classList.remove("editor-open");
+  clearMedia();
+  contentInput.value = "";
+}
 // ===================== 媒体渲染 & 媒体事件 =====================
 function renderMedia(mediaUrl) {
   if (!mediaUrl) return "";
@@ -490,15 +511,11 @@ function setInputMode(mode, pid = null, rid = null, targetName = "") {
 }
 
 function openReply(pid, targetName) {
-  // 列表页点击回复，先进入详情，再激活回复模式
-  goPostDetail(pid);
-  setInputMode("replyPost", pid, null, targetName);
-  contentInput.focus();
+  openEditor("replyPost", pid, null, targetName);
 }
 
 function openSubReply(pid, rid, targetName) {
-  setInputMode("replyFloor", pid, rid, targetName);
-  contentInput.focus();
+  openEditor("replyFloor", pid, rid, targetName);
 }
 
 // ===================== 发布提交（原弹窗提交逻辑完整保留） =====================
@@ -528,6 +545,7 @@ publishForm.addEventListener("submit", async function (e) {
     if (res.ok) {
       contentInput.value = "";
       clearMedia();
+      closeEditor();
       // 刷新当前视图
       if(currentView === "detail" && currentViewPid === pid){
         renderSinglePost(currentViewPid);
@@ -696,6 +714,12 @@ function updateTopBar() {
     viewTitle.textContent = "帖子详情";
     notifyLink.style.display = "inline";
   }
+  // 控制顶部发帖按钮：通知页隐藏，列表/详情显示
+  if (currentView === "notify") {
+    topPostBtn.style.display = "none";
+  } else {
+    topPostBtn.style.display = "inline";
+  }
 }
 
 async function renderSinglePost(pid) {
@@ -739,6 +763,7 @@ async function renderSinglePost(pid) {
 }
 
 function renderRouteView() {
+  closeEditor();
   const hashStr = location.hash.slice(1);
   const pidMatch = hashStr.match(/^post\/(\d+)$/);
 
@@ -812,4 +837,9 @@ window.addEventListener("load", async () => {
   initLoadPosts();
   initWebSocket();
   renderRouteView();
+  // 顶部发帖按钮点击唤起编辑器（禁止通知页打开）
+  topPostBtn.addEventListener("click", () => {
+    if (currentView === "notify") return;
+    openEditor("newPost");
+  });
 });
