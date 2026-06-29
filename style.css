@@ -542,6 +542,7 @@ textarea{
 .cli-nav-buttons {
   flex-shrink: 0;
   flex-wrap: nowrap !important;
+  margin-left: auto; /* 新增这一行，实现右对齐 */
 }
 .nav-main-buttons, .nav-notify-buttons {
   flex-wrap: nowrap;
