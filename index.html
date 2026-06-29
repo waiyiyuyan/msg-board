@@ -5,33 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2f2f7">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c1c1e">
-<!-- 基础TDK -->
+
+<!-- 核心SEO -->
 <title>留言板 - 在线匿名留言交流社区</title>
-<meta name="description" content="轻量在线匿名留言板，支持发帖、图片视频上传、回复互动、消息通知，永久免费在线留言归档，电脑手机自适应访问。">
-<meta name="keywords" content="在线留言板,匿名留言,免费留言社区,图片留言,消息通知">
+<meta name="description" content="轻量匿名留言板，支持发帖、图文视频上传、回复互动，永久免费，电脑手机自适应访问。">
 <meta name="robots" content="index,follow">
-<!-- 标准唯一链接 -->
 <link rel="canonical" href="https://mb.lovefree.de5.net">
-<!-- Open Graph 社交卡片 -->
+
+<!-- 社交分享卡片（极简版，不重复大段文案） -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="留言板 - 在线匿名留言交流社区">
-<meta property="og:description" content="轻量在线匿名留言板，支持发帖、图片视频上传、回复互动、消息通知，永久免费在线留言归档，电脑手机自适应访问。">
 <meta property="og:url" content="https://mb.lovefree.de5.net">
 <meta property="og:site_name" content="匿名留言板">
-<!-- X/Twitter 社交卡片 -->
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="留言板 - 在线匿名留言交流社区">
-<meta name="twitter:description" content="轻量在线匿名留言板，支持发帖、图片视频上传、回复互动、消息通知，永久免费在线留言归档，电脑手机自适应访问。">
-<!-- 结构化数据 Schema -->
-<script type="application/ld+json">
-{
-  "@context":"https://schema.org",
-  "@type":"WebSite",
-  "name":"匿名留言板",
-  "url":"https://mb.lovefree.de5.net",
-  "description":"轻量在线匿名留言板，支持发帖、图片视频上传、回复互动、消息通知，永久免费在线留言归档，电脑手机自适应访问。"
-}
-</script>
+
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -112,13 +99,18 @@
   </div>
 </div>
 
-<!-- 通知独立页面 -->
+<!-- 通知独立页面【已改造】 -->
 <div class="notify-page" id="notifyPage" style="display: none;">
   <div class="page-inner" style="max-width:700px;margin:0 auto;padding:0 12px;">
-    <div class="notify-op-bar" id="notifyOpBarPage">
-      <button class="btn" id="pageReadAll">全部已读</button>
-      <button class="btn del-btn" id="pageClearAll">清空通知</button>
+    <!-- 头部：标题左，按钮组右 -->
+    <div class="notify-page-header">
+      <h2 class="notify-page-title">消息通知</h2>
+      <div class="notify-page-btn-group">
+        <button class="btn" id="pageReadAll">全部已读</button>
+        <button class="btn del-btn" id="pageClearAll">清空通知</button>
+      </div>
     </div>
+    <!-- 通知列表 -->
     <div id="pageNotifyList"></div>
     <div class="empty-tip" id="notifyEmptyTip" style="display:none;">暂无消息通知</div>
   </div>
