@@ -18,21 +18,23 @@
 </head>
 <body>
 <header class="cli-header">
-  <div class="cli-nav-back" style="display:none;">
-      <button class="cli-btn" onclick="goHome()">返回</button>
-  </div>
-  <div class="cli-nav-buttons">
-    <!-- 首页/帖子详情显示按钮 -->
-    <div class="nav-main-buttons">
-      <button id="bellBtn" class="cli-btn">
-        通知<span id="unReadBadge" style="display:none"></span>
-      </button>
-      <button id="openPopBtn" class="cli-btn">发帖</button> 
+  <div class="cli-header-wrap">
+    <div class="cli-nav-back" style="display:none;">
+        <button class="cli-btn" onclick="goHome()">返回</button>
     </div>
-    <!-- 仅通知页面显示操作按钮，在导航条右侧 -->
-    <div class="nav-notify-buttons" style="display: none;">
-      <button class="cli-btn" id="pageReadAll">全部已读</button>
-      <button class="cli-btn" id="pageClearAll">清空通知</button>
+    <div class="cli-nav-buttons">
+      <!-- 首页/帖子详情显示按钮 -->
+      <div class="nav-main-buttons">
+        <button id="bellBtn" class="cli-btn">
+          通知<span id="unReadBadge" style="display:none"></span>
+        </button>
+        <button id="openPopBtn" class="cli-btn">发帖</button> 
+      </div>
+      <!-- 仅通知页面显示操作按钮，在导航条右侧 -->
+      <div class="nav-notify-buttons" style="display: none;">
+        <button class="cli-btn" id="pageReadAll">全部已读</button>
+        <button class="cli-btn" id="pageClearAll">清空通知</button>
+      </div>
     </div>
   </div>
  </header>
