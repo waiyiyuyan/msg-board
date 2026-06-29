@@ -434,7 +434,7 @@ textarea{
   left: 0;
   width: 100%;
   z-index: 999;
-  padding: 6px 12px; /* 上下高度缩小，变窄 */
+  padding: 6px 12px;
   border-bottom: 2px solid var(--border-line);
   background: var(--bg);
 }
@@ -469,31 +469,27 @@ textarea{
   background: transparent;
   border: none;
   color: var(--text-main);
-  padding: 4px 10px; /* 按钮上下内边距缩小 */
+  padding: 4px 10px;
   cursor: pointer;
   font-size: var(--fs-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 32px; /* 按钮最小高度降低，整体更紧凑 */
+  min-height: 32px;
   box-sizing: border-box;
 }
 .cli-btn:hover {
   background: rgba(0, 122, 255, 0.06);
   color: var(--blue);
 }
+/* ========== 修改1：通知角标纯文字，移除红色圆形 ========== */
 #unReadBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  background: var(--red);
-  color: #fff;
-  border-radius: 999px;
-  font-size: 12px;
-  line-height: 1;
+  display: inline;
+  font-size: 14px;
+  color: inherit;
+  margin-left: 4px;
+  /* 删除所有宽高、圆角、红色背景 */
 }
 
 /* 独立通知页面 */
@@ -506,13 +502,15 @@ textarea{
 .notify-op-bar, .notify-page-header, .notify-page-title, .notify-page-btn-group {
   display: none !important;
 }
+/* ========== 修改2：通知列表条目左侧蓝色竖线，和帖子统一风格 ========== */
 .page-notify-item {
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--reply-border);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-left: 4px solid var(--blue);
   cursor: pointer;
 }
 .page-notify-item:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
 .page-notify-text {
   color: var(--text-main);
@@ -530,27 +528,32 @@ textarea{
   margin-top: 4px;
 }
 
+/* 导航布局修复 防止按钮左右偏移 */
 .cli-header-wrap {
   max-width: 700px;
   margin: 0 auto;
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: flex-start;  /* 不再分散对齐，改为从左开始排列 */
-  gap: 8px;
+  justify-content: flex-start;
+  gap: 0;
 }
 .cli-nav-buttons {
   flex-shrink: 0;
   flex-wrap: nowrap !important;
-  margin-left: auto; /* 新增这一行，实现右对齐 */
+  margin-left: auto;
+  min-width: 160px;
+  justify-content: flex-end;
 }
 .nav-main-buttons, .nav-notify-buttons {
   flex-wrap: nowrap;
+  min-width: 160px;
+  justify-content: flex-end;
 }
 .cli-btn {
   white-space: nowrap;
 }
 .cli-nav-back {
   flex-shrink: 0;
-  margin-right: 16px; /* 加个固定间距，防止贴太紧 */
+  margin-right: 16px;
 }
