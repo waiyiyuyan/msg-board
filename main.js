@@ -622,10 +622,6 @@ async function sharePost(pid) {
   }
 }
 // ==================== 新增分享功能 结束 ====================
-
-// ===================== WebSocket 心跳 & 连接（原有代码不动） =====================
-function startHeartbeat() {
-  // ...你原有代码
 // ===================== WebSocket 心跳 & 连接（完整保留） =====================
 function startHeartbeat() {
   clearInterval(heartbeatTimer);
