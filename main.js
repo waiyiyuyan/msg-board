@@ -576,6 +576,26 @@ publishForm.addEventListener("submit", async function (e) {
 });
 
 // ==================== 新增分享功能 开始 ====================
+// 复制链接
+async function copyPostUrl(url) {
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast("帖子链接已复制");
+  } catch (err) {
+    showToast("复制失败，请手动复制链接");
+  }
+}
+// Toast轻提示控制
+let toastTimer = null;
+function showToast(text) {
+  const toast = document.querySelector(".toast-tip");
+  toast.innerText = text;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
+}
 // 分享帖子入口
 async function sharePost(pid) {
   closeEditor();
@@ -595,28 +615,6 @@ async function sharePost(pid) {
   } else {
     copyPostUrl(shareUrl);
   }
-}
-
-// 复制链接
-async function copyPostUrl(url) {
-  try {
-    await navigator.clipboard.writeText(url);
-    showToast("帖子链接已复制");
-  } catch (err) {
-    showToast("复制失败，请手动复制链接");
-  }
-}
-
-// Toast轻提示控制
-let toastTimer = null;
-function showToast(text) {
-  const toast = document.querySelector(".toast-tip");
-  toast.innerText = text;
-  toast.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2500);
 }
 // ==================== 新增分享功能 结束 ====================
 
