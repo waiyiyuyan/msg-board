@@ -318,8 +318,11 @@ function buildPostHtml(post) {
           data-reply-count="${post.replys.length}">
         </button>
       </div>
-      <div class="post-btn-group"><button class="reply-small-btn" onclick="openReply(${post.id},'${post.name}')">回复</button></div>
+      <div class="post-btn-group">
+      <button class="reply-small-btn" onclick="openReply(${post.id},'${post.name}')">回复</button>
       <button class="reply-small-btn" onclick="sharePost(${post.id})">分享</button>
+      </div>
+      
     </div>
     <div class="reply-wrap" data-wrap-pid="${post.id}" style="display:none">${rHtml}</div>
   </div>`;
@@ -585,6 +588,7 @@ async function copyPostUrl(url) {
     showToast("复制失败，请手动复制链接");
   }
 }
+
 // Toast轻提示控制
 let toastTimer = null;
 function showToast(text) {
@@ -596,6 +600,7 @@ function showToast(text) {
     toast.classList.remove("show");
   }, 2500);
 }
+
 // 分享帖子入口
 async function sharePost(pid) {
   closeEditor();
@@ -609,7 +614,7 @@ async function sharePost(pid) {
         title: shareTitle,
         url: shareUrl
       });
-    } catch (err)
+    } catch (err) {
       copyPostUrl(shareUrl);
     }
   } else {
