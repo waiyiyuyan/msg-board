@@ -600,34 +600,40 @@ function showToast(text) {
     toast.classList.remove("show");
   }, 2500);
 }
-
-// 分享帖子入口
 // 分享帖子入口
 async function sharePost(pid) {
+  // 立即让当前点击的按钮失焦，解决点击态残留问题
+  document.activeElement?.blur();
   closeEditor();
+
   const baseUrl = location.origin + location.pathname;
   const shareUrl = baseUrl + "#post/" + pid;
   const shareTitle = "留言帖子";
 
-  // 桌面端直接复制链接，不调用系统共享，避免弹出加载框
-  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  // 更精准的移动端判断：优先用标准API，兜底UA正则
+  const isMobile = navigator.userAgentData?.mobile 
+    ?? /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+  // 非移动端一律直接复制链接，不调用系统共享
   if (!isMobile || !navigator.share) {
     copyPostUrl(shareUrl);
     return;
   }
-  // 移动端才调用系统原生分享
+
+  // 仅移动端调用原生分享
   try {
     await navigator.share({
       title: shareTitle,
       url: shareUrl
     });
   } catch (err) {
-    // 用户主动取消分享：静默处理，不弹任何提示
+    // 用户主动取消：静默不提示
     if (err.name === "AbortError") return;
-    // 其他真实错误，才降级复制链接
+    // 真实错误才降级复制
     copyPostUrl(shareUrl);
   }
 }
+
 // ==================== 新增分享功能 结束 ====================
 // ===================== WebSocket 心跳 & 连接（完整保留） =====================
 function startHeartbeat() {
