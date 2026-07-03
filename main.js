@@ -602,22 +602,29 @@ function showToast(text) {
 }
 
 // 分享帖子入口
+// 分享帖子入口
 async function sharePost(pid) {
   closeEditor();
   const baseUrl = location.origin + location.pathname;
   const shareUrl = baseUrl + "#post/" + pid;
   const shareTitle = "留言帖子";
 
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title: shareTitle,
-        url: shareUrl
-      });
-    } catch (err) {
-      copyPostUrl(shareUrl);
-    }
-  } else {
+  // 桌面端直接复制链接，不调用系统共享，避免弹出加载框
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  if (!isMobile || !navigator.share) {
+    copyPostUrl(shareUrl);
+    return;
+  }
+  // 移动端才调用系统原生分享
+  try {
+    await navigator.share({
+      title: shareTitle,
+      url: shareUrl
+    });
+  } catch (err) {
+    // 用户主动取消分享：静默处理，不弹任何提示
+    if (err.name === "AbortError") return;
+    // 其他真实错误，才降级复制链接
     copyPostUrl(shareUrl);
   }
 }
