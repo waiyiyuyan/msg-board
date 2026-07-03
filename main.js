@@ -319,6 +319,7 @@ function buildPostHtml(post) {
         </button>
       </div>
       <div class="post-btn-group"><button class="reply-small-btn" onclick="openReply(${post.id},'${post.name}')">回复</button></div>
+      <button class="reply-small-btn" onclick="sharePost(${post.id})">分享</button>
     </div>
     <div class="reply-wrap" data-wrap-pid="${post.id}" style="display:none">${rHtml}</div>
   </div>`;
@@ -574,6 +575,54 @@ publishForm.addEventListener("submit", async function (e) {
   }
 });
 
+// ==================== 新增分享功能 开始 ====================
+// 分享帖子入口
+async function sharePost(pid) {
+  closeEditor();
+  const baseUrl = location.origin + location.pathname;
+  const shareUrl = baseUrl + "#post/" + pid;
+  const shareTitle = "留言帖子";
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: shareTitle,
+        url: shareUrl
+      });
+    } catch (err)
+      copyPostUrl(shareUrl);
+    }
+  } else {
+    copyPostUrl(shareUrl);
+  }
+}
+
+// 复制链接
+async function copyPostUrl(url) {
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast("帖子链接已复制");
+  } catch (err) {
+    showToast("复制失败，请手动复制链接");
+  }
+}
+
+// Toast轻提示控制
+let toastTimer = null;
+function showToast(text) {
+  const toast = document.querySelector(".toast-tip");
+  toast.innerText = text;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
+}
+// ==================== 新增分享功能 结束 ====================
+
+// ===================== WebSocket 心跳 & 连接（原有代码不动） =====================
+function startHeartbeat() {
+  // ...你原有代码
 // ===================== WebSocket 心跳 & 连接（完整保留） =====================
 function startHeartbeat() {
   clearInterval(heartbeatTimer);
@@ -866,4 +915,8 @@ window.addEventListener("load", async () => {
 
   // 编辑器内部点击不触发外部关闭（你要找的这一行）
   editorWrap.addEventListener("click", e => e.stopPropagation());
+  // 创建toast提示层
+  const toastBox = document.createElement("div");
+  toastBox.className = "toast-tip";
+  document.body.appendChild(toastBox);
 });
