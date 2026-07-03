@@ -369,7 +369,10 @@ async function initLoadPosts() {
       lastData = [...data.list];
       lastCursor = data.lastCursor;
       hasMore = data.hasMore;
-      renderPosts(lastData);
+      // 仅列表视图下渲染列表，详情/通知视图只更新缓存数据，不覆盖页面
+      if (currentView === "list") {
+        renderPosts(lastData);
+      }
       console.log("[分页] 初始化完成，加载", data.list.length, "条");
     }
   } catch (e) {
