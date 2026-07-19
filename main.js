@@ -252,7 +252,7 @@ async function uploadFile(file) {
       ? `<img src="${PROXY_PREFIX + encodeURIComponent(result.url)}" alt="">`
       : `<span style="font-size:14px;color:var(--text-second)">[视频文件]</span>`;
     
-    mediaStatus.innerHTML = `<div style="display: inline-flex; align-items: center; gap: 8px;"><span style="color:#34c759; font-size:14px; line-height: 1;">上传成功</span><button class="reply-small-btn del-btn" onclick="clearMedia()" style="margin-top: 0;">移除</button></div>`;
+    mediaStatus.innerHTML = `<div style="display: inline-flex; align-items: center; gap: 8px;"><span style="color:#34c759; font-size:14px; line-height: 1;">上传成功</span><button class="reply-small-btn del-btn" onclick="clearMedia()" style="margin-top: 0; font-size: 14px;">移除</button></div>`;
   } catch (err) {
     let errMsg = "上传失败，请重试";
     if (err.message.includes("1101") || err.message.includes("Worker threw exception")) errMsg = "文件过大，上传失败，请压缩后重试";
