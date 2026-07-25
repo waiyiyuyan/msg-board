@@ -82,7 +82,7 @@ button, input, textarea {
   z-index: 999;
   border-bottom: 2px solid var(--border-line);
   background: var(--bg);
-  padding: 10px 12px;
+  padding: 8px 12px; /* 稍微压缩垂直 Padding，避免导航栏过厚 */
 }
 .top-bar-inner {
   max-width: 700px;
@@ -91,28 +91,44 @@ button, input, textarea {
   align-items: center;
   justify-content: space-between;
   position: relative;
+  height: 28px; /* 增加固定中轴高度，确保左右两端与中间标题严格垂直居中 */
 }
 .back-link,
 .notify-link,
 .post-btn-top {
-  background: transparent;
-  border: none;
-  padding: 0 4px;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  
   font-family: inherit;
   font-size: var(--fs-md);
   color: var(--blue);
   cursor: pointer;
   flex-shrink: 0;
-  display: inline-flex;
+  
+  /* 精确对齐与呼吸感内边距 */
+  padding: 4px 6px !important;
+  margin: 0 !important;
+  
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
   line-height: 1;
+  border-radius: 6px;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
 }
 
+/* 悬浮与点击状态 */
+.back-link:hover,
+.notify-link:hover,
+.post-btn-top:hover {
+  background-color: rgba(0, 122, 255, 0.08) !important; /* 微浅蓝悬浮背景，增加质感 */
+}
 .back-link:active,
 .notify-link:active,
 .post-btn-top:active {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .view-title {
@@ -120,15 +136,21 @@ button, input, textarea {
   left: 50%;
   transform: translateX(-50%);
   color: var(--text-main);
+  font-weight: 600; /* 加粗中间标题，增加主次对比 */
   pointer-events: none;
+  font-size: var(--fs-md);
+  line-height: 1;
+  white-space: nowrap;
 }
+
 /* 右侧按钮组 */
 .nav-right-group {
   display: flex;
-  gap: 14px;
+  gap: 12px; /* 优化按钮之间的物理距离 */
   align-items: center;
   line-height: 1;
   z-index: 1;
+  margin-left: auto;
 }
 
 /* 中间内容区 */
