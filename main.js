@@ -780,7 +780,7 @@ function updateTopBar() {
   if (currentView === "list") {
     backLink.textContent = "";
     viewTitle.textContent = "帖子列表";
-    notifyLink.style.display = "inline";
+    notifyLink.style.display = "inline-flex";
   } else if (currentView === "notify") {
     backLink.textContent = "← 返回帖子列表";
     viewTitle.textContent = "通知列表";
@@ -788,13 +788,13 @@ function updateTopBar() {
   } else if (currentView === "detail") {
     backLink.textContent = prevView === "notify" ? "← 返回通知列表" : "← 返回帖子列表";
     viewTitle.textContent = "帖子详情";
-    notifyLink.style.display = "inline";
+    notifyLink.style.display = "inline-flex";
   }
   // 控制顶部发帖按钮：通知页隐藏，列表/详情显示
   if (currentView === "notify") {
     topPostBtn.style.display = "none";
   } else {
-    topPostBtn.style.display = "inline";
+    topPostBtn.style.display = "inline-flex";
   }
 }
 
