@@ -95,10 +95,26 @@ button, input, textarea {
 .back-link,
 .notify-link,
 .post-btn-top {
+  background: transparent;
+  border: none;
+  padding: 0 4px;
+  font-family: inherit;
+  font-size: var(--fs-md);
   color: var(--blue);
   cursor: pointer;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
+
+.back-link:active,
+.notify-link:active,
+.post-btn-top:active {
+  opacity: 0.6;
+}
+
 .view-title {
   position: absolute;
   left: 50%;
